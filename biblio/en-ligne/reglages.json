@@ -1,0 +1,100 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": [
+   "nodejs_compat"
+  ],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "limits": {
+   "cpu_ms": 300000
+  },
+  "observability": {
+   "enabled": true,
+   "head_sampling_rate": 1,
+   "redact_query_string": false,
+   "logs": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "persist": true,
+    "invocation_logs": true
+   },
+   "traces": {
+    "enabled": false,
+    "persist": true,
+    "head_sampling_rate": 1
+   }
+  },
+  "annotations": {
+   "workers/triggered_by": "version_upload"
+  },
+  "bindings": [
+   {
+    "name": "ACCESS_PASSWORD",
+    "type": "secret_text"
+   },
+   {
+    "name": "AI",
+    "project": "<catalog>",
+    "type": "ai"
+   },
+   {
+    "name": "API_TOKEN",
+    "type": "secret_text"
+   },
+   {
+    "name": "ASSETS",
+    "type": "assets"
+   },
+   {
+    "name": "BROWSER",
+    "type": "browser",
+    "version": 2
+   },
+   {
+    "name": "CONTACT_EMAIL",
+    "text": "contact@exemple.ch",
+    "type": "plain_text"
+   },
+   {
+    "database_id": "c7e49415-ec73-42b3-bf7e-802dc3876018",
+    "id": "c7e49415-ec73-42b3-bf7e-802dc3876018",
+    "name": "DB",
+    "type": "d1"
+   },
+   {
+    "name": "PDFKV",
+    "namespace_id": "b2ceaf87ed9e4c98918dbd15b314fb03",
+    "type": "kv_namespace"
+   },
+   {
+    "bucket_name": "biblio-pdfs",
+    "jurisdiction": "eu",
+    "name": "PDFS",
+    "type": "r2_bucket"
+   },
+   {
+    "index_name": "biblio-records",
+    "name": "RVEC",
+    "type": "vectorize"
+   },
+   {
+    "name": "SERVER_EXTRACT",
+    "text": "1",
+    "type": "plain_text"
+   },
+   {
+    "index_name": "biblio-chunks",
+    "name": "VEC",
+    "type": "vectorize"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": false
+ }
+}

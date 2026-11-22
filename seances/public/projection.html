@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Projection</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/seances.css">
+<style>
+  html, body { height: 100%; background: #000; overflow: hidden; }
+  #scene { position: fixed; inset: 0; cursor: pointer; }
+  #noir { position: fixed; inset: 0; background: #000; z-index: 5; }
+  #rejoindre { position: fixed; inset: 0; z-index: 6; background: rgb(244 241 230 / .97); display: grid; place-content: center; justify-items: center; gap: 2vh; cursor: pointer; color: #141A1E; }
+  #rejoindre .qr { width: min(56vh, 60vw); height: auto; }
+  #rejoindre h2 { font-size: 5vh; }
+  #rejoindre p { font: 600 3.4vh/1.2 var(--font-display); }
+  .barre { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 7; display: flex; gap: 6px; align-items: center; padding: 6px; border-radius: 10px; background: rgb(20 26 30 / .85); color: #fff; opacity: 0; transition: opacity .3s; }
+  body.souris .barre, .barre:focus-within { opacity: 1; }
+  .barre .btn { background: transparent; color: #fff; border-color: rgb(255 255 255 / .25); }
+  .barre .btn:hover { background: rgb(255 255 255 / .12); }
+  #num { padding: 0 10px; font: 600 15px var(--font-display); min-width: 70px; text-align: center; }
+  .erreur-plein { color: #fff; font-size: 28px; padding: 40px; }
+</style>
+</head>
+<body>
+<div id="scene" aria-live="polite"></div>
+<div id="noir" hidden></div>
+<div id="rejoindre" hidden>
+  <h2>Suivre la séance</h2>
+  <div id="rejoindre-qr"></div>
+  <p id="rejoindre-url"></p>
+</div>
+<nav class="barre" aria-label="Commandes de projection">
+  <button class="btn icone" id="b-prec" title="Précédente (flèche gauche)" aria-label="Diapositive précédente">◀</button>
+  <span id="num">1 / 1</span>
+  <button class="btn icone" id="b-suiv" title="Suivante (flèche droite)" aria-label="Diapositive suivante">▶</button>
+  <button class="btn petit" id="b-qr" title="Touche Q">QR de la séance</button>
+  <button class="btn petit" id="b-pres" title="Ouvrir la vue présentateur">Présentateur</button>
+  <button class="btn petit" id="b-plein" title="Touche F">Plein écran</button>
+</nav>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script src="/js/projection.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+ "worker": "seances",
+ "module_principal": "index.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "6faf48c2cc62a453cace5eab015377b8b31bfb7814f6833df14fff5cffc2e59f",
+ "modules": [
+  {
+   "nom": "index.js",
+   "fichier": "index.js",
+   "type": "application/javascript+module",
+   "sha256": "6faf48c2cc62a453cace5eab015377b8b31bfb7814f6833df14fff5cffc2e59f",
+   "octets": 13344
+  },
+  {
+   "nom": "index.js.map",
+   "fichier": "index.js.map",
+   "type": "application/source-map",
+   "sha256": "effb2bd719c3b8180aaef37c40a1eb8206af2ded46ab739b5a0ebedcced0856c",
+   "octets": 24068
+  }
+ ]
+}

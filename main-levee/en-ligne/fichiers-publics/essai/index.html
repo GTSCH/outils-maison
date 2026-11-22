@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Essayer Main levée</title>
+<meta name="description" content="Questions en direct en classe, sans compte, avec un mode cartes sans appareil. Essayez en une minute.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Main levée · essayez en une minute">
+<meta property="og:description" content="Questions en direct en classe, sans compte. Avec les téléphones ou avec des cartes imprimées.">
+<meta property="og:image" content="https://main-levee.gtschupp.workers.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://main-levee.gtschupp.workers.dev/essai">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  /* ---------- introduction ---------- */
+  .intro { max-width: 1100px; margin: 0 auto; padding: 44px var(--gouttiere) 60px; }
+  .intro h1 { font-size: clamp(34px, 5.4vw, 60px); margin-bottom: .25em; }
+  .intro .sous { font-size: clamp(19px, 2.2vw, 23px); max-width: 46em; margin-bottom: 30px; }
+  .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .mode {
+    appearance: none; text-align: left; font: inherit; color: var(--encre); cursor: pointer;
+    background: var(--blanc); border: 2px solid var(--encre); border-top: 10px solid var(--rouge); border-radius: 0;
+    padding: 22px 22px 20px; display: grid; gap: 10px; align-content: start; transition: background-color .12s;
+  }
+  .mode:hover { background: var(--rd-10); }
+  .mode b { font-family: var(--font-din); font-size: 26px; line-height: 1.1; }
+  .mode .go { font-family: var(--font-din); font-weight: 700; color: var(--rouge); display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; }
+  .mode .go svg { width: 20px; height: 20px; }
+  .mode[disabled] { opacity: .5; cursor: wait; }
+  .apres { margin-top: 26px; font-size: 16px; }
+  .points { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px 26px; margin: 38px 0 0; padding: 0; list-style: none; }
+  .points li { border-left: 6px solid var(--rouge); padding: 2px 0 2px 12px; }
+  .points b { font-family: var(--font-din); display: block; }
+
+  /* ---------- scène de démonstration ---------- */
+  .scene {
+    display: grid; gap: 18px 22px; padding: 18px var(--gouttiere) 40px; max-width: 1560px; margin: 0 auto;
+    grid-template-columns: minmax(0, 1fr) clamp(250px, 22vw, 320px);
+    grid-template-areas: "guide tel" "proj tel";
+    align-items: start;
+  }
+  .zone-proj { grid-area: proj; }
+  .zone-tel { grid-area: tel; position: sticky; top: 78px; }
+  .zone-guide { grid-area: guide; }
+  .etiquette { font-family: var(--font-din); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: .07em; margin: 0 0 6px; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .etiquette a { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 15px; }
+  .ecran { position: relative; aspect-ratio: 16 / 9; border: 10px solid var(--encre); background: var(--blanc); overflow: hidden; }
+  .telephone { position: relative; aspect-ratio: 390 / 800; border: 12px solid var(--encre); border-top-width: 26px; border-bottom-width: 26px; background: var(--blanc); overflow: hidden; }
+  .ecran iframe, .telephone iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--blanc); }
+
+  .guide { border: 1px solid var(--rd-25); border-left: 8px solid var(--rouge); padding: 14px 18px; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  .guide .etape { font-family: var(--font-din); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: .07em; margin: 0 0 4px; color: var(--rouge); }
+  .guide .consigne { font-size: 19px; line-height: 1.4; margin: 0 0 12px; }
+  .guide .consigne b { font-family: var(--font-din); }
+  .vrai-tel { width: 128px; text-align: center; font-size: 13px; line-height: 1.25; }
+  .vrai-tel .qr { width: 112px; margin: 0 auto 4px; }
+  .vrai-tel .qr svg { display: block; width: 100%; }
+  .btn.actif { background: var(--fp); border-color: var(--fp); color: var(--blanc); }
+  .code-demo { font-family: var(--font-din); font-weight: 700; }
+
+  @media (max-width: 980px) {
+    .scene { grid-template-columns: minmax(0, 1fr); grid-template-areas: "guide" "tel" "proj"; }
+    .zone-tel { position: static; width: min(320px, 100%); margin: 0 auto; }
+    .guide { grid-template-columns: minmax(0, 1fr); }
+    .vrai-tel { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="entete">
+  <a class="marque" href="/essai"><b>Main levée</b><span>Démonstration</span></a>
+  <div class="droite">
+    <a class="btn petit discret" href="/espace">Mon espace</a>
+    <span id="logo"></span>
+  </div>
+</header>
+
+<main id="intro" class="intro">
+  <h1 class="titre-barre">Essayez Main levée</h1>
+  <p class="sous">Des questions en direct en classe, sans compte ni installation. Pendant la démo, vous êtes à la fois l'enseignant·e et la classe : l'écran projeté d'un côté, un téléphone d'étudiant·e de l'autre.</p>
+  <div class="modes">
+    <button class="mode" data-mode="appareils">
+      <b>Avec les téléphones</b>
+      <span>Les étudiant·es répondent avec un code ou un QR code : choix multiple, nuage de mots, échelle, question ouverte.</span>
+      <span class="go">Lancer la démo <span data-icone="droite"></span></span>
+    </button>
+    <button class="mode" data-mode="cartes">
+      <b>Avec des cartes, sans appareil</b>
+      <span>Chaque étudiant·e lève une carte imprimée, vous scannez la salle avec votre téléphone. Idéal en auditoire ou sans wifi.</span>
+      <span class="go">Lancer la démo <span data-icone="droite"></span></span>
+    </button>
+  </div>
+  <ul class="points">
+    <li><b>Pas de compte</b>Ni pour vous, ni pour les étudiant·es. Votre espace tient dans un lien personnel.</li>
+    <li><b>Anonyme par défaut</b>Le prénom est en option, aucune adresse e-mail n'est demandée.</li>
+    <li><b>Les statistiques restent</b>Chaque session est gardée, avec export pour Excel et impression.</li>
+  </ul>
+  <p class="apres muet">La démo crée votre espace sur ce navigateur. Vous pourrez ensuite y écrire vos propres questions.</p>
+</main>
+
+<main id="scene" class="scene" hidden>
+  <section class="zone-proj">
+    <p class="etiquette"><span>Ce que voit la classe (projection)</span><a id="grand" target="_blank" rel="noopener">Ouvrir en grand ↗</a></p>
+    <div class="ecran" id="ecran"></div>
+  </section>
+  <aside class="zone-tel">
+    <p class="etiquette"><span id="titre-tel">Téléphone d'un·e étudiant·e</span></p>
+    <div class="telephone" id="telephone"></div>
+  </aside>
+  <section class="zone-guide">
+    <div class="guide" id="guide"></div>
+  </section>
+</main>
+<footer style="padding: 14px var(--gouttiere) 22px; text-align: center; font-size: 15px;"><a href="/confidentialite">Protection des données</a></footer>
+
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script>
+(() => {
+  const { h, $, $$, icone } = ML;
+  $("#logo").innerHTML = ML.LOGO;
+  $$("[data-icone]").forEach((s) => s.replaceWith(icone(s.dataset.icone)));
+
+  // ---------- activités de démonstration ----------
+  const DEMOS = {
+    appareils: {
+      id: "demo-appareils",
+      titre: "Démo · avec les téléphones",
+      pseudo: false,
+      questions: [
+        { id: "demoq1", type: "qcm", texte: "Quelle est la capitale du Valais ?",
+          options: [{ texte: "Martigny" }, { texte: "Sion", bonne: true }, { texte: "Brigue" }, { texte: "Monthey" }] },
+        { id: "demoq2", type: "nuage", texte: "En un mot, qu'attendez-vous d'un outil de questions en classe ?" },
+        { id: "demoq3", type: "echelle", texte: "Je pourrais utiliser cet outil dans mes cours.", min: 1, max: 5, etiquettes: ["Pas du tout", "Tout à fait"] },
+        { id: "demoq4", type: "libre", texte: "Dans quelle situation l'utiliseriez-vous ?" },
+      ],
+    },
+    cartes: {
+      id: "demo-cartes",
+      titre: "Démo · mode cartes",
+      pseudo: false,
+      questions: [
+        { id: "democ1", type: "qcm", texte: "Quelle est la capitale du Valais ?",
+          options: [{ texte: "Martigny" }, { texte: "Sion", bonne: true }, { texte: "Brigue" }, { texte: "Monthey" }] },
+        { id: "democ2", type: "qcm", texte: "Quel est le plus haut sommet entièrement situé en Suisse ?",
+          options: [{ texte: "Le Cervin" }, { texte: "Le Dom", bonne: true }, { texte: "Le Weisshorn" }, { texte: "L'Eiger" }] },
+        { id: "democ3", type: "qcm", texte: "Avez-vous déjà utilisé des cartes de réponse en classe ?",
+          options: [{ texte: "Oui, souvent" }, { texte: "Parfois" }, { texte: "Jamais" }] },
+      ],
+    },
+  };
+
+  let S = null, cx = null, mode = null, code = null;
+
+  // ---------- iframes mises à l'échelle (rendu identique à un vrai écran) ----------
+  function cadre(conteneur, src, w, hgt, autoriser = "") {
+    const f = h("iframe", { src, width: w, height: hgt, title: conteneur.id === "ecran" ? "Projection" : "Téléphone", allow: autoriser || undefined });
+    f.style.width = w + "px";
+    f.style.height = hgt + "px";
+    conteneur.replaceChildren(f);
+    const ajuster = () => (f.style.transform = `scale(${conteneur.clientWidth / w})`);
+    new ResizeObserver(ajuster).observe(conteneur);
+    ajuster();
+    return f;
+  }
+
+  // ---------- lancement ----------
+  async function lancer(m) {
+    mode = m;
+    $$(".mode").forEach((b) => (b.disabled = true));
+    try {
+      if (!ML.cle()) ML.creerCle();
+      const a = DEMOS[m];
+      await ML.api("PUT", `/activites/${a.id}`, a);
+      const r = await ML.api("POST", "/sessions", { activiteId: a.id, mode: m, demo: true });
+      code = r.code;
+    } catch (e) {
+      $$(".mode").forEach((b) => (b.disabled = false));
+      return ML.toast("La démo n'a pas pu démarrer : " + e.message, "erreur");
+    }
+    $("#intro").hidden = true;
+    $("#scene").hidden = false;
+    window.scrollTo(0, 0);
+    $("#grand").href = `/projeter/${code}`;
+    const large = window.innerWidth < 700 ? 1000 : 1600;
+    cadre($("#ecran"), `/projeter/${code}`, large, Math.round(large * 9 / 16));
+    if (m === "appareils") {
+      $("#titre-tel").textContent = "Téléphone d'un·e étudiant·e";
+      cadre($("#telephone"), `/${code}`, 390, 800);
+    } else {
+      $("#titre-tel").textContent = "Télécommande de l'enseignant·e";
+      $("#telephone").replaceChildren(h("p", { style: { padding: "20px" } }, "Connexion…"));
+    }
+    cx = ML.connecter(code, () => ({ t: "hello", role: "staff", cle: ML.cle() }), {
+      onMessage(msg) {
+        if (msg.t !== "etat") return;
+        const premier = !S;
+        S = msg;
+        if (premier && mode === "cartes") cadre($("#telephone"), `/pilote/${code}#jeton=${S.config.jeton}`, 390, 800, "camera");
+        guider();
+      },
+    });
+  }
+  $$(".mode").forEach((b) => b.addEventListener("click", () => lancer(b.dataset.mode)));
+
+  // ---------- guide pas à pas ----------
+  const cmd = (m) => cx?.envoyer(m) || ML.toast("Connexion en cours, réessayez dans un instant.");
+
+  function consigne() {
+    const e = S.etat, n = S.config.questions.length;
+    const q = S.config.questions[e.index];
+    const sim = !!e.simulation;
+    if (mode === "appareils") {
+      if (e.statut === "attente") return ["Étape 1 · la classe arrive",
+        [`Les étudiant·es rejoignent avec le code `, h("b", { class: "code-demo" }, ML.formatCode(code)), ` ou le QR code. Le téléphone de démonstration est déjà connecté. `,
+          sim ? "La classe fictive entre dans la salle. " : "Ajoutez une classe fictive pour voir la salle se remplir. ",
+          "Puis cliquez sur ", h("b", {}, "Commencer"), "."]];
+      if (e.statut === "terminee") return ["Fin de la session",
+        ["Chaque participant·e voit son score sur son téléphone. Vos statistiques sont gardées dans votre espace, avec export pour Excel."]];
+      if (!e.revele) return [`Question ${e.index + 1} sur ${n} · les réponses arrivent`,
+        [`Répondez sur le téléphone de démonstration${sim ? ", la classe fictive répond aussi" : ""}. Le compteur avance en direct, mais rien n'est montré à la classe. Cliquez ensuite sur `, h("b", {}, "Afficher les résultats"), "."]];
+      return [`Question ${e.index + 1} sur ${n} · les résultats`,
+        [q.type === "qcm" ? "Les résultats et la bonne réponse apparaissent sur l'écran et sur chaque téléphone. " : "Les résultats apparaissent sur l'écran et sur les téléphones. ",
+          q.type === "libre" ? "Vous pouvez masquer une réponse d'un clic. " : "",
+          e.index < n - 1 ? ["Passez à la ", h("b", {}, "question suivante"), "."] : ["Cliquez sur ", h("b", {}, "Terminer"), "."]]];
+    }
+    // mode cartes
+    if (e.statut === "attente") return ["Étape 1 · les cartes",
+      ["Chaque étudiant·e reçoit une carte numérotée. Pour répondre, elle ou il la lève avec la lettre choisie ", h("b", {}, "en haut"), ". ",
+        sim ? "La classe fictive est prête. " : "Ajoutez une classe fictive de 24 cartes. ", "Puis cliquez sur ", h("b", {}, "Commencer"), "."]];
+    if (e.statut === "terminee") return ["Fin de la session", ["Les réponses de chaque carte sont gardées dans vos statistiques, avec le prénom associé à chaque numéro."]];
+    if (!e.revele) return [`Question ${e.index + 1} sur ${n} · scannez la salle`,
+      [sim ? "La classe fictive lève ses cartes : les cases s'allument sous la question. " : "",
+        "Avec une vraie carte, utilisez « Scanner les cartes » sur la télécommande, ou votre propre téléphone (QR code). Puis ", h("b", {}, "Afficher les résultats"), "."]];
+    return [`Question ${e.index + 1} sur ${n} · les résultats`, ["La répartition s'affiche, avec la bonne réponse. ", e.index < n - 1 ? ["Passez à la ", h("b", {}, "question suivante"), "."] : ["Cliquez sur ", h("b", {}, "Terminer"), "."]]];
+  }
+
+  let derniereCle = "";
+  function guider() {
+    const e = S.etat;
+    const cle = [e.statut, e.index, e.revele, !!e.simulation].join("|");
+    if (cle === derniereCle) return;
+    derniereCle = cle;
+    const [etape, texte] = consigne();
+    const btnSim = e.statut === "terminee" ? null : h("button", {
+      class: "btn " + (e.simulation ? "actif" : ""),
+      onclick: () => cmd({ t: "simuler", valeur: !e.simulation }),
+      title: e.simulation ? "Retirer les réponses fictives" : "24 étudiant·es fictifs qui répondent tout seuls",
+    }, icone(e.simulation ? "coche" : "plus"), e.simulation ? "Classe fictive active · la retirer" : "Ajouter une classe fictive (24)");
+    const n = S.config.questions.length;
+    let action = null;
+    if (e.statut === "attente") action = ["Commencer", "play", { t: "demarrer" }];
+    else if (e.statut === "question" && !e.revele) action = ["Afficher les résultats", "oeil", { t: "reveler", valeur: true }];
+    else if (e.statut === "question" && e.index < n - 1) action = ["Question suivante", "droite", { t: "aller", index: e.index + 1 }];
+    else if (e.statut === "question") action = ["Terminer", "stop", { t: "terminer" }];
+    const boutons = h("div", { class: "btns" },
+      action ? h("button", { class: "btn primaire", onclick: () => cmd(action[2]) }, icone(action[1]), action[0]) : null,
+      btnSim,
+      e.statut === "terminee" ? h("a", { class: "btn primaire", href: `/stats/${code}`, target: "_blank" }, icone("stats"), "Voir les statistiques") : null,
+      h("a", { class: "btn", href: "/espace" }, "Écrire mes propres questions"),
+      mode === "cartes" ? h("button", { class: "btn discret", onclick: montrerCarte }, "Pas de carte imprimée ?") : null,
+      h("button", { class: "btn discret", onclick: recommencer }, "Recommencer"));
+    const lien = mode === "appareils" ? `${location.origin}/${code}` : `${location.origin}/pilote/${code}#jeton=${S.config.jeton}`;
+    const vrai = h("div", { class: "vrai-tel" },
+      h("div", { class: "qr", html: ML.qrSvg(lien, { marge: 1 }) }),
+      mode === "appareils" ? "Répondez aussi avec votre vrai téléphone" : "Scannez la salle avec votre vrai téléphone");
+    $("#guide").replaceChildren(h("div", {}, h("p", { class: "etape" }, etape), h("p", { class: "consigne" }, texte), boutons), vrai);
+  }
+
+  function montrerCarte() {
+    const lien = `${location.origin}/carte`;
+    ML.dialogue([
+      h("h2", {}, "Une carte sur un téléphone"),
+      h("p", {}, "Ouvrez une carte sur un téléphone, choisissez la réponse, puis montrez l'écran à la caméra qui scanne : celle de cet ordinateur (bouton « Scanner les cartes » à droite) ou un autre téléphone."),
+      h("div", { style: { width: "min(240px, 60vw)", margin: "8px auto" }, html: ML.qrSvg(lien) }),
+      h("p", { class: "petit muet", style: { textAlign: "center" } }, ML.hoteCourt() + "/carte"),
+      h("p", { class: "petit" }, "En classe, on imprime les cartes depuis l'espace, onglet « Classes et cartes »."),
+    ]);
+  }
+
+  function recommencer() {
+    cx?.fermer();
+    cx = null; S = null; code = null; derniereCle = "";
+    $("#ecran").replaceChildren();
+    $("#telephone").replaceChildren();
+    $("#scene").hidden = true;
+    $("#intro").hidden = false;
+    $$(".mode").forEach((b) => (b.disabled = false));
+    window.scrollTo(0, 0);
+  }
+})();
+</script>
+</body>
+</html>

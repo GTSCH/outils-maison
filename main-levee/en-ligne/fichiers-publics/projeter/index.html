@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projection · Main levée</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  html, body { height: 100%; }
+  body { display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; font-size: clamp(18px, 1.55vw, 34px); }
+  .haut { display: flex; justify-content: space-between; align-items: center; gap: 2vw; padding: 1.2vh 2.2vw 1.2vh 0; border-bottom: 1px solid var(--rd-25); min-height: 9vh; }
+  .rejoindre { display: flex; align-items: center; gap: 1.2vw; font-size: 1.15em; }
+  .rejoindre::before { content: ""; width: 12px; align-self: stretch; background: var(--rouge); }
+  .rejoindre .qr-mini { width: 7.5vh; height: 7.5vh; flex: none; }
+  .rejoindre .qr-mini svg { width: 100%; height: 100%; display: block; }
+  .rejoindre b.code { font-family: var(--font-din); font-size: 1.45em; letter-spacing: .06em; white-space: nowrap; }
+  .rejoindre .hote { font-family: var(--font-din); font-weight: 700; }
+  .haut .logo { height: 3.4vh; min-height: 22px; }
+  .mode-cartes { font-family: var(--font-din); font-weight: 700; font-size: 1.2em; padding-left: 1.2vw; }
+
+  #scene { overflow: auto; padding: 3.5vh 13vw 2vh 4vw; position: relative; }
+  #scene:has(.accueil-session), #scene:has(.fin) { padding-right: 4vw; }
+  .num { font-family: var(--font-din); font-weight: 700; font-size: .95em; text-transform: uppercase; letter-spacing: .08em; display: flex; gap: 1em; align-items: center; margin-bottom: 1.4vh; }
+  .num::before { content: ""; width: 4vw; height: 8px; background: var(--rouge); margin-left: -4vw; }
+  .num .type { font-weight: 500; opacity: .75; text-transform: none; letter-spacing: 0; }
+  .q-texte { font-family: var(--font-din); font-weight: 700; font-size: clamp(30px, 3.3vw, 72px); line-height: 1.12; margin: 0 0 3.5vh; white-space: pre-wrap; max-width: 60ch; }
+  .options { display: grid; gap: 1.6vh 3vw; font-size: 1.35em; }
+  .options.deux { grid-template-columns: 1fr 1fr; }
+  .options .opt { display: flex; align-items: center; gap: .7em; font-weight: 700; padding: .5em 0; border-bottom: 2px solid var(--rd-25); }
+  .options .opt .lettre { font-size: 1em; }
+  .res-qcm { font-size: 1.35em; gap: 1.6vh; max-width: 1500px; }
+  .res-ligne .barre { height: 1.6vh; }
+  .res-echelle { height: 38vh; font-size: 1.2em; max-width: 1400px; }
+  .res-echelle-legende, .res-moyenne { font-size: 1.1em; max-width: 1400px; }
+  .res-nuage { font-size: clamp(16px, 1.6vw, 34px); min-height: 30vh; padding: 2vh 0; }
+  .res-libre { font-size: .95em; }
+  .echelle-apercu { display: flex; justify-content: space-between; align-items: center; gap: 2vw; font-size: 1.3em; max-width: 1400px; border-top: 3px solid var(--encre); padding-top: 1.5vh; }
+  .echelle-apercu b { font-family: var(--font-din); font-size: 1.4em; }
+  .attente-res { font-size: 1.2em; padding: 6vh 0; text-align: center; border: 2px dashed var(--rd-50); }
+  .compteur { position: fixed; right: 2.2vw; bottom: calc(10vh + 2vh); text-align: right; background: var(--blanc); padding: .3em .6em; }
+  .compteur b { font-family: var(--font-din); font-size: 2.6em; line-height: 1; display: block; }
+
+  .accueil-session { display: grid; grid-template-columns: 1.2fr 1fr; gap: 4vw; align-items: center; height: 100%; }
+  .accueil-session h1 { font-size: clamp(36px, 4.2vw, 88px); }
+  .etapes { font-size: 1.5em; line-height: 1.35; }
+  .etapes .grand-hote { font-family: var(--font-din); font-weight: 700; font-size: 1.15em; overflow-wrap: anywhere; }
+  .etapes .grand-code { font-family: var(--font-din); font-weight: 700; font-size: 3.2em; letter-spacing: .06em; line-height: 1; display: block; margin-top: .15em; }
+  .qr-grand { width: min(56vh, 38vw); justify-self: center; }
+  .qr-grand svg { width: 100%; display: block; }
+  .presents { margin-top: 3vh; font-size: 1.2em; }
+  .puces { display: flex; flex-wrap: wrap; gap: .4em; margin-top: 1vh; font-size: .85em; max-height: 18vh; overflow: hidden; }
+  .puces span { background: var(--rd-10); border-left: 5px solid var(--rouge); padding: .15em .6em; }
+
+  .grille-cartes { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.4em, 1fr)); gap: .45em; margin-top: 3vh; font-size: .9em; }
+  .grille-cartes .c { border: 2px solid var(--rd-50); padding: .25em .3em; text-align: center; line-height: 1.1; min-height: 2.6em; }
+  .grille-cartes .c b { font-family: var(--font-din); font-size: 1.25em; display: block; }
+  .grille-cartes .c small { display: block; font-size: .72em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .grille-cartes .c.ok { background: var(--encre); border-color: var(--encre); color: var(--blanc); }
+  .grille-cartes.dense { font-size: .7em; grid-template-columns: repeat(auto-fill, minmax(4.6em, 1fr)); gap: .3em; margin-top: 2vh; }
+
+  .fin { text-align: center; padding-top: 6vh; }
+  .fin h1 { font-size: clamp(40px, 5vw, 100px); }
+  .chiffres { display: flex; justify-content: center; gap: 6vw; margin: 4vh 0; }
+  .chiffres b { font-family: var(--font-din); font-size: 3.4em; display: block; line-height: 1; }
+
+  .commandes { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 1vh 2.2vw; border-top: 1px solid var(--rd-25); min-height: 10vh; background: var(--blanc); }
+  .commandes .btns { gap: 8px; }
+  .commandes .btn { font-size: 17px; }
+  .message-plein { display: grid; place-items: center; height: 100%; text-align: center; padding: 4vw; }
+  body.plein .commandes { opacity: .12; transition: opacity .3s; }
+  body.plein .commandes:hover, body.plein .commandes:focus-within { opacity: 1; }
+  @media (max-width: 900px) { .accueil-session { grid-template-columns: 1fr; } .options.deux { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="haut">
+  <div id="rejoindre"></div>
+  <div id="logo"></div>
+</header>
+<main id="scene"><div class="message-plein"><p>Connexion à la session…</p></div></main>
+<footer class="commandes" id="commandes"></footer>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script src="/js/resultats.js"></script>
+<script>
+(() => {
+  const { h, $, icone, LETTRES } = ML;
+  $("#logo").innerHTML = ML.LOGO;
+  const code = ML.codeDansAdresse();
+  const jeton = new URLSearchParams(location.hash.slice(1)).get("jeton");
+  const cle = ML.cle();
+  const scene = $("#scene");
+  let S = null; // dernier état reçu
+  let cx = null;
+  const lienParticipant = `${location.origin}/${code}`;
+  const hote = ML.hoteCourt();
+
+  if (!code || (!cle && !jeton)) {
+    scene.replaceChildren(h("div", { class: "message-plein" }, h("div", {},
+      h("h1", {}, "Ouvrez cette page depuis votre espace"),
+      h("p", {}, "La projection est réservée à l'enseignant·e qui a lancé la session."),
+      h("a", { class: "btn primaire", href: "/espace" }, "Mon espace"))));
+    return;
+  }
+
+  cx = ML.connecter(code, () => ({ t: "hello", role: "staff", cle: cle || undefined, jeton: jeton || undefined }), {
+    onMessage(m) {
+      if (m.t === "etat") { const avant = S; S = m; rendre(avant); }
+      if (m.t === "refus") ML.toast(m.message, "erreur");
+    },
+    onStatut(s, c) {
+      if (s === "coupe") ML.toast("Connexion interrompue, reconnexion…");
+      if (s === "refuse") scene.replaceChildren(h("div", { class: "message-plein" }, h("div", {},
+        h("h1", {}, c === 4004 ? "Session supprimée" : "Accès refusé"),
+        h("p", {}, "Ouvrez la projection depuis l'espace qui a créé cette session."),
+        h("a", { class: "btn primaire", href: "/espace" }, "Mon espace"))));
+    },
+  });
+  const cmd = (m) => cx.envoyer(m) || ML.toast("Pas de connexion pour l'instant.", "erreur");
+
+  // ---------- rendu ----------
+  function rendreHaut() {
+    const zone = $("#rejoindre");
+    if (S.config.mode === "cartes") {
+      zone.replaceChildren(h("div", { class: "rejoindre" }, h("span", { class: "mode-cartes" }, "Mode cartes · ", S.config.titre)));
+      return;
+    }
+    if (zone.dataset.fait) return;
+    zone.dataset.fait = "1";
+    zone.replaceChildren(h("div", { class: "rejoindre" },
+      h("span", { class: "qr-mini", html: ML.qrSvg(lienParticipant, { marge: 1 }) }),
+      h("span", {}, "Répondez sur ", h("span", { class: "hote" }, hote), h("br"), "avec le code ", h("b", { class: "code" }, ML.formatCode(code)))));
+  }
+
+  function grilleCartes(repondues) {
+    const noms = S.config.classe?.noms || [];
+    const vues = S.cartesVues || [];
+    const nb = Math.max(noms.filter(Boolean).length ? noms.length : 0, ...vues, 0);
+    if (!nb) return h("p", { class: "muet" }, "Les cartes scannées apparaîtront ici.");
+    const ok = new Set(repondues);
+    const cases = [];
+    for (let i = 1; i <= nb; i++) {
+      if (noms.length && !noms[i - 1] && !vues.includes(i)) continue;
+      cases.push(h("div", { class: "c" + (ok.has(i) ? " ok" : "") }, h("b", {}, String(i)), noms[i - 1] ? h("small", {}, noms[i - 1]) : null));
+    }
+    return h("div", { class: "grille-cartes" + (cases.length > 30 || S.etat.revele ? " dense" : ""), "aria-label": "Cartes" }, cases);
+  }
+
+  function vueAttente() {
+    const c = S.config;
+    if (c.mode === "cartes") {
+      return h("div", {},
+        h("h1", { class: "titre-barre" }, c.titre),
+        h("div", { class: "etapes" },
+          h("p", {}, "Préparez vos cartes. Pour répondre, tenez la carte avec la lettre choisie ", h("b", {}, "en haut"), ", face à l'enseignant·e."),
+          h("p", {}, "Gardez les doigts en dehors du carré noir.")),
+        c.classe ? h("p", {}, "Classe : ", h("b", {}, c.classe.nom)) : null,
+        grilleCartes([]));
+    }
+    return h("div", { class: "accueil-session" },
+      h("div", {},
+        h("h1", { class: "titre-barre" }, c.titre),
+        h("div", { class: "etapes" },
+          h("p", {}, "Scannez le QR code, ou allez sur", h("br"), h("span", { class: "grand-hote" }, hote)),
+          h("p", {}, "puis entrez le code", h("span", { class: "grand-code" }, ML.formatCode(code)))),
+        h("p", { class: "presents" }, h("b", {}, String(S.connectes)), S.connectes > 1 ? " participant·es connecté·es" : " participant·e connecté·e"),
+        S.pseudos?.length ? h("div", { class: "puces" }, S.pseudos.map((p) => h("span", {}, p))) : null),
+      h("div", { class: "qr-grand", html: ML.qrSvg(lienParticipant) }));
+  }
+
+  function vueQuestion(justeRevele) {
+    const c = S.config, e = S.etat, q = c.questions[e.index], res = S.resultats;
+    const blocs = [
+      h("p", { class: "num" }, `Question ${e.index + 1} / ${c.questions.length}`, h("span", { class: "type" }, ML.TYPES[q.type])),
+      h("h1", { class: "q-texte" }, q.texte || "(question sans texte)"),
+    ];
+    if (q.type === "qcm") {
+      if (e.revele) blocs.push(Resultats.qcm(q, res, { revele: true }));
+      else blocs.push(h("div", { class: "options" + (q.options.length >= 4 && q.options.every((o) => o.texte.length < 40) ? " deux" : "") },
+        q.options.map((o, i) => h("div", { class: "opt" }, h("span", { class: "lettre" }, LETTRES[i]), h("span", {}, o.texte)))));
+    } else if (q.type === "echelle") {
+      if (e.revele) blocs.push(Resultats.echelle(q, res));
+      else blocs.push(h("div", { class: "echelle-apercu" },
+        h("span", {}, h("b", {}, String(q.min)), q.etiquettes?.[0] ? ` ${q.etiquettes[0]}` : ""),
+        h("span", {}, q.etiquettes?.[1] ? `${q.etiquettes[1]} ` : "", h("b", {}, String(q.max)))));
+    } else if (e.revele) {
+      blocs.push(q.type === "nuage" ? Resultats.nuage(res) : Resultats.libre(res, { montrerMasques: true, onMasquer: (t) => cmd({ t: "masquer", q: e.index, pid: t.pid, valeur: !t.masque }) }));
+    } else {
+      blocs.push(h("div", { class: "attente-res" }, "Les réponses s'afficheront ici quand vous cliquerez sur « Afficher les résultats »."));
+    }
+    if (c.mode === "cartes") {
+      if (q.type === "qcm" && q.options.length <= 4) blocs.push(grilleCartes(S.cartes.map((x) => x.carte)));
+      else blocs.push(h("p", { class: "encart", style: { marginTop: "3vh" } }, "Cette question ne se fait pas avec les cartes (4 réponses au plus, choix multiple seulement)."));
+    }
+    const total = res?.total || 0;
+    const base = c.mode === "cartes" ? null : S.connectes;
+    blocs.push(h("div", { class: "compteur", "aria-live": "polite" }, h("b", {}, String(total)), total > 1 ? "réponses" : "réponse", base !== null ? h("div", { class: "petit" }, `${base} connecté·e${base > 1 ? "s" : ""}`) : null));
+    return blocs;
+  }
+
+  function vueFin() {
+    const r = S.resume || {};
+    return h("div", { class: "fin" },
+      h("h1", {}, "Merci !"),
+      h("div", { class: "chiffres" },
+        h("div", {}, h("b", {}, String(r.participants ?? 0)), r.participants > 1 ? "participant·es" : "participant·e"),
+        r.reussite !== null && r.reussite !== undefined ? h("div", {}, h("b", {}, `${Math.round(r.reussite)} %`), "de bonnes réponses") : null),
+      h("div", { class: "btns", style: { justifyContent: "center" } },
+        h("a", { class: "btn primaire grand", href: `/stats/${code}${jeton ? "#jeton=" + jeton : ""}`, target: "_blank" }, icone("stats"), "Voir les statistiques")));
+  }
+
+  function rendre(avant) {
+    rendreHaut();
+    const e = S.etat;
+    const justeRevele = e.revele && avant && !avant.etat.revele && avant.etat.index === e.index;
+    let contenu;
+    if (e.statut === "attente") contenu = vueAttente();
+    else if (e.statut === "terminee") contenu = vueFin();
+    else contenu = vueQuestion(justeRevele);
+    const defil = scene.scrollTop;
+    scene.replaceChildren(...[contenu].flat());
+    if (avant && avant.etat.index === e.index && avant.etat.statut === e.statut) scene.scrollTop = defil;
+    if (justeRevele) {
+      const barres = [...scene.querySelectorAll(".barre i, .res-echelle .b")];
+      const cibles = barres.map((b) => (b.classList.contains("b") ? b.style.height : b.style.width));
+      barres.forEach((b) => (b.classList.contains("b") ? (b.style.height = "0%") : (b.style.width = "0%")));
+      requestAnimationFrame(() => requestAnimationFrame(() =>
+        barres.forEach((b, i) => (b.classList.contains("b") ? (b.style.height = cibles[i]) : (b.style.width = cibles[i])))));
+    }
+    rendreCommandes();
+  }
+
+  function bouton(libelle, ic, action, cls = "", titre = "") {
+    return h("button", { class: "btn " + cls, onclick: action, title: titre || undefined }, ic ? icone(ic) : null, libelle);
+  }
+
+  function rendreCommandes() {
+    const e = S.etat, n = S.config.questions.length;
+    const gauche = [], droite = [];
+    if (e.statut === "attente") {
+      gauche.push(bouton("Commencer", "play", () => cmd({ t: "demarrer" }), "primaire grand", "Flèche droite"));
+    } else if (e.statut === "question") {
+      gauche.push(bouton("", "gauche", () => cmd({ t: "aller", index: e.index - 1 }), "", "Question précédente (flèche gauche)"));
+      if (e.index === 0) gauche[0].disabled = true;
+      gauche.push(bouton(e.revele ? "Masquer les résultats" : "Afficher les résultats", "oeil", () => cmd({ t: "reveler", valeur: !e.revele }), e.revele ? "" : "primaire", "Touche R"));
+      if (e.index < n - 1) gauche.push(bouton("Suivante", "droite", () => cmd({ t: "aller", index: e.index + 1 }), e.revele ? "primaire" : "", "Flèche droite"));
+      else gauche.push(bouton("Terminer", "stop", () => cmd({ t: "terminer" }), e.revele ? "primaire" : ""));
+      gauche.push(h("span", { class: "petit muet", style: { marginLeft: "8px" } }, `${e.index + 1} / ${n}`));
+    } else {
+      gauche.push(bouton("Reprendre la session", "play", () => cmd({ t: "reprendre" })));
+    }
+    droite.push(bouton("Télécommande", "tel", ouvrirTelecommande, "discret", "Piloter depuis votre téléphone et scanner les cartes"));
+    droite.push(bouton("", "plein", pleinEcran, "discret", "Plein écran (touche F)"));
+    if (e.statut === "question") droite.push(bouton("Terminer", "stop", async () => { if (await ML.confirmer("Terminer la session ?", "Terminer", false)) cmd({ t: "terminer" }); }, "discret"));
+    $("#commandes").replaceChildren(h("div", { class: "btns" }, gauche), h("div", { class: "btns" }, droite));
+  }
+
+  function avancer() {
+    if (!S) return;
+    const e = S.etat, n = S.config.questions.length;
+    if (e.statut === "attente") return cmd({ t: "demarrer" });
+    if (e.statut !== "question") return;
+    if (!e.revele) return cmd({ t: "reveler", valeur: true });
+    if (e.index < n - 1) cmd({ t: "aller", index: e.index + 1 });
+    else cmd({ t: "terminer" });
+  }
+  function reculer() {
+    if (S?.etat.statut === "question" && S.etat.index > 0) cmd({ t: "aller", index: S.etat.index - 1 });
+  }
+  function pleinEcran() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.().catch(() => {});
+  }
+  document.addEventListener("fullscreenchange", () => document.body.classList.toggle("plein", !!document.fullscreenElement));
+
+  async function ouvrirTelecommande() {
+    const lien = `${location.origin}/pilote/${code}#jeton=${S.config.jeton}`;
+    const d = ML.dialogue([
+      h("h2", {}, "Télécommande sur votre téléphone"),
+      h("p", {}, "Scannez ce code avec votre téléphone pour changer de question et, en mode cartes, scanner les cartes de la classe."),
+      h("div", { style: { width: "min(320px, 70vw)", margin: "10px auto" }, html: ML.qrSvg(lien) }),
+      h("p", { class: "encart petit" }, "Ce code donne le contrôle de cette session. Fermez cette fenêtre une fois scanné."),
+      h("div", { class: "btns", style: { marginTop: "14px" } },
+        h("button", { class: "btn", onclick: () => ML.copier(lien, "Lien de la télécommande copié") }, icone("copier"), "Copier le lien"),
+        h("button", { class: "btn primaire", onclick: () => d.close() }, "Fermer")),
+    ]);
+  }
+
+  document.addEventListener("keydown", (ev) => {
+    if (ev.target.closest("input, textarea, dialog")) return;
+    if (ev.target.closest("button, a") && (ev.key === " " || ev.key === "Enter")) return;
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(ev.key)) { ev.preventDefault(); avancer(); }
+    else if (["ArrowLeft", "PageUp"].includes(ev.key)) { ev.preventDefault(); reculer(); }
+    else if (ev.key === "r" || ev.key === "R") S?.etat.statut === "question" && cmd({ t: "reveler", valeur: !S.etat.revele });
+    else if (ev.key === "f" || ev.key === "F") pleinEcran();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "observability": {
+   "enabled": true,
+   "head_sampling_rate": 1,
+   "redact_query_string": false,
+   "logs": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "persist": true,
+    "invocation_logs": false
+   },
+   "traces": {
+    "enabled": false,
+    "persist": true,
+    "head_sampling_rate": 1
+   }
+  },
+  "annotations": {
+   "workers/triggered_by": "version_upload"
+  },
+  "bindings": [
+   {
+    "name": "ASSETS",
+    "type": "assets"
+   },
+   {
+    "class_name": "Espace",
+    "name": "ESPACE",
+    "namespace_id": "fdccdca1984f428d98b7467849349f92",
+    "type": "durable_object_namespace"
+   },
+   {
+    "class_name": "Registre",
+    "name": "REGISTRE",
+    "namespace_id": "d0b7f5852a0a492ebc5b567d7505e0f4",
+    "type": "durable_object_namespace"
+   },
+   {
+    "class_name": "Session",
+    "name": "SESSION",
+    "namespace_id": "359ea0b165dc4ac2972aa1253b9dbf2d",
+    "type": "durable_object_namespace"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": true
+ }
+}

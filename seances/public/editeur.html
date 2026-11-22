@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Modifier la séance</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/seances.css">
+<style>
+  html, body { height: 100%; }
+  body { display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+  .barre-h { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .barre-h .logo { font: 700 17px var(--font-display); text-decoration: none; color: var(--fg); padding-right: 6px; }
+  .barre-h #titre { flex: 1; min-width: 220px; font: 600 18px var(--font-display); border-color: transparent; background: transparent; }
+  .barre-h #titre:hover, .barre-h #titre:focus { border-color: var(--line-strong); background: var(--surface); }
+  .etat { font-size: 13px; color: var(--muted); min-width: 120px; }
+  .etat.ok { color: var(--ok); } .etat.erreur { color: var(--bad); font-weight: 700; }
+  .sep { width: 1px; height: 28px; background: var(--line); margin: 0 4px; }
+  .travail { display: grid; grid-template-columns: 250px minmax(0, 1fr) 380px; min-height: 0; }
+  .col-liste { display: grid; grid-template-rows: auto 1fr auto; min-height: 0; border-right: 1px solid var(--line); background: var(--surface-2); }
+  .col-liste .tete { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; font-size: 13px; color: var(--muted); gap: 6px; }
+  #liste { list-style: none; margin: 0; padding: 4px 10px 10px; overflow: auto; display: grid; gap: 8px; align-content: start; }
+  .item { position: relative; border-radius: 8px; }
+  .item .choisir { display: grid; grid-template-columns: 22px 1fr; gap: 6px; align-items: start; width: 100%; padding: 4px; border: 2px solid transparent; border-radius: 8px; background: none; cursor: pointer; color: var(--muted); text-align: left; }
+  .item .n { font: 700 12px var(--font-display); padding-top: 2px; }
+  .item.actif .choisir { border-color: var(--accent); background: var(--accent-soft); }
+  .item.masquee .mini { opacity: .35; }
+  .item.cible { outline: 2px dashed var(--accent); }
+  .item.glisse { opacity: .4; }
+  .mini { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; box-shadow: 0 0 0 1px var(--line); background: #fff; }
+  .item .actions { position: absolute; right: 6px; bottom: 6px; display: none; gap: 2px; background: var(--surface); border-radius: 6px; padding: 2px; box-shadow: var(--shadow); }
+  .item:hover .actions, .item:focus-within .actions { display: flex; }
+  .item .actions .btn { min-height: 26px; min-width: 26px; padding: 0 4px; font-size: 13px; }
+  .col-liste .pied-l { padding: 10px; border-top: 1px solid var(--line); display: grid; gap: 6px; }
+  .col-apercu { display: grid; grid-template-rows: 1fr auto; min-height: 0; padding: 18px; gap: 10px; }
+  #apercu { position: relative; min-height: 0; }
+  #apercu .scene { box-shadow: var(--shadow-lg); border-radius: 4px; }
+  #apercu.depot { outline: 4px dashed var(--accent); outline-offset: 6px; }
+  .col-apercu .info { font-size: 13px; color: var(--muted); text-align: center; }
+  .col-form { overflow: auto; border-left: 1px solid var(--line); background: var(--surface); }
+  #formulaire { padding: 16px; display: grid; gap: 14px; }
+  textarea.court { min-height: 0; }
+  .aide { font-weight: 400; color: var(--faint); font-size: 12.5px; line-height: 1.35; }
+  label.case { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .bloc-image, .champ { display: grid; gap: 6px; }
+  .lab { font-weight: 700; font-size: 14px; color: var(--muted); }
+  .vignette { max-height: 120px; max-width: 100%; object-fit: contain; border-radius: 6px; border: 1px solid var(--line); background: #fff; justify-self: start; }
+  .rang { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .source { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; }
+  .sources { display: grid; gap: 6px; }
+  .ressource { display: grid; grid-template-columns: 1.2fr 1.4fr 1fr auto; gap: 6px; align-items: center; }
+  .ressources { display: grid; gap: 8px; }
+  .grille-mises { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .grille-mises .btn { justify-content: flex-start; min-height: 48px; }
+  .galerie { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .g-img { padding: 4px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; aspect-ratio: 16 / 10; }
+  .g-img img { width: 100%; height: 100%; object-fit: contain; }
+  dialog.large { width: min(980px, 96vw); }
+  .lien-qr { width: 260px; justify-self: center; }
+  .lien-url { text-align: center; font: 600 18px var(--font-display); word-break: break-all; }
+  .pastille-c { width: 34px; height: 34px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; }
+  .pastille-c.actif { border-color: var(--fg); }
+  .versions { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  .versions li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 6px; background: var(--surface-2); }
+  .vide-plein { padding: 40px; display: grid; gap: 12px; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 6px 0; width: 100%; }
+  @media (max-width: 1100px) { .travail { grid-template-columns: 200px minmax(0, 1fr) 320px; } }
+  @media (max-width: 860px) { body { overflow: auto; } .travail { grid-template-columns: 1fr; } .col-liste { max-height: 220px; } #apercu { aspect-ratio: 16/9; } }
+</style>
+</head>
+<body>
+<header class="barre-h">
+  <a class="logo" href="/espace" title="Mes séances">Séances</a>
+  <span class="prototype">prototype</span>
+  <input id="titre" aria-label="Titre de la séance">
+  <span id="etat" class="etat" role="status"></span>
+  <button class="btn petit" id="b-annuler" disabled title="Ctrl+Z">Annuler</button>
+  <span class="sep"></span>
+  <button class="btn petit" id="b-ressources">Ressources</button>
+  <button class="btn petit" id="b-lien">Lien participant·es</button>
+  <button class="btn petit" id="b-pdf">PDF</button>
+  <button class="btn petit" id="b-historique">Historique</button>
+  <button class="btn petit" id="b-reglages">Réglages</button>
+  <span class="sep"></span>
+  <button class="btn petit" id="b-projeter">Projeter</button>
+  <button class="btn primaire" id="b-presenter">Présenter</button>
+</header>
+<div class="travail">
+  <aside class="col-liste">
+    <div class="tete"><span id="compte"></span><span>glisser pour réordonner</span></div>
+    <ol id="liste" aria-label="Diapositives"></ol>
+    <div class="pied-l"><button class="btn" id="b-ajouter">+ Nouvelle diapositive</button></div>
+  </aside>
+  <section class="col-apercu">
+    <div id="apercu" aria-label="Aperçu de la diapositive"></div>
+    <p class="info">Aperçu tel que projeté · ↑ ↓ pour changer de diapositive · enregistrement automatique</p>
+  </section>
+  <aside class="col-form"><div id="formulaire"></div></aside>
+</div>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script src="/js/editeur.js"></script>
+</body>
+</html>

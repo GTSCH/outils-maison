@@ -1,0 +1,15 @@
+{
+ "worker": "passages",
+ "module_principal": "index.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "2b9c90a3b25d8b1fc4064a0bb21dae11d81a19c708aa2bbf963098b88e43cdbb",
+ "modules": [
+  {
+   "nom": "index.js",
+   "fichier": "index.js",
+   "type": "application/javascript+module",
+   "sha256": "2b9c90a3b25d8b1fc4064a0bb21dae11d81a19c708aa2bbf963098b88e43cdbb",
+   "octets": 16730
+  }
+ ]
+}

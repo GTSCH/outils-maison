@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Télécommande · Main levée</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#231F20">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { min-height: 100dvh; }
+  .entete { padding-top: 10px; padding-bottom: 10px; }
+  .entete .marque b { font-size: 19px; }
+  .entete .marque::before { height: 28px; }
+  .entete .logo { height: 18px; }
+  main { padding: 16px var(--gouttiere) 120px; max-width: 640px; margin: 0 auto; }
+  .etat { font-family: var(--font-din); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: 15px; display: flex; justify-content: space-between; gap: 10px; }
+  .q { font-size: 22px; margin: 6px 0 14px; white-space: pre-wrap; }
+  .pad { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 8px; margin: 14px 0; }
+  .pad .btn { min-height: 76px; font-size: 18px; padding: 8px; }
+  .pad .btn svg { width: 28px; height: 28px; }
+  .scan-btn { width: 100%; min-height: 76px; font-size: 21px; margin-bottom: 8px; }
+  .cartes-liste { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .cartes-liste button { appearance: none; border: 2px solid var(--encre); background: var(--blanc); font: inherit; font-weight: 700; padding: 6px 10px; border-radius: 0; cursor: pointer; }
+  .cartes-liste button b { font-family: var(--font-din); }
+  .cartes-liste button small { font-weight: 400; }
+  .mini { margin-top: 18px; font-size: 16px; }
+  .res-echelle { height: 120px; }
+  .res-nuage { font-size: 14px; }
+
+  #scanner { position: fixed; inset: 0; background: #000; z-index: 100; display: grid; grid-template-rows: auto 1fr auto; color: #fff; }
+  #scanner .zone { position: relative; overflow: hidden; }
+  #scanner video, #scanner canvas.calque { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  #scanner .barre { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px var(--gouttiere); background: #231F20; font-family: var(--font-din); font-weight: 700; }
+  #scanner .barre .gros { font-size: 26px; }
+  #scanner .bas { flex-direction: column; align-items: stretch; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+  #scanner .zoom { display: flex; gap: 10px; align-items: center; font-weight: 500; font-family: var(--font-texte); }
+  #scanner .zoom input { flex: 1; accent-color: var(--rouge); }
+  #scanner .btn { min-height: 58px; }
+  #scanner .conseil { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px var(--gouttiere); background: rgba(35,31,32,.75); font-size: 15px; text-align: center; }
+  .repartition { display: flex; gap: 12px; font-size: 18px; }
+</style>
+</head>
+<body>
+<header class="entete">
+  <span class="marque"><b>Télécommande</b><span id="code"></span></span>
+  <div class="droite" id="logo"></div>
+</header>
+<main id="app"><p>Connexion…</p></main>
+<footer style="padding: 0 var(--gouttiere) 22px; text-align: center; font-size: 15px;"><a href="/confidentialite">Protection des données</a></footer>
+
+<div id="scanner" hidden>
+  <div class="barre">
+    <span id="scan-q">Question</span>
+    <span class="gros" id="scan-nb">0 carte</span>
+  </div>
+  <div class="zone">
+    <video id="video" playsinline muted autoplay></video>
+    <canvas class="calque" id="calque"></canvas>
+    <p class="conseil" id="conseil">Visez la salle, tenez le téléphone stable. Les cartes lues s'entourent en vert.</p>
+  </div>
+  <div class="barre bas">
+    <div class="repartition" id="repartition"></div>
+    <label class="zoom" id="zoom-zone" hidden>Zoom <input type="range" id="zoom" min="1" max="1" step="0.1" value="1"></label>
+    <div class="btns" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn" id="scan-res" style="background:#fff">Résultats</button>
+      <button class="btn primaire" id="scan-fin">Terminer le scan</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script src="/js/resultats.js"></script>
+<script>
+(() => {
+  const { h, $, icone, LETTRES } = ML;
+  $("#logo").innerHTML = ML.LOGO;
+  const code = ML.codeDansAdresse();
+  const jeton = new URLSearchParams(location.hash.slice(1)).get("jeton");
+  const cle = ML.cle();
+  const app = $("#app");
+  if (code) $("#code").textContent = ML.formatCode(code);
+  let S = null;
+
+  if (!code || (!cle && !jeton)) {
+    app.replaceChildren(h("h1", {}, "Lien incomplet"), h("p", {}, "Scannez le QR code « Télécommande » affiché sur la projection."));
+    return;
+  }
+
+  const cx = ML.connecter(code, () => ({ t: "hello", role: "staff", cle: cle || undefined, jeton: jeton || undefined }), {
+    onMessage(m) {
+      if (m.t !== "etat") return;
+      const avant = S;
+      S = m;
+      if (!avant || avant.etat.index !== S.etat.index) reinitialiserScan();
+      rendre();
+      majScanner();
+    },
+    onStatut(s) {
+      if (s === "coupe") ML.toast("Connexion interrompue, reconnexion…");
+      if (s === "refuse") app.replaceChildren(h("h1", {}, "Accès refusé"), h("p", {}, "Ce lien de télécommande n'est plus valable."));
+    },
+  });
+  const cmd = (m) => cx.envoyer(m) || ML.toast("Pas de connexion pour l'instant.", "erreur");
+
+  const questionCourante = () => S?.config.questions[S.etat.index];
+  const compatibleCartes = (q) => q && q.type === "qcm" && q.options.length <= 4;
+  const nomCarte = (n) => S.config.classe?.noms?.[n - 1] || "";
+
+  function rendre() {
+    const e = S.etat, c = S.config, n = c.questions.length, q = questionCourante();
+    const blocs = [];
+    if (e.statut === "attente") {
+      blocs.push(h("p", { class: "etat" }, h("span", {}, c.titre)),
+        h("h1", { class: "q" }, "La session n'a pas commencé"),
+        c.mode === "appareils" ? h("p", {}, h("b", {}, String(S.connectes)), " connecté·e(s)") : null,
+        h("button", { class: "btn primaire grand", style: { width: "100%" }, onclick: () => cmd({ t: "demarrer" }) }, icone("play"), "Commencer"));
+    } else if (e.statut === "terminee") {
+      blocs.push(h("h1", { class: "q" }, "Session terminée"),
+        h("p", {}, `${S.resume?.participants ?? 0} participant·es`, S.resume?.reussite != null ? ` · ${Math.round(S.resume.reussite)} % de bonnes réponses` : ""),
+        h("button", { class: "btn", onclick: () => cmd({ t: "reprendre" }) }, "Reprendre"));
+    } else {
+      const total = S.resultats?.total || 0;
+      blocs.push(
+        h("p", { class: "etat" }, h("span", {}, `Question ${e.index + 1} / ${n}`), h("span", {}, `${total} réponse${total > 1 ? "s" : ""}`)),
+        h("h1", { class: "q" }, q.texte),
+        h("div", { class: "pad" },
+          h("button", { class: "btn", "aria-label": "Question précédente", disabled: e.index === 0, onclick: () => cmd({ t: "aller", index: e.index - 1 }) }, icone("gauche")),
+          h("button", { class: "btn " + (e.revele ? "" : "primaire"), onclick: () => cmd({ t: "reveler", valeur: !e.revele }) }, e.revele ? "Masquer résultats" : "Afficher résultats"),
+          e.index < n - 1
+            ? h("button", { class: "btn " + (e.revele ? "primaire" : ""), "aria-label": "Question suivante", onclick: () => cmd({ t: "aller", index: e.index + 1 }) }, icone("droite"))
+            : h("button", { class: "btn " + (e.revele ? "primaire" : ""), onclick: () => cmd({ t: "terminer" }) }, "Fin")));
+      if (compatibleCartes(q)) {
+        blocs.push(h("button", { class: "btn primaire scan-btn", onclick: ouvrirScanner }, icone("camera"), "Scanner les cartes"));
+        if (S.cartes.length) {
+          blocs.push(h("p", { class: "petit muet", style: { margin: "8px 0 0" } }, "Cartes lues (touchez pour retirer une erreur de lecture) :"),
+            h("div", { class: "cartes-liste" }, S.cartes.slice().sort((a, b) => a.carte - b.carte).map((x) =>
+              h("button", { onclick: async () => { if (await ML.confirmer(`Retirer la carte ${x.carte} de cette question ?`, "Retirer")) cmd({ t: "retirerCarte", q: e.index, carte: x.carte }); } },
+                h("b", {}, `${x.carte} · ${x.lettre}`), nomCarte(x.carte) ? h("small", {}, " " + nomCarte(x.carte)) : null))));
+        }
+      } else if (c.mode === "cartes") {
+        blocs.push(h("p", { class: "encart petit" }, "Pas de cartes pour cette question : choix multiple à 4 réponses au plus seulement."));
+      }
+      if (e.revele && S.resultats) blocs.push(h("div", { class: "mini" }, Resultats.rendre(q, S.resultats, { revele: true, tailleMax: 2.4 })));
+      blocs.push(h("p", { style: { marginTop: "26px" } }, h("button", { class: "btn discret", onclick: async () => { if (await ML.confirmer("Terminer la session ?", "Terminer", false)) cmd({ t: "terminer" }); } }, icone("stop"), "Terminer la session")));
+    }
+    app.replaceChildren(...blocs);
+  }
+
+  // ------------------------------------------------------------------ scanner de cartes
+
+  const scanner = $("#scanner"), video = $("#video"), calque = $("#calque");
+  let flux = null, worker = null, actif = false, enCours = false, verrou = null;
+  let lectures = new Map();  // carte -> {lettre, n, t}
+  let envoyees = new Map();  // carte -> lettre déjà transmise pour la question
+  let dernieres = [];         // cartes de la dernière image (pour le dessin)
+  const grab = document.createElement("canvas");
+  const gctx = grab.getContext("2d", { willReadFrequently: true });
+
+  function reinitialiserScan() {
+    lectures = new Map();
+    envoyees = new Map((S?.cartes || []).map((x) => [x.carte, x.lettre]));
+  }
+
+  function majScanner() {
+    if (scanner.hidden || !S) return;
+    const q = questionCourante();
+    if (!compatibleCartes(q) || S.etat.statut !== "question") return fermerScanner();
+    for (const x of S.cartes) envoyees.set(x.carte, x.lettre);
+    const nb = S.cartes.length;
+    $("#scan-q").textContent = `Question ${S.etat.index + 1}`;
+    $("#scan-nb").textContent = `${nb} carte${nb > 1 ? "s" : ""}`;
+    const rep = q.options.map((_, i) => S.cartes.filter((x) => x.lettre === LETTRES[i]).length);
+    $("#repartition").replaceChildren(...rep.map((n, i) => h("span", {}, `${LETTRES[i]} ${n}`)));
+    $("#scan-res").textContent = S.etat.revele ? "Masquer résultats" : "Afficher résultats";
+  }
+
+  async function ouvrirScanner() {
+    if (!navigator.mediaDevices?.getUserMedia) return ML.toast("Cet appareil ne donne pas accès à la caméra depuis le navigateur.", "erreur");
+    try {
+      flux = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } } });
+    } catch (e) {
+      return ML.toast("Caméra refusée ou indisponible. Autorisez la caméra pour ce site dans les réglages du navigateur.", "erreur");
+    }
+    video.srcObject = flux;
+    await video.play().catch(() => {});
+    scanner.hidden = false;
+    actif = true;
+    try { verrou = await navigator.wakeLock?.request("screen"); } catch {}
+    const piste = flux.getVideoTracks()[0];
+    const caps = piste.getCapabilities?.() || {};
+    if (caps.zoom && caps.zoom.max > caps.zoom.min) {
+      const z = $("#zoom");
+      z.min = caps.zoom.min; z.max = Math.min(caps.zoom.max, 8); z.step = caps.zoom.step || 0.1; z.value = piste.getSettings().zoom || caps.zoom.min;
+      z.oninput = () => piste.applyConstraints({ advanced: [{ zoom: Number(z.value) }] }).catch(() => {});
+      $("#zoom-zone").hidden = false;
+    }
+    if (!worker) {
+      worker = new Worker("/js/scanner-worker.js");
+      worker.onmessage = (ev) => resultat(ev.data);
+    }
+    reinitialiserScan();
+    majScanner();
+    boucle();
+  }
+
+  function fermerScanner() {
+    actif = false;
+    scanner.hidden = true;
+    flux?.getTracks().forEach((t) => t.stop());
+    flux = null;
+    verrou?.release?.().catch(() => {});
+    verrou = null;
+  }
+
+  function boucle() {
+    if (!actif) return;
+    if (enCours || video.readyState < 2 || !video.videoWidth) return requestAnimationFrame(boucle);
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const k = Math.min(1, 1920 / Math.max(vw, vh));
+    grab.width = Math.round(vw * k);
+    grab.height = Math.round(vh * k);
+    gctx.drawImage(video, 0, 0, grab.width, grab.height);
+    const img = gctx.getImageData(0, 0, grab.width, grab.height);
+    enCours = true;
+    worker.postMessage({ width: img.width, height: img.height, buffer: img.data.buffer, k }, [img.data.buffer]);
+  }
+
+  function resultat(r) {
+    enCours = false;
+    if (!actif || !S) return;
+    const q = questionCourante();
+    const maintenant = Date.now();
+    dernieres = r.cartes.map((c) => ({ ...c, k: grab.width / video.videoWidth }));
+    for (const c of r.cartes) {
+      if (LETTRES.indexOf(c.lettre) >= q.options.length) { c.horsChoix = true; continue; }
+      const l = lectures.get(c.carte);
+      if (l && l.lettre === c.lettre && maintenant - l.t < 3000) { l.n++; l.t = maintenant; }
+      else lectures.set(c.carte, { lettre: c.lettre, n: 1, t: maintenant });
+      if (lectures.get(c.carte).n >= 2 && envoyees.get(c.carte) !== c.lettre) {
+        envoyees.set(c.carte, c.lettre);
+        cx.envoyer({ t: "carte", q: S.etat.index, carte: c.carte, lettre: c.lettre });
+        navigator.vibrate?.(25);
+      }
+    }
+    dessiner();
+    setTimeout(() => requestAnimationFrame(boucle), 30);
+  }
+
+  function dessiner() {
+    const W = calque.clientWidth, H = calque.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    if (calque.width !== W * dpr) { calque.width = W * dpr; calque.height = H * dpr; }
+    const ctx = calque.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw) return;
+    const s = Math.min(W / vw, H / vh), ox = (W - vw * s) / 2, oy = (H - vh * s) / 2;
+    ctx.font = "700 18px Barlow, Arial, sans-serif";
+    for (const c of dernieres) {
+      const pts = c.coins.map((p) => ({ x: ox + (p.x / c.k) * s, y: oy + (p.y / c.k) * s }));
+      const ok = envoyees.get(c.carte) === c.lettre;
+      const couleur = c.horsChoix ? "#F58220" : ok ? "#00A676" : "#FFFFFF";
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = couleur;
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+      ctx.closePath();
+      ctx.stroke();
+      const minY = Math.min(...pts.map((p) => p.y)), cxp = pts.reduce((a, p) => a + p.x, 0) / 4;
+      const largeur = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      const nom = largeur > 80 ? nomCarte(c.carte) : "";
+      const txt = `${c.carte} · ${c.horsChoix ? "?" : c.lettre}${nom ? " " + nom : ""}`;
+      const lw = ctx.measureText(txt).width + 12;
+      ctx.fillStyle = couleur;
+      ctx.fillRect(cxp - lw / 2, minY - 30, lw, 26);
+      ctx.fillStyle = "#231F20";
+      ctx.fillText(txt, cxp - lw / 2 + 6, minY - 11);
+    }
+  }
+
+  $("#scan-fin").addEventListener("click", fermerScanner);
+  $("#scan-res").addEventListener("click", () => S && cmd({ t: "reveler", valeur: !S.etat.revele }));
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible" && actif && !verrou) { try { verrou = await navigator.wakeLock?.request("screen"); } catch {} }
+  });
+})();
+</script>
+</body>
+</html>

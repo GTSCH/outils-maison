@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Résultats · L’Établi</title>
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/etabli.css">
+<link rel="stylesheet" href="/live/live.css">
+<style>
+  .page { max-width: 1120px; margin: 0 auto; padding: 28px 16px 80px; }
+  .meta { color: var(--muted); font-size: 15px; display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; }
+  h1.titre { font-size: clamp(26px, 3.2vw, 38px); overflow-wrap: anywhere; margin-top: 6px; }
+  .eyebrow { color: var(--t-quiz); }
+  .chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0; margin: 24px 0 34px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); overflow: hidden; }
+  .chiffre { padding: 14px 18px; border-left: 1px solid var(--line); }
+  .chiffre:first-child { border-left: 0; }
+  .chiffre b { display: block; font: 800 34px/1.05 var(--font-display); font-variant-numeric: tabular-nums; }
+  .chiffre span { color: var(--muted); font-size: 14px; }
+  h2.section { font-size: 22px; margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
+  h2.section::before { content: ""; width: 6px; height: 1.1em; border-radius: 3px; background: var(--t-quiz); }
+  .q-stat { border-top: 1px solid var(--line); padding: 22px 0 26px; break-inside: avoid; }
+  .q-stat .num { font: 700 12px/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .q-stat h3 { font: 700 21px/1.3 var(--font-eleve); white-space: pre-wrap; margin: 6px 0 16px; overflow-wrap: anywhere; }
+  .q-stat .resume-q { font-size: 15px; margin-top: 12px; color: var(--muted); }
+  .q-stat .resume-q b { color: var(--fg); }
+  .q-stat .lv-res-qcm { max-width: 860px; font-size: 17px; }
+  .q-stat .lv-res-echelle { height: 160px; max-width: 640px; }
+  .q-stat .lv-res-echelle-legende { max-width: 640px; }
+  .q-stat .lv-res-nuage { font-size: 15px; padding: 10px 0; justify-content: flex-start; }
+  .q-stat .lv-res-libre { columns: 2 300px; font-size: 16px; }
+  .table-defile { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th { text-align: left; font: 700 13px/1.2 var(--font-display); color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line-strong); white-space: nowrap; background: var(--surface-2); position: sticky; top: 0; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.nom { white-space: nowrap; font-weight: 700; }
+  td .ok { color: var(--ok); font-weight: 700; }
+  td .ko { color: var(--bad); font-weight: 700; }
+  td.vide { color: var(--faint); }
+  .vide-bloc { padding: 28px; text-align: center; color: var(--muted); border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); }
+  .message { max-width: 620px; margin: 10vh auto; text-align: center; display: grid; gap: 16px; justify-items: center; padding: 0 16px; }
+  .message p { color: var(--muted); }
+  .message .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .q-stat .lv-res-classement { max-width: 860px; font-size: 17px; }
+  .q-stat .lv-image { justify-content: flex-start; }
+  .q-stat .lv-image img { max-height: 180px; }
+  .q-stat .corps { white-space: pre-wrap; color: var(--muted); max-width: 70ch; }
+  .q-stat .q-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .classement-final { margin-bottom: 34px; }
+  td.r { font-family: var(--font-display); font-variant-numeric: tabular-nums; color: var(--muted); }
+  td.pts { font-family: var(--font-display); font-variant-numeric: tabular-nums; font-weight: 700; }
+  @media (max-width: 760px) {
+    .eb-actions .btn > span:not(.ic) { display: none; }
+    .eb-actions .btn { width: 36px; padding: 0; }
+    .chiffre { border-left: 0; border-top: 1px solid var(--line); }
+    .chiffre:first-child { border-top: 0; }
+  }
+  .eb-etat[data-etat="propre"] { display: none; }
+  @media print {
+    .eb-barre, .pas-imprimer, .eb-toasts { display: none !important; }
+    body { background: #fff; color: #000; font-size: 11pt; }
+    .page { padding: 0; max-width: none; }
+    .table-defile { overflow: visible; border: 0; }
+    .lv-barre i, .lv-res-echelle .lv-b, .lv-lettre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<main class="page" id="app"><p class="muted">Chargement des résultats…</p></main>
+<script src="/js/etabli-client.js"></script>
+<script src="/js/etabli-ui.js"></script>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/live-commun.js"></script>
+<script src="/js/live-jeu.js"></script>
+<script src="/js/live-resultats.js"></script>
+<script>
+(async () => {
+  'use strict';
+  const { h, $, LETTRES, TYPES } = Live;
+  const app = $('#app');
+  const code = Live.codeDansAdresse();
+  const jeton = code ? Live.jetonSession(code) : null;
+  const barre = EtabliUI.barre({ titre: 'Résultats', type: 'quiz', editable: false });
+
+  function message(titre, texte, boutons) {
+    app.replaceChildren(h('div', { class: 'message' }, h('h1', {}, titre), h('p', {}, texte), h('div', { class: 'btns' }, boutons || [])));
+  }
+  if (!code) { message('Adresse incomplète', 'Ouvre les résultats depuis l’historique d’un quiz.', [h('a', { class: 'btn btn-primary', href: '/' }, 'Aller au pupitre')]); return; }
+
+  await Etabli.pret;
+  let D;
+  try {
+    D = await Etabli.live.lire(code, jeton || undefined);
+  } catch (e) {
+    const pasConnecte = Etabli.mode() !== 'compte';
+    message('Résultats indisponibles',
+      e.code === 'reseau' ? e.message
+        : pasConnecte ? 'Ces résultats appartiennent à un compte. Connecte-toi avec le compte qui a lancé la session.'
+          : 'Cette session n’existe pas, ou elle a été lancée depuis un autre compte.',
+      [pasConnecte ? h('a', { class: 'btn btn-primary', href: '/#connexion' }, 'Se connecter') : null, h('a', { class: 'btn', href: '/' }, 'Pupitre')]);
+    return;
+  }
+  const C = D.config, Q = C.questions || [];
+  const quizId = C.quizId || C.activiteId;
+  barre.setTitre(C.titre || 'Résultats');
+  document.title = (C.titre || 'Quiz') + ' · Résultats · L’Établi';
+
+  // participant·es ayant répondu au moins une fois
+  const repPar = new Map();
+  for (const r of D.reponses) {
+    if (!repPar.has(r.pid)) repPar.set(r.pid, new Map());
+    repPar.get(r.pid).set(r.q, r.valeur);
+  }
+  // tableau participatif : nombre de notes par personne et par question
+  const notesD = D.notes || [];
+  const notesPar = new Map();
+  for (const n of notesD) {
+    if (!repPar.has(n.pid)) repPar.set(n.pid, new Map());
+    const k = n.pid + '|' + n.q;
+    notesPar.set(k, (notesPar.get(k) || 0) + 1);
+  }
+  const notesDe = (pid, qi) => notesPar.get(pid + '|' + qi) || 0;
+  const avecReponses = (q) => q.type !== 'diapo';
+  const itemsDe = (q) => (q.items || []).map((x) => x.texte || '');
+  const ordreTexte = (q, v) => String(v).split(',').map((x, k) => (k + 1) + '. ' + (itemsDe(q)[Number(x)] || '')).join(' / ');
+  let anonyme = 0;
+  const personnes = D.participants
+    .filter((p) => repPar.has(p.id))
+    .sort((a, b) => (a.carte == null ? 1e9 : a.carte) - (b.carte == null ? 1e9 : b.carte) || a.rejoint - b.rejoint)
+    .map((p) => ({ id: p.id, nom: p.carte != null ? 'Carte ' + p.carte + (p.pseudo ? ' · ' + p.pseudo : '') : p.pseudo || 'Anonyme ' + ++anonyme, rep: repPar.get(p.id) }));
+
+  const personnesParId = new Map(personnes.map((p) => [p.id, p]));
+  const bonnesDe = (q) => (q.type === 'qcm' ? q.options.map((o, i) => (o.bonne ? i : -1)).filter((i) => i >= 0) : []);
+  const posees = new Set(D.reponses.map((r) => r.q));
+  const notees = Q.map((q, i) => ({ q, i, b: bonnesDe(q) })).filter((x) => x.b.length && posees.has(x.i));
+  const score = (p) => notees.reduce((s, x) => s + (p.rep.has(x.i) && x.b.indexOf(Number(p.rep.get(x.i))) !== -1 ? 1 : 0), 0);
+  let totalNote = 0, totalJuste = 0;
+  for (const x of notees) for (const p of personnes) if (p.rep.has(x.i)) { totalNote++; if (x.b.indexOf(Number(p.rep.get(x.i))) !== -1) totalJuste++; }
+  const reussite = totalNote ? Math.round((100 * totalJuste) / totalNote) : null;
+  const duree = D.etat.debut && D.etat.fin ? Math.max(1, Math.round((D.etat.fin - D.etat.debut) / 60000)) : null;
+  const masquesDe = (i) => (D.etat.masques && D.etat.masques[i]) || [];
+
+  /* ---------- exports ---------- */
+  const csvCellule = (v) => {
+    let s = String(v == null ? '' : v);
+    if (/^[=+\-@\t]/.test(s)) s = "'" + s; // pas de formule venue d'une réponse
+    return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  function exportCsv() {
+    const L = [];
+    L.push(['L’Établi · ' + (C.titre || 'Quiz')]);
+    L.push(['Session ' + C.code + ' du ' + Live.date(C.cree), C.mode === 'cartes' ? 'Mode cartes' : 'Mode appareils']);
+    L.push([]);
+    const QR = Q.map((q, i) => ({ q, i })).filter((x) => avecReponses(x.q));
+    L.push(['Participant·e', ...QR.map(({ q, i }) => 'Q' + (i + 1) + ' · ' + (q.texte || '').replace(/\s+/g, ' ').slice(0, 60)), ...(notees.length ? ['Score (sur ' + notees.length + ')'] : [])]);
+    for (const p of personnes) {
+      L.push([p.nom, ...QR.map(({ q, i }) => {
+        if (q.type === 'idees') return notesDe(p.id, i) ? Live.pluriel(notesDe(p.id, i), 'note', 'notes') : '';
+        const v = p.rep.get(i);
+        if (v === undefined) return '';
+        if (q.type === 'qcm') {
+          const b = bonnesDe(q);
+          return LETTRES[v] + ' · ' + ((q.options[v] && q.options[v].texte) || '') + (b.length ? (b.indexOf(Number(v)) !== -1 ? ' (juste)' : ' (faux)') : '');
+        }
+        if (q.type === 'classement') return ordreTexte(q, v);
+        return v;
+      }), ...(notees.length ? [score(p)] : [])]);
+    }
+    if (D.classement && D.classement.length) {
+      L.push([]);
+      L.push(['Classement du jeu']);
+      L.push(['Place', 'Pseudo', 'Points', 'Bonnes réponses']);
+      for (const x of D.classement) L.push([x.rang, x.pseudo, x.points, x.bonnes]);
+    }
+    L.push([]);
+    L.push(['Résumé par question']);
+    L.push(['Question', 'Type', 'Réponses', 'Détail', 'Taux de réussite']);
+    Q.forEach((q, i) => {
+      const r = LiveVue.agreger(q, i, D.reponses);
+      let detail = '';
+      if (q.type === 'qcm') detail = q.options.map((o, k) => LETTRES[k] + ' ' + o.texte + ' : ' + r.comptes[k]).join(' | ');
+      if (q.type === 'echelle') detail = 'Moyenne ' + (r.moyenne === null ? '' : r.moyenne.toFixed(2).replace('.', ',')) + ' | ' + Object.entries(r.comptes).map(([v, n]) => v + ' : ' + n).join(' | ');
+      if (q.type === 'nuage') detail = r.mots.slice(0, 30).map((m) => m.mot + ' (' + m.n + ')').join(' | ');
+      if (q.type === 'classement') detail = itemsDe(q).map((t, k) => ({ t, m: r.moyennes[k] })).sort((a, b) => (a.m == null ? 99 : a.m) - (b.m == null ? 99 : b.m)).map((x) => x.t + ' : ' + (x.m == null ? '' : x.m.toFixed(2).replace('.', ','))).join(' | ');
+      if (q.type === 'idees') {
+        const ns = notesD.filter((n) => n.q === i);
+        r.total = ns.length;
+        detail = ns.slice().sort((a, b) => b.votes - a.votes).slice(0, 30).map((n) => n.texte + ' (' + n.votes + ')').join(' | ');
+      }
+      const b = bonnesDe(q);
+      const t = b.length && r.total ? Math.round((100 * b.reduce((s, k) => s + r.comptes[k], 0)) / r.total) + ' %' : '';
+      L.push(['Q' + (i + 1) + ' · ' + (q.texte || '').replace(/\s+/g, ' '), TYPES[q.type], r.total, detail, t]);
+    });
+    const csv = '﻿' + L.map((l) => l.map(csvCellule).join(';')).join('\r\n');
+    Live.telecharger('etabli-' + Live.nomFichier(C.titre) + '-' + C.code + '.csv', csv, 'text/csv;charset=utf-8');
+  }
+  function exportNotes(qi) {
+    const q = Q[qi];
+    const cols = new Map((q.colonnes || []).map((c) => [c.id, c.titre]));
+    const L = [['L’Établi · ' + (C.titre || 'Quiz') + ' · Q' + (qi + 1)], [q.texte || ''], [],
+      ['Note', 'Colonne', 'Votes', 'Statut', 'Auteur·e', 'Heure']];
+    const statuts = { ok: 'visible', attente: 'en attente', masque: 'masquée' };
+    notesD.filter((n) => n.q === qi).sort((a, b) => b.votes - a.votes || a.t - b.t).forEach((n) => L.push([n.texte, cols.get(n.col) || '', n.votes, (statuts[n.statut] || n.statut) + (n.repondue ? ', répondue' : ''), (personnesParId.get(n.pid) || {}).nom || '', Live.heure(n.t)]));
+    const csv = '\uFEFF' + L.map((l) => l.map(csvCellule).join(';')).join('\r\n');
+    Live.telecharger('etabli-' + Live.nomFichier(C.titre) + '-' + C.code + '-tableau-q' + (qi + 1) + '.csv', csv, 'text/csv;charset=utf-8');
+  }
+  function exportJson() {
+    Live.telecharger('etabli-' + Live.nomFichier(C.titre) + '-' + C.code + '.json', JSON.stringify(Object.assign({ format: 'etabli-session', version: 1 }, D), null, 2), 'application/json');
+  }
+
+  // actions de la barre commune
+  const act = (label, icone, fn, titre, primaire) => {
+    const b = h('button', { type: 'button', class: 'btn btn-sm ' + (primaire ? 'btn-primary' : 'btn-ghost'), title: titre || label, onclick: fn }, Live.ic(icone), h('span', {}, label));
+    barre.actions.appendChild(b);
+    return b;
+  };
+  act('Excel', 'telecharger', exportCsv, 'Télécharger pour Excel (CSV)', true);
+  act('JSON', 'telecharger', exportJson, 'Fichier complet (.json)');
+  act('Imprimer', 'imprimer', () => print(), 'Imprimer ou enregistrer en PDF');
+
+  /* ---------- page ---------- */
+  const tableau = personnes.length
+    ? h('div', { class: 'table-defile' }, h('table', {},
+        h('thead', {}, h('tr', {}, h('th', {}, 'Participant·e'), Q.map((q, i) => (avecReponses(q) ? h('th', { title: q.texte }, 'Q' + (i + 1)) : null)), notees.length ? h('th', {}, 'Score') : null)),
+        h('tbody', {}, personnes.map((p) => h('tr', {},
+          h('td', { class: 'nom' }, p.nom),
+          Q.map((q, i) => {
+            if (!avecReponses(q)) return null;
+            if (q.type === 'idees') return notesDe(p.id, i) ? h('td', {}, Live.pluriel(notesDe(p.id, i), 'note', 'notes')) : h('td', { class: 'vide' }, '·');
+            const v = p.rep.get(i);
+            if (v === undefined) return h('td', { class: 'vide' }, '·');
+            if (q.type === 'qcm') {
+              const b = bonnesDe(q);
+              const juste = b.indexOf(Number(v)) !== -1;
+              return h('td', { title: (q.options[v] && q.options[v].texte) || '' }, LETTRES[v], b.length ? h('span', { class: juste ? 'ok' : 'ko', html: ' ' + Live.icone(juste ? 'check' : 'croix').replace('class="ico"', 'class="ico" style="width:15px;height:15px;vertical-align:-2px"') + '<span class="lv-sr">' + (juste ? ' juste' : ' faux') + '</span>' }) : null);
+            }
+            const txt = q.type === 'classement' ? ordreTexte(q, v) : String(v);
+            return h('td', { title: txt }, txt.length > 28 ? txt.slice(0, 28) + '…' : txt);
+          }),
+          notees.length ? h('td', { class: 'nom' }, score(p) + ' / ' + notees.length) : null)))))
+    : h('p', { class: 'vide-bloc' }, 'Aucune réponse enregistrée pour cette session.');
+
+  const nomC = Live.nomClasse(C.classe);
+  app.replaceChildren(
+    h('p', { class: 'eyebrow' }, 'Résultats de session'),
+    h('h1', { class: 'titre' }, C.titre || 'Quiz'),
+    h('p', { class: 'meta' },
+      h('span', {}, 'Session ' + Live.formatCode(C.code)),
+      h('span', {}, Live.date(C.cree)),
+      h('span', {}, C.mode === 'cartes' ? 'Mode cartes' : 'Mode appareils'),
+      nomC ? h('span', {}, 'Classe ' + nomC) : null,
+      C.jeu ? h('span', {}, 'Mode jeu') : null,
+      C.demo ? h('span', {}, 'Démonstration') : null),
+    h('div', { class: 'btns pas-imprimer', style: { display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '16px' } },
+      h('a', { class: 'btn btn-sm', href: '/projeter/' + C.code }, Live.ic('projeter'), 'Rouvrir la projection'),
+      quizId ? h('a', { class: 'btn btn-sm', href: '/quiz/?doc=' + encodeURIComponent(quizId) }, Live.ic('quiz'), 'Éditeur du quiz') : null,
+      h('a', { class: 'btn btn-sm btn-ghost', href: '/' }, Live.ic('logo'), 'Pupitre')),
+    h('div', { class: 'chiffres' },
+      h('div', { class: 'chiffre' }, h('b', {}, String(personnes.length)), h('span', {}, personnes.length > 1 ? 'participant·es' : 'participant·e')),
+      h('div', { class: 'chiffre' }, h('b', {}, String(D.reponses.length)), h('span', {}, D.reponses.length > 1 ? 'réponses' : 'réponse')),
+      reussite !== null ? h('div', { class: 'chiffre' }, h('b', {}, reussite + ' %'), h('span', {}, 'de bonnes réponses')) : null,
+      duree ? h('div', { class: 'chiffre' }, h('b', {}, duree + ' min'), h('span', {}, 'de session')) : null),
+    D.classement && D.classement.length ? h('section', { class: 'classement-final' },
+      h('h2', { class: 'section' }, 'Classement du jeu'),
+      h('div', { class: 'table-defile' }, h('table', {},
+        h('thead', {}, h('tr', {}, h('th', {}, 'Place'), h('th', {}, 'Pseudo'), h('th', {}, 'Points'), h('th', {}, 'Bonnes réponses'))),
+        h('tbody', {}, D.classement.map((x) => h('tr', {}, h('td', { class: 'r' }, LiveJeu.rang(x.rang)), h('td', { class: 'nom' }, x.pseudo), h('td', { class: 'pts' }, LiveJeu.points(x.points)), h('td', {}, String(x.bonnes)))))))) : '',
+    h('h2', { class: 'section' }, 'Question par question'),
+    ...Q.map((q, i) => {
+      const r = LiveVue.agreger(q, i, D.reponses, masquesDe(i));
+      const b = bonnesDe(q);
+      const taux = b.length && r.total ? Math.round((100 * b.reduce((s, k) => s + r.comptes[k], 0)) / r.total) : null;
+      const fig = Live.figureImage(q.image, { vignette: true });
+      if (q.type === 'diapo') {
+        return h('section', { class: 'q-stat' },
+          h('p', { class: 'num' }, 'Étape ' + (i + 1) + ' · ' + TYPES[q.type]),
+          h('h3', {}, q.texte || '(diapositive sans titre)'), fig,
+          q.corps ? h('p', { class: 'corps' }, q.corps) : null);
+      }
+      if (q.type === 'idees') {
+        const ns = notesD.filter((n) => n.q === i);
+        const votes = ns.reduce((s, n) => s + (n.votes || 0), 0);
+        const masquees = ns.filter((n) => n.statut === 'masque').length;
+        return h('section', { class: 'q-stat' },
+          h('p', { class: 'num' }, 'Question ' + (i + 1) + ' · ' + (q.variante === 'questions' ? 'Questions de la salle' : TYPES[q.type])),
+          h('h3', {}, q.texte || '(tableau sans consigne)'), fig,
+          LiveVue.notes(ns, { colonnes: q.colonnes, auteurs: true, statuts: true }),
+          h('p', { class: 'resume-q' }, h('b', {}, Live.pluriel(ns.length, 'note', 'notes')), votes ? ' · ' + Live.pluriel(votes, 'vote', 'votes') : '',
+            masquees ? ' · ' + Live.pluriel(masquees, 'note masquée', 'notes masquées') : ''),
+          ns.length ? h('div', { class: 'q-btns pas-imprimer' }, h('button', { type: 'button', class: 'btn btn-sm', onclick: () => exportNotes(i) }, Live.ic('telecharger'), 'Notes pour Excel (CSV)')) : null);
+      }
+      return h('section', { class: 'q-stat' },
+        h('p', { class: 'num' }, 'Question ' + (i + 1) + ' · ' + TYPES[q.type]),
+        h('h3', {}, q.texte || '(question sans texte)'), fig,
+        LiveVue.rendre(q, r, { revele: true, tailleMax: 3, montrerMasques: true }),
+        h('p', { class: 'resume-q' }, h('b', {}, Live.pluriel(r.total, 'réponse', 'réponses')), taux !== null ? ' · ' + taux + ' % de bonnes réponses' : '', q.type === 'libre' && masquesDe(i).length ? ' · ' + Live.pluriel(masquesDe(i).length, 'réponse masquée', 'réponses masquées') + ' en classe' : ''));
+    }),
+    h('h2', { class: 'section', style: { marginTop: '36px' } }, 'Réponses par participant·e'),
+    tableau);
+})();
+</script>
+</body>
+</html>

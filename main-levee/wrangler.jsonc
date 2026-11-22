@@ -1,0 +1,17 @@
+// Configuration de TRAVAIL LOCAL pour Main levée (reconstituée le 26.10.2026), pas celle de la mise en ligne.
+// - essayer en local : npx --yes wrangler@4 dev --persist-to ~/.cache/outils-maison-ia/main-levee   (http://127.0.0.1:8787)
+// - mettre en ligne (depuis le dossier parent, avec accord) : node outils/mettre-en-ligne.mjs main-levee --construire --essai
+// Réglages d'interface identiques à ceux en ligne (relevés le 26.10.2026).
+{
+  "name": "main-levee-local",
+  "main": "source-reconstituee/main-levee-worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "en-ligne/fichiers-publics", "binding": "ASSETS", "html_handling": "auto-trailing-slash" },
+  "durable_objects": { "bindings": [
+    { "name": "ESPACE", "class_name": "Espace" },
+    { "name": "REGISTRE", "class_name": "Registre" },
+    { "name": "SESSION", "class_name": "Session" }
+  ] },
+  "migrations": [{ "tag": "local-v1", "new_sqlite_classes": ["Espace", "Registre", "Session"] }],
+  "observability": { "enabled": true }
+}

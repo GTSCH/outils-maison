@@ -1,0 +1,71 @@
+/*
+ * L'Établi : badges imprimables des élèves. À l'écran, un aperçu réduit des feuilles A4 ; à l'impression,
+ * les feuilles seules, en taille réelle (2 colonnes de 4 ou 5 badges, traits de coupe en pointillés).
+ */
+body { min-height: 100vh; }
+.bd-chargement { padding: 48px 24px; color: var(--muted); text-align: center; font-family: var(--font-display); }
+.bd-barre .eb-etat[data-etat="propre"] { display: none; }
+.bd-ecran { max-width: 1120px; margin: 0 auto; padding: 24px 16px 8px; display: grid; gap: 16px; }
+.bd-intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 32px; align-items: start; }
+.bd-intro h1 { margin: 4px 0 10px; font-size: clamp(24px, 3vw, 34px); }
+.bd-intro p:not(.eyebrow) { max-width: 66ch; color: var(--muted); }
+.bd-intro .eyebrow { color: var(--t-classe); }
+.bd-code { display: grid; justify-items: center; gap: 4px; padding: 14px 22px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.bd-code span { color: var(--muted); font-size: 13px; font-weight: 700; }
+.bd-code b { font: 700 34px/1 var(--font-display); letter-spacing: .06em; }
+.bd-alerte { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radius); background: var(--warn-soft); font-size: 15px; }
+.bd-alerte > span { display: grid; flex: none; color: var(--warn); }
+.bd-alerte svg { width: 22px; height: 22px; }
+.bd-reglages { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 16px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.bd-reglages .field { flex: 0 1 320px; }
+.bd-retour { margin-left: auto; }
+.bd-resume { color: var(--muted); font-size: 15px; }
+.bd-resume b { color: var(--fg); }
+
+.bd-vide { display: grid; justify-items: center; gap: 12px; max-width: 620px; margin: 40px auto; padding: 36px 24px; border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); background: var(--surface); text-align: center; }
+.bd-vide h1 { font-size: 24px; }
+.bd-vide p { color: var(--muted); }
+.bd-vide-ico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; background: var(--t-classe); color: #fff; }
+.bd-vide-ico svg { width: 30px; height: 30px; }
+
+/* aperçu : feuilles A4 réduites */
+.bd-apercu { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: 1120px; margin: 0 auto; padding: 12px 16px 60px; }
+.bd-apercu:empty { display: none; }
+.bd-cadre { width: calc(210mm * var(--z)); height: calc(297mm * var(--z)); overflow: hidden; flex: none; background: #fff; box-shadow: var(--shadow); border-radius: 2px; }
+.bd-cadre .bd-feuille { transform: scale(var(--z)); transform-origin: top left; }
+
+/* la feuille et les badges (toujours papier blanc, encre sombre) */
+.bd-feuille { width: 210mm; height: 297mm; display: grid; grid-template-columns: 1fr 1fr; background: #fff; color: #141A1E; }
+.bd-feuille.f8 { grid-template-rows: repeat(4, 1fr); --qr: 36mm; --pre: 8.2mm; --lig: 4.4mm; --con: 3.1mm; --pad: 5.5mm; }
+.bd-feuille.f10 { grid-template-rows: repeat(5, 1fr); --qr: 30mm; --pre: 7mm; --lig: 3.9mm; --con: 2.75mm; --pad: 4.5mm; }
+.bd-badge { position: relative; display: grid; grid-template-columns: var(--qr) minmax(0, 1fr); gap: 4.5mm; align-items: center; padding: var(--pad); border-right: .25mm dashed #9AA7A3; border-bottom: .25mm dashed #9AA7A3; overflow: hidden; }
+.bd-badge:nth-child(2n) { border-right: 0; }
+.bd-badge.vide { border-color: transparent; }
+.bd-qr { width: var(--qr); height: var(--qr); }
+.bd-qr svg { display: block; width: 100%; height: 100%; }
+.bd-txt { display: grid; gap: 1.2mm; min-width: 0; font-family: var(--font-eleve); }
+.bd-prenom { font: 700 var(--pre)/1.05 var(--font-eleve); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bd-ligne { display: flex; align-items: baseline; gap: 2mm; font-size: var(--lig); line-height: 1.2; }
+.bd-ligne span { min-width: 18mm; color: #4A5559; font-size: calc(var(--lig) * .8); }
+.bd-ligne b { padding: .5mm 1.8mm; border: .3mm solid #141A1E; border-radius: 1.2mm; font: 700 var(--lig)/1.15 var(--font-display); letter-spacing: .04em; }
+.bd-ligne .bd-secret { font-family: var(--font-eleve); letter-spacing: .02em; }
+.bd-consignes { margin: .6mm 0 0; padding-left: 4mm; font-size: var(--con); line-height: 1.3; color: #2A3438; }
+.bd-pied { font-size: calc(var(--con) * .92); color: #5B666A; font-style: italic; }
+
+@media (max-width: 760px) {
+  .bd-intro { grid-template-columns: minmax(0, 1fr); }
+  .bd-code { justify-items: start; }
+  .bd-reglages .field { flex: 1 1 100%; }
+  .bd-reglages .btn { flex: 1 1 100%; }
+  .bd-retour { margin-left: 0; }
+}
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+  html, body { margin: 0; background: #fff; }
+  .eb-barre, .bd-ecran, .eb-toasts { display: none !important; }
+  .bd-apercu { display: block; padding: 0; margin: 0; max-width: none; }
+  .bd-cadre { width: auto; height: auto; overflow: visible; box-shadow: none; border-radius: 0; }
+  .bd-cadre .bd-feuille { transform: none; }
+  .bd-feuille { break-after: page; page-break-after: always; }
+  .bd-cadre:last-child .bd-feuille { break-after: auto; page-break-after: auto; }
+}

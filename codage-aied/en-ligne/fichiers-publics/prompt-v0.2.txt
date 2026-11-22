@@ -1,0 +1,46 @@
+Tu vas coder un article scientifique joint en PDF selon trois critères. Travaille uniquement à partir du texte de l'article : n'utilise aucune connaissance extérieure sur l'article, ses auteur·es ou le domaine, et ne fais aucune recherche.
+
+RÈGLES GÉNÉRALES
+- Chaque élément se code oui ou non. Il n'y a pas de réponse intermédiaire.
+- Un oui exige un passage du texte qui le justifie. Copie ce passage mot pour mot, dans la langue de l'article, sans traduire ni corriger, 30 mots au plus. Indique la page du PDF (1 = première page du fichier) et dis en une phrase pourquoi ce passage remplit la règle.
+- Si aucun passage ne justifie un oui, la réponse est non. Indique alors les sections où tu as cherché.
+- Les sections citées sont des indications. Beaucoup d'articles n'ont pas la structure type : cherche dans tout le texte, tableaux et légendes compris. La bibliographie ne compte pas.
+- Pour chaque élément, indique ton hésitation : 0 aucune, 1 un peu, 2 forte.
+
+C1. DES PERSONNES SITUÉES
+Les personnes concernées par l'étude (apprenant·es, enseignant·es ou autres) sont-elles décrites ?
+- C1a Qui : le texte donne leur statut avec un âge ou un niveau (par exemple « élèves de 6e année », « étudiant·es de première année de licence », « adultes de 25 à 60 ans »).
+- C1b Combien : le texte donne leur nombre.
+- C1c Où : le texte dit où se trouvent ces personnes, par un type d'établissement ou un pays, et dans quelle situation (en classe, en ligne, en laboratoire). Le lieu doit être celui des personnes : la plateforme qui héberge un cours en ligne ne suffit pas.
+Pour des données secondaires (traces, jeux de données existants), la description de la population d'origine compte.
+C1 est réussi si C1a, C1b et C1c sont oui.
+
+C2. UNE THÉORIE QUI TRAVAILLE
+Une théorie de la façon dont les personnes apprennent guide-t-elle l'étude du début à la fin ?
+Par théorie, on entend un cadre ou un concept issu de la recherche sur l'apprentissage, la motivation, le développement ou l'interaction (par exemple charge cognitive, autorégulation, zone proximale de développement, motivation intrinsèque).
+- C2a Nommée : l'article nomme une telle théorie ou un tel concept, avec une référence.
+- C2b Définie : l'article dit, en au moins une phrase, ce que ce concept désigne. Une phrase suffit.
+- C2c Utilisée en méthode : ce concept nomme une variable, une mesure, une condition ou un choix de conception de l'étude.
+- C2d Utilisée pour interpréter : ce concept sert à interpréter ou à discuter les résultats du point de vue de l'apprentissage des personnes.
+Les quatre éléments doivent porter sur le même concept. Si plusieurs concepts sont présents, retiens celui qui va le plus loin et nomme-le. Si C2a est non, C2b, C2c et C2d sont non.
+C2 est réussi si C2a, C2b, C2c et C2d sont oui.
+
+C3. AUTRE CHOSE QUE LA MACHINE
+L'étude rapporte-t-elle quelque chose sur les personnes, et pas seulement sur le système ?
+- C3a Résultat sur les personnes : l'article rapporte au moins un résultat sur ce que des personnes ont appris ou compris, sur leur réussite à une tâche, sur leur pratique observée, ou sur leur perception ou leur expérience recueillie auprès d'elles.
+  Ne comptent pas : la performance d'un système ou d'un modèle (précision, F1, AUC, accord avec un jugement humain, temps de calcul), ni les traces d'interaction prises seules (clics, pauses, retours en arrière, temps passé, nombre d'échanges), même agrégées ou présentées comme indicateurs de processus cognitifs.
+- C3b Discuté : ce résultat sur les personnes est repris dans la discussion ou la conclusion. Si C3a est non, C3b est non.
+Regarde d'abord les résultats, la discussion et la conclusion, puis le résumé.
+C3 est réussi si C3a et C3b sont oui.
+
+HORS CHAMP
+Indique si l'article est une revue de littérature, un article de position ou un travail purement théorique, sans système ni données. Code quand même les trois critères.
+
+FORMAT DE RÉPONSE
+Réponds uniquement avec les deux tableaux suivants, sans commentaire avant ni après.
+
+Tableau 1 : éléments (une ligne par élément : C1a, C1b, C1c, C2a, C2b, C2c, C2d, C3a, C3b)
+| Élément | Réponse | Page | Extrait exact | Pourquoi (une phrase) | Si non : sections examinées | Hésitation |
+
+Tableau 2 : bilan
+| C1 | C2 | C3 | Les trois réussis | Concept retenu pour C2 | Hors champ |

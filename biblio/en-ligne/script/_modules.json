@@ -1,0 +1,15 @@
+{
+ "worker": "biblio",
+ "module_principal": "index.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "bb60580419e33db24df6f12427f837fa99aceb5f127a7a80eb416e18f655b467",
+ "modules": [
+  {
+   "nom": "index.js",
+   "fichier": "index.js",
+   "type": "application/javascript+module",
+   "sha256": "bb60580419e33db24df6f12427f837fa99aceb5f127a7a80eb416e18f655b467",
+   "octets": 4538949
+  }
+ ]
+}

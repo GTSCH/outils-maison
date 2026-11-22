@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon espace · Main levée</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .tete { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  .tete h1 { margin: 0; }
+  .act { display: flex; flex-direction: column; gap: 10px; border-top: 6px solid var(--rouge); }
+  .act h3 { margin: 0; font-size: 22px; overflow-wrap: anywhere; }
+  .act .meta { font-size: 15px; }
+  .act .btns { margin-top: auto; }
+  .act .btns .icone-btn:first-of-type { margin-left: auto; }
+  .icone-btn { min-width: 40px; padding: 7px 9px; }
+
+  /* éditeur */
+  .ed-tete { display: grid; grid-template-columns: 1fr auto; gap: 12px 18px; align-items: center; margin-bottom: 16px; }
+  input.ed-titre { font-family: var(--font-din); font-weight: 700; font-size: 30px; border-width: 0 0 3px; padding: 6px 0; }
+  .sauve { font-size: 15px; min-width: 120px; text-align: right; }
+  .q-bloc { border: 1px solid var(--rd-25); border-left: 8px solid var(--rouge); padding: 16px 18px; margin-bottom: 16px; }
+  .q-tete { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .q-tete .no { font-family: var(--font-din); font-weight: 700; font-size: 20px; }
+  .q-tete select { width: auto; padding: 6px 10px; font-size: 16px; }
+  .q-tete .actions { margin-left: auto; display: flex; gap: 2px; }
+  .q-texte { font-size: 20px; min-height: 60px; }
+  .opts { display: grid; gap: 8px; margin-top: 12px; }
+  .opt-ligne { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; align-items: center; }
+  .opt-ligne .lettre { width: 40px; height: 44px; font-size: 18px; }
+  .bonne-btn { min-width: 168px; }
+  .bonne-btn[aria-pressed=true] { background: var(--fp); border-color: var(--fp); color: var(--blanc); }
+  .aide { font-size: 15px; margin: 8px 0 0; }
+  .ajout { border: 2px dashed var(--rd-50); padding: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .ajout b { margin-right: 6px; }
+  @media (max-width: 640px) {
+    .opt-ligne { grid-template-columns: auto 1fr auto; }
+    .opt-ligne .bonne-btn { grid-column: 2; grid-row: 2; justify-self: start; min-width: 0; }
+    .ed-tete { grid-template-columns: 1fr; }
+    input.ed-titre { font-size: 24px; }
+    .q-bloc { padding: 12px; }
+  }
+  .echelle-reglages { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+
+  /* lancement */
+  .choix-mode { display: grid; gap: 10px; margin: 16px 0; }
+  .choix-mode label { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; border: 2px solid var(--rd-50); padding: 14px; cursor: pointer; }
+  .choix-mode label:has(input:checked) { border-color: var(--rouge); background: #FDF3F4; }
+  .choix-mode input { width: 22px; height: 22px; accent-color: var(--rouge); grid-row: span 2; margin-top: 2px; }
+  .choix-mode b { font-family: var(--font-din); font-size: 19px; }
+
+  .lien-boite { display: flex; gap: 0; border: 2px solid var(--encre); }
+  .lien-boite input { border: 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; }
+  .lien-boite .btn { border-width: 0 0 0 2px; }
+  .section { margin-top: 40px; }
+  .apercu-texte { max-height: 200px; overflow: auto; background: var(--rd-10); padding: 10px 14px; font-size: 15px; }
+  .apercu-texte ol { margin: 0; padding-left: 22px; }
+  pre.format { background: var(--rd-10); padding: 12px 14px; font-size: 14px; white-space: pre-wrap; margin: 8px 0; }
+  .noms-apercu { font-size: 15px; columns: 2; }
+</style>
+</head>
+<body>
+<header class="entete">
+  <a class="marque" href="#/"><b>Main levée</b><span>Espace enseignant·e</span></a>
+  <div class="droite">
+    <a class="btn petit discret" href="#/lien" id="btn-lien"></a>
+    <span id="logo"></span>
+  </div>
+</header>
+<main class="page" id="app"><p>Chargement…</p></main>
+<footer style="padding: 14px var(--gouttiere) 22px; text-align: center; font-size: 15px;"><a href="/confidentialite">Protection des données</a></footer>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script src="/js/espace.js"></script>
+</body>
+</html>

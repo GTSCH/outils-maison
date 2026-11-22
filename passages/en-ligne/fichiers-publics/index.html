@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Passages : ta bibliothèque d’articles, lisible par Claude</title>
+<meta name="description" content="Une bibliothèque de recherche en ligne, sur ton propre compte : tes PDF, tes surlignages, la recherche dans le texte, et des citations qui ouvrent le passage exact. Import depuis Zotero, connexion à Claude.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2318243A'/%3E%3Crect x='7' y='9' width='18' height='4' rx='1' fill='%23FFE04A'/%3E%3Crect x='7' y='16' width='14' height='2' rx='1' fill='%23fff'/%3E%3Crect x='7' y='21' width='16' height='2' rx='1' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --desk: #e7ebef;
+  --paper: #ffffff;
+  --ink: #18243a;
+  --ink-soft: #4f5c6d;
+  --rule: #cbd3db;
+  --mark: #ffe04a;
+  --mark-ink: #18243a;
+  --link: #2f5fb8;
+  --ok: #1d7a4c;
+  --warn: #8a5600;
+  --err: #b3261e;
+  --serif: 'Literata', Georgia, serif;
+  --sans: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #10151c; --paper: #18202a; --ink: #e6ecf2; --ink-soft: #a6b1be; --rule: #2c3744;
+    --mark: rgba(255, 214, 10, .42); --mark-ink: #fff6c8; --link: #8db2ee; --ok: #6fd0a0; --warn: #f0b860; --err: #ff9a8f;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body { margin: 0; background: var(--desk); color: var(--ink); font: 18px/1.6 var(--sans); }
+a { color: var(--link); }
+:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+.narrow { max-width: 760px; }
+
+/* en-tête */
+.top { display: flex; align-items: center; gap: 24px; padding: 18px 0; }
+.wordmark { font: 700 22px var(--serif); color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+.wordmark svg { flex: none; }
+.top nav { margin-left: auto; display: flex; gap: 22px; font-size: 16px; }
+.top nav a { color: var(--ink-soft); text-decoration: none; }
+.top nav a:hover { color: var(--ink); text-decoration: underline; }
+
+/* ouverture */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 48px; align-items: center; padding: 40px 0 72px; }
+.hero h1 { font: 700 clamp(48px, 8vw, 84px)/1 var(--serif); letter-spacing: -.02em; margin: 0 0 22px; }
+.hero .lead { font: 400 clamp(21px, 2.4vw, 26px)/1.45 var(--serif); margin: 0 0 30px; max-width: 30ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { font: 700 17px var(--sans); border-radius: 10px; padding: 13px 20px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn.quiet { background: transparent; color: var(--ink); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.small { font-size: 15px; padding: 8px 14px; border-width: 1.5px; }
+
+/* l'illustration : un texte, une citation, la page du PDF */
+.scene { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.sheet { background: var(--paper); border-radius: 6px; box-shadow: 0 1px 0 var(--rule), 0 14px 34px rgba(24, 36, 58, .12); padding: 22px 22px 26px; min-height: 300px; }
+.sheet .label { font-size: 14px; color: var(--ink-soft); margin-bottom: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; }
+.ln { display: block; height: 9px; border-radius: 5px; background: var(--rule); margin: 0 0 12px; }
+.inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.inline .ln { margin: 0; flex: 1 1 40px; }
+.cite { font: 700 15px var(--sans); color: var(--link); background: transparent; border: 0; padding: 2px 4px; border-radius: 4px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; white-space: nowrap; }
+.cite[aria-pressed="true"] { background: var(--mark); color: var(--mark-ink); text-decoration: none; }
+.pdf { transform: translateY(10px); opacity: .55; transition: transform .45s ease, opacity .45s ease; }
+.pdf.open { transform: none; opacity: 1; }
+.pdf .pg { font-weight: 700; color: var(--ink); }
+.hl { position: relative; }
+.hl::before { content: ''; position: absolute; left: -4px; top: -6px; bottom: -6px; width: 0; background: var(--mark); border-radius: 3px; z-index: 0; transition: width .7s ease .25s; }
+.pdf.open .hl::before { width: calc(100% + 8px); }
+.hl .ln { position: relative; z-index: 1; background: color-mix(in srgb, var(--rule) 70%, var(--ink) 30%); }
+.pdf .note { font-size: 14px; color: var(--ink-soft); margin-top: 18px; opacity: 0; transition: opacity .3s ease .9s; }
+.pdf.open .note { opacity: 1; }
+.scene-caption { grid-column: 1 / -1; font-size: 15px; color: var(--ink-soft); margin: 4px 0 0; }
+
+/* sections */
+section { padding: 64px 0; border-top: 1px solid var(--rule); }
+h2 { font: 700 clamp(30px, 4vw, 40px)/1.15 var(--serif); margin: 0 0 18px; letter-spacing: -.01em; }
+h3 { font: 600 22px/1.3 var(--serif); margin: 0 0 6px; }
+.intro { font: 400 21px/1.55 var(--serif); max-width: 62ch; margin: 0 0 32px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 48px; }
+.grid2 p, .facts p { margin: 0; max-width: 52ch; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }
+.soft { color: var(--ink-soft); }
+
+/* installation */
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; display: grid; gap: 18px; }
+.step { counter-increment: step; background: var(--paper); border-radius: 10px; padding: 22px 24px 24px 76px; position: relative; border: 2px solid transparent; }
+.step::before { content: counter(step); position: absolute; left: 22px; top: 20px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 700 18px var(--serif); background: var(--desk); color: var(--ink); }
+.step.done::before { content: '✓'; background: var(--ok); color: #fff; }
+.step.current { border-color: var(--ink); }
+.step.locked { opacity: .55; }
+.step p { margin: 6px 0 12px; max-width: 64ch; }
+.step ul, .step ol { margin: 6px 0 14px; padding-left: 20px; }
+.step ol li + li { margin-top: 4px; }
+.field { display: grid; gap: 6px; margin: 12px 0; max-width: 560px; }
+.field span { font-size: 15px; color: var(--ink-soft); }
+.field input { font: 17px var(--sans); padding: 11px 13px; border-radius: 8px; border: 1.5px solid var(--rule); background: var(--desk); color: var(--ink); width: 100%; }
+.addr { display: flex; align-items: center; flex-wrap: wrap; font-size: 16px; gap: 2px; }
+.addr input { width: 220px; }
+.checks { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 4px; font-size: 16px; }
+.checks li::before { display: inline-block; width: 1.4em; font-weight: 700; }
+.checks .ok::before { content: '✓'; color: var(--ok); }
+.checks .warn::before { content: '!'; color: var(--warn); }
+.checks .err::before { content: '✗'; color: var(--err); }
+.msg { font-size: 16px; margin: 8px 0 0; }
+.msg.err { color: var(--err); }
+.log { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; font-size: 16px; }
+.log li { display: flex; gap: 10px; }
+.log .s { width: 1.3em; flex: none; font-weight: 700; }
+.log .run .s { color: var(--ink-soft); }
+.log .ok .s { color: var(--ok); }
+.log .warn .s { color: var(--warn); }
+.log .err .s { color: var(--err); }
+.result { background: var(--desk); border-radius: 8px; padding: 14px 16px; margin: 12px 0; }
+.result code { font: 15px ui-monospace, Menlo, monospace; word-break: break-all; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* questions */
+details { border-top: 1px solid var(--rule); padding: 14px 0; }
+details:last-of-type { border-bottom: 1px solid var(--rule); }
+summary { font: 600 20px var(--serif); cursor: pointer; }
+details p { margin: 10px 0 0; max-width: 66ch; }
+footer { padding: 40px 0 60px; font-size: 15px; color: var(--ink-soft); }
+
+@media (max-width: 880px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding-top: 16px; }
+  .grid2, .facts { grid-template-columns: 1fr; }
+  .top nav { gap: 14px; font-size: 15px; }
+}
+@media (max-width: 520px) {
+  .scene { gap: 10px; }
+  .sheet { min-height: 0; padding: 14px 12px 16px; }
+  .sheet .label { font-size: 12px; margin-bottom: 10px; }
+  .sheet .label span + span:not(.pg) { display: none; }
+  .ln { height: 7px; margin-bottom: 9px; }
+  .inline { margin-bottom: 9px; }
+  .cite { font-size: 12px; white-space: normal; text-align: left; }
+  .pdf .note { font-size: 12px; margin-top: 12px; }
+  .step { padding: 64px 18px 20px; }
+  .step::before { left: 18px; top: 16px; }
+  .top nav { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wordmark" href="#"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="currentColor"/><rect x="7" y="9" width="18" height="4" rx="1" fill="#FFE04A"/><rect x="7" y="16" width="14" height="2" rx="1" fill="#fff"/><rect x="7" y="21" width="16" height="2" rx="1" fill="#fff"/></svg>Passages</a>
+    <nav aria-label="Sections"><a href="#fonctions">Ce qu’elle fait</a><a href="#installer">Installer</a><a href="#questions">Questions</a></nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>Passages</h1>
+      <p class="lead">Ta bibliothèque d’articles, en ligne et lisible par Claude. Chaque citation ouvre le PDF sur le passage exact.</p>
+      <div class="actions"><a class="btn" href="#installer">Installer ma bibliothèque</a><a class="btn quiet" href="#fonctions">Voir ce qu’elle fait</a></div>
+    </div>
+    <div class="scene" aria-label="Illustration : une citation dans un texte ouvre la page du PDF, sur le passage surligné">
+      <div class="sheet">
+        <div class="label"><span>Ton texte</span><span>Word, Notion, courriel…</span></div>
+        <span class="ln" style="width:94%"></span>
+        <span class="ln" style="width:100%"></span>
+        <div class="inline"><span class="ln"></span><button class="cite" id="demoCite" aria-pressed="false" aria-controls="demoPdf">(Autrice, 2025, p. 4)</button></div>
+        <span class="ln" style="width:88%"></span>
+        <span class="ln" style="width:96%"></span>
+        <span class="ln" style="width:60%"></span>
+      </div>
+      <div class="sheet pdf" id="demoPdf">
+        <div class="label"><span>Le PDF, dans ta bibliothèque</span><span class="pg">p. 4</span></div>
+        <span class="ln" style="width:100%"></span>
+        <span class="ln" style="width:92%"></span>
+        <div class="hl"><span class="ln" style="width:100%"></span><span class="ln" style="width:97%"></span><span class="ln" style="width:58%;margin-bottom:0"></span></div>
+        <span class="ln" style="width:95%;margin-top:14px"></span>
+        <span class="ln" style="width:83%"></span>
+        <p class="note">Le passage cité est surligné, avec ton commentaire.</p>
+      </div>
+      <p class="scene-caption">Clique sur la citation. Dans ta bibliothèque, c’est le vrai PDF qui s’ouvre, à la bonne page.</p>
+    </div>
+  </div>
+</div>
+
+<section id="fonctions">
+  <div class="wrap">
+    <h2>Ce qu’elle fait</h2>
+    <p class="intro">Une bibliothèque de recherche qui vit en ligne, sur ton propre compte. Tu lis et annotes tes PDF partout, tu cherches dans tout leur texte, et Claude travaille avec tes sources au lieu d’en inventer.</p>
+    <div class="grid2">
+      <div><h3>Lire et annoter partout</h3><p>Un lecteur PDF dans le navigateur, sur ordinateur, tablette ou téléphone. Surlignage en quatre couleurs, commentaires, reprise à la dernière page lue, vue de toutes tes annotations.</p></div>
+      <div><h3>Chercher dans tout le texte</h3><p>Une recherche dans le texte de tous tes PDF, par mots ou par le sens : une question en français trouve aussi un passage en anglais. Chaque résultat ouvre la bonne page.</p></div>
+      <div><h3>Travailler avec Claude</h3><p>Avec le connecteur, Claude cherche dans tes PDF, lit les passages, voit tes surlignages et en ajoute à ta demande. Ses réponses citent tes sources avec des liens vers le passage exact.</p></div>
+      <div><h3>Des citations vérifiables</h3><p>Ces liens fonctionnent dans Word, Notion ou un courriel. Toi, ta direction de thèse ou un jury, vous vérifiez une affirmation en un clic, sur le texte original.</p></div>
+      <div><h3>Partir de Zotero</h3><p>L’assistant de démarrage reprend tes collections, tes PDF et tes surlignages Zotero en quelques minutes. Zotero n’est pas modifié : tu peux continuer à l’utiliser.</p></div>
+      <div><h3>Garder la main</h3><p>Export complet à tout moment (RIS pour Zotero, CSV, bibliographie APA, annotations). Accès invité en lecture seule pour une collègue ou ta direction de thèse.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="donnees">
+  <div class="wrap">
+    <h2>Ta copie, sur ton compte</h2>
+    <div class="facts">
+      <div><h3>Tes données restent chez toi</h3><p>La bibliothèque est installée sur ton propre compte Cloudflare, avec un stockage en Europe. Personne d’autre n’y a accès, pas même l’auteur de Passages.</p></div>
+      <div><h3>Ce que ça coûte</h3><p>Un compte Cloudflare gratuit suffit pour essayer. Pour une vraie bibliothèque, l’offre Workers à 5 $ par mois lit le texte des PDF sur le serveur et donne plus de place. Côté Claude, il faut pouvoir ajouter un connecteur personnalisé (un seul avec l’offre gratuite).</p></div>
+      <div><h3>Et si tu arrêtes</h3><p>Tu exportes tout en un clic, puis tu supprimes la bibliothèque depuis ton compte Cloudflare. Rien n’est conservé ailleurs.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="installer">
+  <div class="wrap narrow">
+    <h2>Installer ma bibliothèque</h2>
+    <p class="intro">Environ un quart d’heure, sans rien télécharger ni installer sur ton ordinateur. Il te faut seulement un navigateur et ton dossier Zotero.</p>
+    <ol class="steps">
+      <li class="step current" id="s1">
+        <h3>Ouvre un compte Cloudflare</h3>
+        <p>Cloudflare héberge ta bibliothèque. Si tu as déjà un compte, passe à l’étape suivante.</p>
+        <div class="row"><a class="btn small" href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener">Créer un compte Cloudflare</a><button class="btn small quiet" data-next="s2">J’ai un compte</button></div>
+        <p class="soft">Conseillé pour une grande bibliothèque : l’offre <b>Workers Paid</b> (5 $ par mois), dans <a href="https://dash.cloudflare.com/?to=/:account/workers/plans" target="_blank" rel="noopener">Workers &amp; Pages › Plans</a>. Tu peux aussi commencer gratuitement et changer plus tard.</p>
+      </li>
+      <li class="step locked" id="s2">
+        <h3>Crée une clé d’installation</h3>
+        <p>Cette clé permet à l’installateur de créer ta bibliothèque sur ton compte. Elle ne sert que pendant l’installation et n’est pas conservée.</p>
+        <ol>
+          <li>Ouvre la page de création de clé : les droits nécessaires sont déjà cochés.</li>
+          <li>Vérifie la liste : Workers Scripts, D1, Workers R2 Storage, Workers KV Storage et Vectorize en <b>Edit</b>, Account Settings en <b>Read</b>. Si une ligne manque, ajoute-la avec « + Add more ».</li>
+          <li>En bas, clique <b>Continue to summary</b>, puis <b>Create Token</b>, et copie la clé affichée.</li>
+        </ol>
+        <div class="row"><a class="btn small" id="tokenLink" target="_blank" rel="noopener">Ouvrir la page de création de clé</a></div>
+        <label class="field"><span>Colle ta clé ici</span><input type="password" id="token" autocomplete="off" spellcheck="false" placeholder="clé Cloudflare"></label>
+        <div class="row"><button class="btn small" id="verify">Vérifier la clé</button></div>
+        <div id="verifyOut"></div>
+      </li>
+      <li class="step locked" id="s3">
+        <h3>Choisis l’adresse et le mot de passe</h3>
+        <label class="field"><span>Nom de ta bibliothèque (lettres sans accents, chiffres, tirets)</span>
+          <span class="addr">https://<input type="text" id="name" value="ma-bibliotheque" autocomplete="off" spellcheck="false">.<span id="sub">ton-compte</span>.workers.dev</span></label>
+        <label class="field"><span>Mot de passe pour ouvrir ta bibliothèque (10 caractères au moins)</span><input type="password" id="password" autocomplete="new-password"></label>
+        <label class="field"><span>Ton adresse e-mail (facultatif : utilisée seulement pour interroger Crossref et Unpaywall poliment, pour les métadonnées et les PDF en libre accès)</span><input type="email" id="email" autocomplete="email"></label>
+        <div class="row"><button class="btn" id="install">Installer ma bibliothèque</button></div>
+        <p class="soft">Déjà installée sous ce nom ? L’installateur met seulement le programme à jour : tes données et ton mot de passe sont conservés.</p>
+      </li>
+      <li class="step locked" id="s4">
+        <h3>Installation</h3>
+        <ul class="log" id="log" aria-live="polite"></ul>
+      </li>
+      <li class="step locked" id="s5">
+        <h3>C’est prêt</h3>
+        <div id="done"></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="questions">
+  <div class="wrap narrow">
+    <h2>Questions</h2>
+    <details><summary>Pourquoi l’installateur a-t-il besoin d’une clé Cloudflare ?</summary><p>Pour créer à ta place, sur ton compte, la base de données, le stockage des PDF, l’index de recherche et le programme. La clé transite une seule fois, n’est ni enregistrée ni journalisée. Supprime-la ensuite depuis ton profil Cloudflare (API Tokens) : ta bibliothèque continue de fonctionner sans elle.</p></details>
+    <details><summary>Mes PDF sont rangés ailleurs que dans Zotero (ZotFile, OneDrive…)</summary><p>L’assistant de démarrage le détecte et te propose de choisir aussi ce dossier. Les PDF sont retrouvés par leur nom de fichier.</p></details>
+    <details><summary>Est-ce que Zotero est modifié ?</summary><p>Non. La base Zotero est seulement lue dans ton navigateur. Tu peux continuer à utiliser Zotero, et relancer l’import plus tard : ce qui est déjà importé est reconnu, sans doublons.</p></details>
+    <details><summary>Comment relier Claude ?</summary><p>À la fin de l’assistant de démarrage, ta bibliothèque affiche l’adresse de ton connecteur et les étapes dans Claude : Personnaliser › Connecteurs › Ajouter un connecteur personnalisé. Cette adresse est personnelle, comme un mot de passe.</p></details>
+    <details><summary>Une mise à jour est sortie : comment l’installer ?</summary><p>Refais l’installation avec le même nom de bibliothèque et une nouvelle clé. Seul le programme est remplacé : tes références, tes PDF, tes annotations et ton mot de passe restent.</p></details>
+    <details><summary>Puis-je montrer ma bibliothèque à quelqu’un ?</summary><p>Oui : un accès invité, avec un second mot de passe, permet de lire tes PDF et tes annotations sans rien modifier. Tu peux aussi publier la bibliographie d’une collection sous forme de page web.</p></details>
+    <details><summary>Qui a fait Passages ?</summary><p>Guillaume Tschupp, formateur d’enseignant·es et chercheur, l’a conçu pour son propre travail de thèse et l’a construit avec Claude. C’est un projet expérimental, fourni tel quel, sans garantie ni support.</p></details>
+  </div>
+</section>
+
+<footer><div class="wrap">Passages · projet expérimental, fourni tel quel. Ta bibliothèque, tes PDF et tes annotations restent sur ton compte.</div></footer>
+
+<script src="/installer.js" type="module"></script>
+</body>
+</html>

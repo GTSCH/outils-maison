@@ -1,0 +1,42 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2025-09-15",
+  "compatibility_flags": [],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "annotations": {
+   "workers/triggered_by": "version_upload"
+  },
+  "bindings": [
+   {
+    "name": "ASSETS",
+    "type": "assets"
+   },
+   {
+    "database_id": "c7e49415-ec73-42b3-bf7e-802dc3876018",
+    "id": "c7e49415-ec73-42b3-bf7e-802dc3876018",
+    "name": "BIBLIO",
+    "type": "d1"
+   },
+   {
+    "database_id": "9be193a4-a717-4551-9310-99eb22647b44",
+    "id": "9be193a4-a717-4551-9310-99eb22647b44",
+    "name": "DB",
+    "type": "d1"
+   },
+   {
+    "bucket_name": "biblio-pdfs",
+    "jurisdiction": "eu",
+    "name": "PDFS",
+    "type": "r2_bucket"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": true
+ }
+}

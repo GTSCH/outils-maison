@@ -1,0 +1,18 @@
+/*
+ * L'Établi : page publique d'un paquet de cartes mémoire (/a/<jeton>, public/p/memo.html).
+ * Complète /p/public.css (cadre des pages publiques) et /css/memo-etude.css (révision). Préfixe .mp-.
+ */
+:root { --t-memo: #A16207; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --t-memo: #FACC15; } }
+:root[data-theme="dark"] { --t-memo: #FACC15; }
+[data-genre="memo"] { --genre: var(--t-memo); }
+.mp-page { width: min(1040px, 100%); }
+.mp-page .pub-tete { padding-bottom: 10px; }
+.mp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.mp-outil { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--fg); cursor: pointer; }
+.mp-outil:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.mp-outil[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.mp-outil svg { width: 22px; height: 22px; }
+html.pub-projection .me { font-size: 22px; }
+html.pub-projection .me .me-texte { font-size: clamp(36px, 5.6vw, 80px); }
+html.pub-projection .me .me-btn { min-height: 62px; font-size: 22px; }

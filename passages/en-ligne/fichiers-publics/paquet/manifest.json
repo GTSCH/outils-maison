@@ -1,0 +1,125 @@
+{
+ "name": "bibliotheque",
+ "version": "202610060524",
+ "compatibility_date": "2026-08-01",
+ "compatibility_flags": [
+  "nodejs_compat"
+ ],
+ "main_module": "index-bibliotheque.js",
+ "modules": [
+  {
+   "name": "index-bibliotheque.js",
+   "type": "application/javascript+module"
+  }
+ ],
+ "crons": [
+  "17 * * * *"
+ ],
+ "assets": {
+  "/favicon.svg": {
+   "hash": "44f58b7f50acf4ef59f575c483d0b7d8",
+   "size": 198,
+   "type": "image/svg+xml"
+  },
+  "/icons/icon-192.png": {
+   "hash": "2c4523ba2f23d4da719df71955695efb",
+   "size": 1222,
+   "type": "image/png"
+  },
+  "/icons/icon-512.png": {
+   "hash": "acfe5bc9d18fcd015b07df3e569b5064",
+   "size": 3841,
+   "type": "image/png"
+  },
+  "/icons/maskable-192.png": {
+   "hash": "c7ffc8497998fb89671dbbc1ad21f9a3",
+   "size": 4439,
+   "type": "image/png"
+  },
+  "/icons/maskable-512.png": {
+   "hash": "47641ba5e36a2573854d09840eb9941c",
+   "size": 12696,
+   "type": "image/png"
+  },
+  "/index.html": {
+   "hash": "4c533171a0d1e20c25a2d09048c3aeb8",
+   "size": 15827,
+   "type": "text/html"
+  },
+  "/login.html": {
+   "hash": "edaba762a635950559dc742210cd5060",
+   "size": 1581,
+   "type": "text/html"
+  },
+  "/manifest.webmanifest": {
+   "hash": "a6f6e6ec5690295c0d2b81c2fbd77372",
+   "size": 622,
+   "type": "application/manifest+json"
+  },
+  "/static/app.js": {
+   "hash": "11449d99f5330a956e0c2c55dc351cce",
+   "size": 75640,
+   "type": "application/javascript"
+  },
+  "/static/core.js": {
+   "hash": "24427746774889da2e49ca6adbba03c8",
+   "size": 6226,
+   "type": "application/javascript"
+  },
+  "/static/dashboard.js": {
+   "hash": "20cd9cfcb9dd5735a7d32a74a2811e2c",
+   "size": 17427,
+   "type": "application/javascript"
+  },
+  "/static/demarrage.js": {
+   "hash": "377894258e42129e0edeb83284b9f8c9",
+   "size": 29679,
+   "type": "application/javascript"
+  },
+  "/static/envoi.js": {
+   "hash": "eb07b45a804a0305bfbd11094acce7ec",
+   "size": 10186,
+   "type": "application/javascript"
+  },
+  "/static/notes.js": {
+   "hash": "b1a90e845a89d71aeffe138becc103c1",
+   "size": 7384,
+   "type": "application/javascript"
+  },
+  "/static/ocr.js": {
+   "hash": "4a69b7d66c89356013d7818e3ebd7c2e",
+   "size": 3955,
+   "type": "application/javascript"
+  },
+  "/static/reader.js": {
+   "hash": "74c3ce62a0f5f72dca052b6ccc576c64",
+   "size": 60154,
+   "type": "application/javascript"
+  },
+  "/static/style.css": {
+   "hash": "b65859e92c9cd7b99307f15b1b658fce",
+   "size": 46444,
+   "type": "text/css"
+  },
+  "/static/vendor/chunk-SQE76S5B.js": {
+   "hash": "90e9a8ed9371baf7a23c90f906e39f6d",
+   "size": 577,
+   "type": "application/javascript"
+  },
+  "/static/vendor/exportall.js": {
+   "hash": "db19ddc6f1b5c821dae77ccf300803b5",
+   "size": 10498,
+   "type": "application/javascript"
+  },
+  "/static/vendor/pdfannot.js": {
+   "hash": "e7513266cbb40483184b5ca35ef376a9",
+   "size": 433293,
+   "type": "application/javascript"
+  },
+  "/sw.js": {
+   "hash": "d7dfe1c3e7b18845da8ccb2ada262088",
+   "size": 3679,
+   "type": "application/javascript"
+  }
+ }
+}

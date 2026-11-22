@@ -1,0 +1,95 @@
+/*
+ * L'Établi : éditeur de galerie. Complète etabli.css, organisation.css, /mur/rendu.css et /mur/editeur.css.
+ * Les œuvres en mosaïque justifiée (proportions respectées), rangées en sections ; le rappel sur les visages
+ * et les noms est bien visible en haut de page.
+ */
+body { min-height: 100vh; }
+.gal-page { width: min(1480px, 100%); margin: 0 auto; padding: 18px clamp(16px, 2.6vw, 36px) 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.gal-tete { display: grid; gap: 12px; }
+.gal-tete-txt { display: grid; gap: 4px; min-width: 0; }
+.gal-desc { max-width: 80ch; font: 17px/1.5 var(--font-eleve); white-space: pre-line; overflow-wrap: anywhere; }
+.gal-mode { display: inline-flex; align-items: center; gap: 6px; }
+.gal-mode svg { width: 16px; height: 16px; }
+.gal-rappel { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 1px solid color-mix(in srgb, var(--mark) 55%, var(--line)); border-radius: var(--radius-lg); background: var(--mark-soft); font-size: 15px; }
+.gal-rappel p { min-width: 0; }
+.gal-rappel-ico { display: grid; place-items: center; color: var(--warn); flex: none; }
+.gal-rappel-ico svg { width: 22px; height: 22px; }
+.gal-rappel.petit { padding: 8px 12px; font-size: 14px; align-items: center; }
+
+/* zone d'ajout */
+.gal-zone { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; padding: 26px 22px; border: 2px dashed var(--line-strong); border-radius: var(--radius-xl); background: var(--surface); }
+.gal-zone.compacte { padding: 12px 16px; border-width: 1.5px; }
+.gal-zone.sans-compte { padding: 0; border: 0; background: none; display: block; }
+.gal-zone-ico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; background: color-mix(in srgb, var(--t-galerie) 14%, var(--surface)); color: var(--t-galerie); flex: none; }
+.gal-zone-ico svg { width: 30px; height: 30px; }
+.gal-zone.compacte .gal-zone-ico { width: 40px; height: 40px; border-radius: 10px; }
+.gal-zone.compacte .gal-zone-ico svg { width: 22px; height: 22px; }
+.gal-zone-txt { flex: 1 1 280px; min-width: 0; display: grid; gap: 2px; }
+.gal-photo { display: none; }
+@media (pointer: coarse) { .gal-photo { display: inline-flex; } }
+html.gal-survol .gal-zone { border-color: var(--t-galerie); background: color-mix(in srgb, var(--t-galerie) 8%, var(--surface)); }
+html.gal-survol .gal-sections { outline: 3px dashed color-mix(in srgb, var(--t-galerie) 60%, transparent); outline-offset: 8px; border-radius: 12px; }
+
+/* sections */
+.gal-sections { display: grid; gap: 30px; }
+.gal-section { display: grid; gap: 12px; }
+.gal-section-tete { display: flex; align-items: center; gap: 8px; min-height: 44px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.gal-section-titre { flex: 1 1 auto; min-width: 0; font: 600 21px/1.25 var(--font-display); overflow-wrap: anywhere; }
+.gal-section .mur-sec-btn { color: var(--muted); }
+.gal-nouvelle { max-width: 360px; }
+
+/* tuiles dans l'éditeur */
+.gal-section .mr-tuile { position: relative; }
+.gal-section .mr-tuile-txt { color: var(--fg); }
+.gal-section .mr-tuile-auteur { color: var(--muted); }
+.gal-tuile-menu, .gal-poignee { position: absolute; top: 8px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 9px; background: rgb(255 255 255 / .9); color: #172126; box-shadow: 0 1px 3px rgb(0 0 0 / .25); cursor: pointer; }
+.gal-tuile-menu { right: 8px; }
+.gal-poignee { left: 8px; margin: 0; cursor: grab; }
+.gal-tuile-menu svg, .gal-poignee svg { width: 20px; height: 20px; }
+.gal-tuile-menu:hover, .gal-poignee:hover { background: #fff; }
+.gal-auteur { position: absolute; top: 14px; left: 50px; }
+.gal-a-nommer { font-size: 13.5px; color: var(--faint); font-style: italic; padding: 0 2px; }
+.gal-tuile-depot .mr-tuile-img { outline: 2px dashed color-mix(in srgb, var(--t-galerie) 70%, transparent); outline-offset: 2px; }
+.gal-tuile-marque { position: absolute; top: 8px; left: 8px; padding: 3px 10px; border-radius: 999px; background: var(--t-galerie); color: #fff; font: 700 12.5px/1.4 var(--font-ui); }
+@media (hover: hover) and (pointer: fine) {
+  .gal-section .mr-tuile .gal-tuile-menu, .gal-section .mr-tuile .gal-poignee { opacity: 0; transition: opacity .12s; }
+  .gal-section .mr-tuile:hover .gal-tuile-menu, .gal-section .mr-tuile:hover .gal-poignee,
+  .gal-section .mr-tuile:focus-within .gal-tuile-menu, .gal-section .mr-tuile:focus-within .gal-poignee,
+  .gal-section .mr-tuile.med-saisi .gal-poignee { opacity: 1; }
+}
+.mr-tuile.med-saisi { outline-offset: 4px; border-radius: 10px; }
+.mr-mosaique li.med-place { min-height: 120px; }
+
+/* envoi en lot */
+.gal-envoi { position: fixed; z-index: 700; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(380px, calc(100% - 32px)); display: grid; gap: 8px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-lg); }
+.gal-envoi-titre { display: flex; align-items: center; gap: 8px; font: 600 16px/1.2 var(--font-display); }
+.gal-envoi-titre svg { width: 20px; height: 20px; color: var(--t-galerie); }
+.gal-envoi-txt { font-size: 14.5px; color: var(--muted); }
+.gal-envoi-barre { height: 10px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.gal-envoi-barre > i { display: block; height: 100%; width: 0; background: var(--t-galerie); border-radius: inherit; transition: width .2s; }
+.gal-envoi.fini .gal-envoi-barre > i { background: var(--ok); }
+.gal-envoi-erreurs { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--bad); max-height: 120px; overflow: auto; }
+.gal-envoi-erreurs:empty { display: none; }
+
+/* légender, modifier */
+.gal-legender { display: grid; gap: 12px; }
+.gal-leg-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.gal-leg { display: flex; gap: 12px; align-items: flex-start; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.gal-leg img { width: 92px; height: 92px; object-fit: cover; border-radius: 8px; flex: none; background: var(--surface-2); }
+.gal-leg-champs { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.gal-leg-ligne { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 6px; }
+.gal-editer { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.gal-e-image { padding: 0; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface-2); overflow: hidden; cursor: zoom-in; }
+.gal-e-image img { display: block; width: 100%; height: auto; max-height: 360px; object-fit: contain; }
+.gal-e-champs { display: grid; gap: 12px; }
+.gal-e-champs .hint { margin-top: -6px; }
+.gal-e-titre { font: 700 18px/1.3 var(--font-eleve); }
+@media (max-width: 640px) {
+  .gal-page { padding: 14px 16px 64px; }
+  .gal-editer { grid-template-columns: minmax(0, 1fr); }
+  .gal-e-image img { max-height: 220px; }
+  .gal-leg { flex-direction: column; }
+  .gal-leg img { width: 100%; height: 140px; }
+  .gal-leg-ligne { grid-template-columns: minmax(0, 1fr); }
+  .gal-zone { padding: 18px 16px; }
+}

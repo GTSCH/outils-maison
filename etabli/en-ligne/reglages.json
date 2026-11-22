@@ -1,0 +1,138 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "observability": {
+   "enabled": true,
+   "head_sampling_rate": 1,
+   "redact_query_string": false,
+   "logs": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "persist": true,
+    "invocation_logs": false
+   },
+   "traces": {
+    "enabled": false,
+    "persist": true,
+    "head_sampling_rate": 1
+   }
+  },
+  "annotations": {
+   "workers/triggered_by": "upload"
+  },
+  "bindings": [
+   {
+    "name": "AI",
+    "project": "<catalog>",
+    "type": "ai"
+   },
+   {
+    "name": "ASSETS",
+    "type": "assets"
+   },
+   {
+    "database_id": "0e62fea6-1b8e-4005-b09c-e9562653ca3f",
+    "id": "0e62fea6-1b8e-4005-b09c-e9562653ca3f",
+    "name": "DB",
+    "type": "d1"
+   },
+   {
+    "bucket_name": "etabli-fichiers-eu",
+    "jurisdiction": "eu",
+    "name": "FICHIERS",
+    "type": "r2_bucket"
+   },
+   {
+    "name": "FICHIERS_PLAFOND_GLOBAL",
+    "text": "9000000000",
+    "type": "plain_text"
+   },
+   {
+    "name": "IA_FACTICE",
+    "text": "0",
+    "type": "plain_text"
+   },
+   {
+    "name": "IA_LIMITE_GLOBALE_JOUR",
+    "text": "200",
+    "type": "plain_text"
+   },
+   {
+    "name": "IA_LIMITE_JOUR",
+    "text": "20",
+    "type": "plain_text"
+   },
+   {
+    "name": "IA_MODELE",
+    "text": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "type": "plain_text"
+   },
+   {
+    "name": "LIMITE_CODES_IP",
+    "text": "20",
+    "type": "plain_text"
+   },
+   {
+    "name": "LIMITE_ECHECS_CLASSE_IP",
+    "text": "30",
+    "type": "plain_text"
+   },
+   {
+    "name": "LIMITE_ECHECS_EMAIL",
+    "text": "10",
+    "type": "plain_text"
+   },
+   {
+    "name": "LIMITE_ECHECS_IP",
+    "text": "40",
+    "type": "plain_text"
+   },
+   {
+    "name": "POIVRE",
+    "type": "secret_text"
+   },
+   {
+    "name": "QUOTA_FICHIERS_COMPTE",
+    "text": "1000000000",
+    "type": "plain_text"
+   },
+   {
+    "name": "QUOTA_FICHIERS_ESPACE",
+    "text": "1000000000",
+    "type": "plain_text"
+   },
+   {
+    "name": "QUOTA_OCTETS_COMPTE",
+    "text": "200000000",
+    "type": "plain_text"
+   },
+   {
+    "name": "QUOTA_OCTETS_ESPACE",
+    "text": "200000000",
+    "type": "plain_text"
+   },
+   {
+    "class_name": "Registre",
+    "name": "REGISTRE",
+    "namespace_id": "0674529ebbec45b4adf15bb5343c4480",
+    "type": "durable_object_namespace"
+   },
+   {
+    "class_name": "Session",
+    "name": "SESSION",
+    "namespace_id": "ef5f8d5b5f0e456ebda0dbacbb0579ad",
+    "type": "durable_object_namespace"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": true
+ }
+}

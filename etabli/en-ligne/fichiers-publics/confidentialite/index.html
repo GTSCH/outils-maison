@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Protection des données · L’Établi</title>
+<meta name="description" content="Ce que l’Établi garde, pourquoi, où, combien de temps, avec qui, et comment tout exporter ou effacer. Prototype en test, outil personnel de Guillaume Tschupp.">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#EEF2EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232350B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='10' rx='2'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/p/public.css">
+<style>
+  /* Page « Protection des données » de l'Établi : s'appuie sur /p/public.css (couleurs, clair et sombre). */
+  .cf-maj { color: var(--muted); font-size: 16px; }
+  .cf-encart { margin: 6px 0 26px; padding: 18px 20px; border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--line)); border-left: 6px solid var(--warn); border-radius: var(--radius-lg); background: var(--warn-soft); display: grid; gap: 8px; }
+  .cf-encart h2 { font-size: 20px; }
+  .cf-encart p { font-size: 17px; }
+  .cf-bref { margin: 0 0 26px; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+  .cf-bref h2 { font-size: 20px; margin-bottom: 8px; }
+  .cf-bref ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+  .cf-sommaire { margin: 0 0 34px; padding: 16px 20px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface-2); }
+  .cf-sommaire h2 { font-size: 17px; color: var(--muted); margin-bottom: 6px; letter-spacing: .02em; }
+  .cf-sommaire ol { margin: 0; padding-left: 1.4em; columns: 2 220px; column-gap: 28px; }
+  .cf-sommaire li { margin: 3px 0; break-inside: avoid; }
+  .cf-sommaire a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  main section { margin: 0 0 38px; scroll-margin-top: 16px; }
+  main h2.cf-h2 { font-size: clamp(24px, 4.6vw, 30px); margin: 0 0 12px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; }
+  main h2.cf-h2 .cf-num { color: var(--accent); font-size: .8em; min-width: 1.2em; }
+  main h3 { font-size: 20px; margin: 22px 0 6px; }
+  main p { margin: 0 0 10px; }
+  main ul, main ol { margin: 0 0 12px; padding-left: 1.3em; }
+  main li { margin: 4px 0; }
+  main li::marker { color: var(--muted); }
+  code { font: 15px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--surface-3); padding: 1px 5px; border-radius: 5px; }
+  .cf-note { color: var(--muted); font-size: 16px; }
+  .cf-carte { margin: 12px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .cf-carte p:last-child, .cf-carte ul:last-child { margin-bottom: 0; }
+  .cf-table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .cf-table th, .cf-table td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .cf-table thead th { background: var(--surface-2); font-size: 15px; color: var(--muted); }
+  .cf-table tbody th { font-weight: 700; width: 30%; }
+  .cf-table tbody tr:last-child > * { border-bottom: 0; }
+  .cf-haut { font-size: 15px; }
+  @media (max-width: 640px) {
+    .cf-table, .cf-table thead, .cf-table tbody, .cf-table tr, .cf-table th, .cf-table td { display: block; width: 100%; }
+    .cf-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .cf-table tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+    .cf-table tbody tr:last-child { border-bottom: 0; }
+    .cf-table th, .cf-table td { border-bottom: 0; padding: 3px 14px; }
+    .cf-table tbody th { width: 100%; font-size: 17px; }
+    .cf-table td[data-titre]::before { content: attr(data-titre); display: block; color: var(--muted); font-size: 14px; font-weight: 700; }
+  }
+  @media print {
+    body { background: #fff; color: #000; }
+    .cf-sommaire, .cf-haut { display: none; }
+  }
+</style>
+</head>
+<body class="pub" data-genre="portail">
+<div class="pub-page">
+  <header class="pub-tete">
+    <p class="pub-surtitre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>L’Établi</span></p>
+    <h1 class="pub-titre">Protection des données</h1>
+    <p class="cf-maj">Mise à jour le 23 octobre 2026</p>
+  </header>
+
+  <main id="contenu">
+    <div class="cf-encart" role="note">
+      <h2>Un prototype, un outil personnel</h2>
+      <p>L’Établi est un outil personnel de Guillaume Tschupp, à l’état de prototype : un essai, pas un produit fini. Ce n’est <strong>pas un service de la HEP-VS</strong>, ni d’aucune autre institution.</p>
+      <p>Il est offert sans garantie de disponibilité : il peut changer ou s’interrompre sans préavis. Gardez une sauvegarde de vos documents, et <strong>n’y saisissez pas de données sensibles</strong> : ni santé, ni difficultés d’apprentissage, ni évaluations, ni situation familiale, ni noms de famille d’élèves.</p>
+    </div>
+
+    <div class="cf-bref">
+      <h2>En bref</h2>
+      <ul>
+        <li>Aucune publicité, aucun traceur publicitaire. Une statistique de visites anonyme (Cloudflare Web Analytics) compte les pages vues, sans cookie et sans garder l’adresse IP. À part son script, les polices et les programmes des pages sont servis par l’Établi lui-même.</li>
+        <li>Deux cookies au plus, tous deux strictement nécessaires : la session d’enseignant·e, et celle d’un·e élève qui a un compte.</li>
+        <li>Les mots de passe et les mots secrets ne sont jamais stockés en clair, ni les adresses IP. L’Établi ne vous envoie aucun e-mail.</li>
+        <li>Pour les élèves : des prénoms. Ni adresse e-mail, ni nom de famille, ni date de naissance, même avec un compte élève.</li>
+        <li>Hébergement chez Cloudflare, une entreprise américaine. La base de données est en Europe de l’Ouest, les fichiers restent dans l’Union européenne.</li>
+        <li>Vous pouvez exporter vos documents et tout effacer vous-même, compte compris. Un ménage automatique efface chaque nuit ce qui n’a plus besoin d’être gardé.</li>
+      </ul>
+    </div>
+
+    <nav class="cf-sommaire" aria-labelledby="sommaire-titre">
+      <h2 id="sommaire-titre">Sommaire</h2>
+      <ol>
+        <li><a href="#responsable">Qui est responsable</a></li>
+        <li><a href="#donnees">Quelles données</a></li>
+        <li><a href="#pourquoi">Pourquoi</a></li>
+        <li><a href="#ou">Où</a></li>
+        <li><a href="#duree">Combien de temps</a></li>
+        <li><a href="#avec-qui">Avec qui</a></li>
+        <li><a href="#droits">Vos droits</a></li>
+        <li><a href="#cookies">Cookies et stockage local</a></li>
+        <li><a href="#eleves">Comptes élèves, tâches et cartes</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </nav>
+
+    <section id="responsable" aria-labelledby="t-responsable">
+      <h2 class="cf-h2" id="t-responsable"><span class="cf-num">1</span>Qui est responsable</h2>
+      <p>Guillaume Tschupp, à Fully (Valais, Suisse), développe et exploite l’Établi à titre personnel. Il est responsable du service au sens de la loi fédérale sur la protection des données (nLPD). Pour les personnes qui se trouvent dans l’Union européenne, le règlement général sur la protection des données (RGPD) peut aussi s’appliquer : cette page en suit les principes, sans prétendre à une conformité certifiée.</p>
+      <p>Ce que vous écrivez vous appartient. Quand un·e enseignant·e saisit les prénoms de ses élèves, ouvre des comptes élèves, publie un mur ou ouvre un sondage, c’est elle ou lui qui décide de ces contenus. Avant d’utiliser l’Établi avec des élèves, vérifiez avec votre établissement que c’est permis : dans une école publique, le droit cantonal sur la protection des données s’applique aussi à cet usage.</p>
+    </section>
+
+    <section id="donnees" aria-labelledby="t-donnees">
+      <h2 class="cf-h2" id="t-donnees"><span class="cf-num">2</span>Quelles données</h2>
+
+      <h3>Votre compte d’enseignant·e</h3>
+      <ul>
+        <li>Votre adresse e-mail. Elle sert d’identifiant ; l’Établi n’envoie aucun e-mail.</li>
+        <li>Le nom affiché que vous choisissez (facultatif).</li>
+        <li>Votre mot de passe et votre code de secours, jamais en clair : seule une empreinte est gardée (PBKDF2-SHA256, avec un sel propre à chaque empreinte et un secret du serveur appelé « poivre »). Une fuite de la base de données seule ne permet donc pas de les retrouver.</li>
+        <li>Les dates de création et de modification du compte.</li>
+        <li>Vos sessions de connexion : une empreinte du jeton de session (jamais le jeton lui-même), ses dates de création, de dernière utilisation et d’expiration.</li>
+      </ul>
+
+      <h3>Vos documents</h3>
+      <p>Classes, ardoises, fiches, quiz, séances, planifications, semaines, murs, galeries, sondages et paquets de cartes mémoire, avec tout ce que vous y écrivez, leurs dates et le compte qui les a modifiés en dernier. Une classe contient les prénoms de vos élèves (63 au plus) ; l’Établi signale une ligne qui ressemble à un nom de famille.</p>
+      <p>Vos documents ne sont visibles que par vous, par les membres de l’espace partagé où vous les rangez, et par les personnes à qui vous donnez un lien public. Comme administrateur, Guillaume Tschupp a techniquement accès à la base de données ; il ne consulte pas vos contenus, sauf à votre demande pour résoudre un problème.</p>
+
+      <h3>Espaces partagés (duo, équipe)</h3>
+      <p>Le nom de l’espace, ses membres (compte, rôle, couleur, date d’arrivée) et les invitations en cours. D’une invitation, seule une empreinte du code est gardée ; un code vaut 14 jours et 5 utilisations. Les membres d’un espace voient votre nom affiché (ou, s’il est vide, le début de votre adresse e-mail, avant le @) et lisent et modifient tous les documents de l’espace, y compris ses classes et leur suivi.</p>
+
+      <h3>Ce que vous publiez</h3>
+      <ul>
+        <li><strong>Devoirs pour les familles</strong> : la page montre le nom de la classe et les devoirs de la semaine passée et des trois suivantes, rien d’autre.</li>
+        <li><strong>Liens publics</strong> des murs, galeries, sondages, du portail d’une classe et des paquets de cartes mémoire : toute personne qui a le lien voit le contenu. Le lien est long et impossible à deviner, et vous pouvez ajouter un code d’accès. Ces pages ne sont pas indexées par les moteurs de recherche. De ce lien et de ce code, seule une empreinte est gardée.</li>
+        <li><strong>Fichiers</strong> (images, PDF, sons, vidéos, documents bureautiques) : leur contenu, leur nom, leur type, leur taille, leurs dimensions et leur date. Chaque fichier a une adresse de lecture secrète : qui la connaît peut l’ouvrir sans compte (c’est ce qui permet de l’afficher sur un mur public ou au tableau). Les photos sont en principe réduites et réencodées dans votre navigateur avant l’envoi, ce qui retire leurs métadonnées (données EXIF, position GPS) ; les GIF, les PDF, les sons, les vidéos et les documents sont envoyés tels quels, avec leurs éventuelles métadonnées.</li>
+      </ul>
+
+      <h3>Ce que les élèves et les familles envoient, sans compte</h3>
+      <ul>
+        <li><strong>Dépôts sur un mur ou une galerie</strong> : le prénom ou le nom indiqué, le texte, le lien, le fichier (image ou PDF, 10 Mo au plus), la section et la date, ainsi qu’une empreinte de l’adresse IP pour limiter les envois abusifs (jamais l’adresse elle-même). Selon les réglages, un dépôt attend la validation de l’enseignant·e ou paraît tout de suite. Une fois publié, il est visible avec son nom par toutes les personnes qui ont le lien, sauf si la galerie masque les auteur·es.</li>
+        <li><strong>Cœurs des galeries</strong> : un identifiant aléatoire créé par le navigateur, gardé sous forme d’empreinte, l’œuvre et la date. Il sert à compter un cœur par appareil, sans savoir qui l’a donné.</li>
+        <li><strong>Sondages de dates et prises de rendez-vous</strong> : le nom donné par la personne qui répond, ses choix, son commentaire éventuel et les dates. Dans un sondage de dates, les noms et les réponses sont visibles par les personnes qui ont le lien, sauf si l’enseignant·e les masque ; pour un rendez-vous, seul·e l’enseignant·e voit les noms. La personne qui répond reçoit un jeton secret, gardé dans son navigateur, pour modifier ou annuler sa réponse.</li>
+      </ul>
+      <p>Les élèves qui ont un compte : voir la <a href="#eleves">section 9</a>.</p>
+
+      <h3>Quiz en direct</h3>
+      <p>Une séance garde les questions, les participant·es (un identifiant aléatoire créé par l’appareil, et le prénom ou le pseudo s’il est demandé), leurs réponses avec l’heure, les idées et les votes du tableau participatif, et les éventuelles exclusions. En mode cartes avec une classe, les prénoms de la classe sont copiés dans la séance pour afficher qui a répondu. Selon le type de question, les réponses s’affichent à l’écran de la classe ; le classement du mode jeu et le tableau participatif montrent les pseudos. La télécommande s’ouvre avec un lien secret : qui l’a voit les réponses de la séance. Votre compte garde l’historique de vos séances : titre, mode, dates, nombre de participant·es, taux de réussite.</p>
+
+      <h3>Assistant IA</h3>
+      <p>Quand vous demandez à l’assistant des questions de quiz ou des cartes mémoire, le thème, le niveau et le texte source que vous collez sont envoyés à un modèle de langage (aujourd’hui un modèle Llama 3.3 de Meta) exécuté chez Cloudflare (Workers AI). L’Établi ne les envoie à aucun autre fournisseur et ne les garde pas : seul le résultat revient dans votre navigateur. Selon Cloudflare, ces textes ne sont pas conservés après le traitement et ne servent pas à entraîner des modèles. L’Établi compte seulement le nombre de générations par compte et par jour (20 au plus, quiz et cartes ensemble). N’y collez pas de données personnelles.</p>
+
+      <h3>Sécurité : les limites d’essais</h3>
+      <p>Pour empêcher qu’on devine un mot de passe, un mot secret ou un code, l’Établi note les essais faux, les inscriptions et les envois publics avec leur heure. Il ne garde jamais l’adresse IP ni l’adresse e-mail elles-mêmes, seulement leur empreinte (HMAC avec le poivre) : celle de l’adresse IP, de l’adresse e-mail saisie ou, pour une action protégée, l’identifiant interne de votre compte. Ces lignes ne servent que de 15 minutes à 24 heures.</p>
+
+      <h3>Journaux techniques</h3>
+      <p>L’Établi tient un journal technique chez Cloudflare, limité aux messages que son programme écrit lui-même : les erreurs imprévues (avec l’adresse de la page concernée), le bilan chiffré du ménage de la nuit et, quand l’assistant IA échoue, un extrait de la réponse du modèle. Cloudflare y ajoute quelques renseignements techniques sur la requête concernée (heure, résultat). Le journal détaillé de chaque requête, qui noterait l’adresse IP et les en-têtes de toutes les visites, est désactivé. Ce journal sert à repérer et à corriger les pannes ; seul Guillaume Tschupp le consulte.</p>
+
+      <h3>Statistique de visites</h3>
+      <p>Cloudflare Web Analytics compte les visites des pages : adresse de la page, site d’où l’on arrive, pays, type de navigateur et d’appareil, vitesse de chargement. Ce service ne dépose pas de cookie, n’utilise pas le stockage du navigateur et ne garde pas l’adresse IP ; Guillaume Tschupp n’en voit que des totaux, sans pouvoir identifier personne. Le petit programme qui envoie ces mesures vient de <code>static.cloudflareinsights.com</code>.</p>
+
+      <h3>Essai sans compte</h3>
+      <p>En mode essai, vos documents restent dans votre navigateur et ne sont envoyés nulle part. Si vous créez ensuite un compte, ils y sont versés, puis effacés du navigateur. Les quiz en direct, les fichiers, les liens publics, les comptes élèves et l’assistant IA demandent un compte.</p>
+    </section>
+
+    <section id="pourquoi" aria-labelledby="t-pourquoi">
+      <h2 class="cf-h2" id="t-pourquoi"><span class="cf-num">3</span>Pourquoi</h2>
+      <ul>
+        <li><strong>Faire fonctionner ce que vous utilisez</strong> : enregistrer vos documents, les retrouver sur vos appareils, les partager avec qui vous choisissez, faire vivre les quiz en direct, les murs, les galeries et les sondages, donner des tâches aux élèves et suivre leur travail.</li>
+        <li><strong>Protéger les comptes et le service</strong> : sessions, limites d’essais, place disque et quotas de l’assistant, journal technique.</li>
+        <li><strong>Rien d’autre</strong> : ni profilage, ni publicité, ni revente, ni statistiques d’usage, ni entraînement de modèles d’IA.</li>
+      </ul>
+      <p class="cf-note">Pour les personnes soumises au RGPD, ces traitements reposent sur la fourniture du service que vous demandez et sur l’intérêt légitime à le sécuriser.</p>
+    </section>
+
+    <section id="ou" aria-labelledby="t-ou">
+      <h2 class="cf-h2" id="t-ou"><span class="cf-num">4</span>Où</h2>
+      <p>Tout est hébergé par <strong>Cloudflare, Inc.</strong>, une entreprise des États-Unis, seul sous-traitant de l’Établi.</p>
+      <ul>
+        <li><strong>Le programme du site</strong> tourne dans les centres de données de Cloudflare, en général le plus proche de la personne qui consulte.</li>
+        <li><strong>La base de données</strong> (comptes, documents, partages, dépôts, réponses, comptes élèves, suivi) : Cloudflare D1, région principale Europe de l’Ouest, servie depuis Amsterdam. C’est une région choisie, pas une restriction juridique.</li>
+        <li><strong>Les fichiers</strong> : Cloudflare R2, dans la juridiction de l’Union européenne (seau <code>etabli-fichiers-eu</code>) : ils restent dans l’UE.</li>
+        <li><strong>Les séances en direct</strong> : Durable Objects de Cloudflare, créés en principe près de la première connexion, sans limitation à une juridiction.</li>
+        <li><strong>L’assistant IA</strong> (Workers AI) et <strong>le journal technique</strong> : chez Cloudflare.</li>
+      </ul>
+      <p>Cloudflare est une entreprise américaine. Comme tout hébergeur, elle voit les adresses IP pour acheminer les requêtes, et elle peut être soumise au droit des États-Unis, même pour des données stockées en Europe. Voir la <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">politique de confidentialité de Cloudflare</a>.</p>
+    </section>
+
+    <section id="duree" aria-labelledby="t-duree">
+      <h2 class="cf-h2" id="t-duree"><span class="cf-num">5</span>Combien de temps</h2>
+      <p>En règle générale, ce que vous créez reste jusqu’à ce que vous l’effaciez ; rien n’est effacé automatiquement en fin d’année. Un ménage automatique passe chaque nuit pour effacer ce qui a fait son temps : limites d’essais, sessions expirées, activité des élèves trop ancienne, fichiers de dépôts abandonnés.</p>
+      <table class="cf-table">
+        <thead><tr><th scope="col">Donnée</th><th scope="col">Durée</th><th scope="col">Pour l’effacer</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Compte</th><td data-titre="Durée">Jusqu’à la suppression du compte.</td><td data-titre="Pour l’effacer">Mon compte, Supprimer mon compte.</td></tr>
+          <tr><th scope="row">Sessions de connexion</th><td data-titre="Durée">30 jours, prolongés à l’usage. Une session expirée ne sert plus et elle est effacée la nuit suivante.</td><td data-titre="Pour l’effacer">Se déconnecter. Changer le mot de passe ferme les sessions des autres appareils.</td></tr>
+          <tr><th scope="row">Documents</th><td data-titre="Durée">Jusqu’à ce que vous les effaciez.</td><td data-titre="Pour l’effacer">Mettre à la corbeille, puis effacer.</td></tr>
+          <tr><th scope="row">Corbeille</th><td data-titre="Durée">Pas de vidage automatique : les documents y restent jusqu’à ce que vous les effaciez.</td><td data-titre="Pour l’effacer">Corbeille, Vider la corbeille.</td></tr>
+          <tr><th scope="row">Fichiers</th><td data-titre="Durée">Jusqu’à leur effacement, ou l’effacement définitif du document auquel ils sont rattachés (un fichier repris dans un autre de vos documents est gardé).</td><td data-titre="Pour l’effacer">Mon compte, Fichiers. Le contenu est retiré du stockage juste après.</td></tr>
+          <tr><th scope="row">Liens publics</th><td data-titre="Durée">Jusqu’au retrait du lien. L’adresse ne répond plus aussitôt ; le réglage reste, désactivé, jusqu’à l’effacement du document.</td><td data-titre="Pour l’effacer">Retirer le lien.</td></tr>
+          <tr><th scope="row">Devoirs publiés</th><td data-titre="Durée">Jusqu’au retrait de la page.</td><td data-titre="Pour l’effacer">Retirer le lien de la page des devoirs.</td></tr>
+          <tr><th scope="row">Dépôts sur les murs et galeries</th><td data-titre="Durée">Jusqu’à leur effacement par l’enseignant·e (même refusés), ou celui du document.</td><td data-titre="Pour l’effacer">Modération du mur ou de la galerie.</td></tr>
+          <tr><th scope="row">Fichier d’un dépôt jamais terminé</th><td data-titre="Durée">Effacé automatiquement quand il a plus de 24 heures, au plus tard lors du ménage de la nuit suivante.</td><td data-titre="Pour l’effacer">Automatique.</td></tr>
+          <tr><th scope="row">Cœurs</th><td data-titre="Durée">Jusqu’à l’effacement du document.</td><td data-titre="Pour l’effacer">Un second clic retire votre cœur.</td></tr>
+          <tr><th scope="row">Réponses aux sondages</th><td data-titre="Durée">Jusqu’à leur annulation, leur effacement par l’enseignant·e ou l’effacement du document.</td><td data-titre="Pour l’effacer">Annuler depuis le navigateur qui a répondu ; l’enseignant·e peut effacer une réponse.</td></tr>
+          <tr><th scope="row">Quiz en direct</th><td data-titre="Durée">Séance et historique : jusqu’à leur effacement.</td><td data-titre="Pour l’effacer">Supprimer la séance dans l’historique du quiz.</td></tr>
+          <tr><th scope="row">Espaces partagés</th><td data-titre="Durée">Jusqu’à leur suppression. Une invitation vaut 14 jours.</td><td data-titre="Pour l’effacer">Quitter l’espace ; la ou le propriétaire peut le supprimer.</td></tr>
+          <tr><th scope="row">Comptes élèves, code de classe, suivi, progrès des cartes</th><td data-titre="Durée">Jusqu’à leur effacement par l’enseignant·e, ou celui de la classe.</td><td data-titre="Pour l’effacer">Classe, Élèves en ligne : Supprimer le compte, ou « Effacer les comptes et le suivi » (fin d’année).</td></tr>
+          <tr><th scope="row">Tâches</th><td data-titre="Durée">Jusqu’à leur suppression (une tâche archivée est gardée).</td><td data-titre="Pour l’effacer">Tâches de la classe : Supprimer la tâche.</td></tr>
+          <tr><th scope="row">Sessions des élèves</th><td data-titre="Durée">30 jours sans utilisation, 8 heures sur un appareil partagé ; effacées la nuit suivant leur expiration.</td><td data-titre="Pour l’effacer">Se déconnecter. Un nouveau mot secret ou un compte désactivé les ferme toutes.</td></tr>
+          <tr><th scope="row">Activité des élèves par jour</th><td data-titre="Durée">400 jours au plus, puis effacée par le ménage de la nuit.</td><td data-titre="Pour l’effacer">Avec le compte élève.</td></tr>
+          <tr><th scope="row">Compteur de l’assistant IA</th><td data-titre="Durée">Jusqu’à la suppression du compte.</td><td data-titre="Pour l’effacer">Avec le compte.</td></tr>
+          <tr><th scope="row">Limites d’essais</th><td data-titre="Durée">Elles servent de 15 minutes à 24 heures ; le ménage de chaque nuit efface tout ce qui a plus d’un jour.</td><td data-titre="Pour l’effacer">Automatique.</td></tr>
+          <tr><th scope="row">Journal technique</th><td data-titre="Durée">Quelques jours, 7 au plus, puis effacé par Cloudflare.</td><td data-titre="Pour l’effacer">Automatique.</td></tr>
+          <tr><th scope="row">Mode essai</th><td data-titre="Durée">Dans votre navigateur, jusqu’à ce que vous l’effaciez.</td><td data-titre="Pour l’effacer">Effacer les données du site dans le navigateur.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Supprimer votre compte</h3>
+      <p>Le bouton « Supprimer mon compte » (Mon compte, confirmation par mot de passe) efface d’un seul coup :</p>
+      <ul>
+        <li>votre compte et toutes vos sessions ;</li>
+        <li>tous vos documents personnels, corbeille comprise ;</li>
+        <li>les comptes élèves de vos classes, avec leurs sessions, le code de classe, les tâches, le suivi, les progrès des cartes et l’activité ;</li>
+        <li>vos fichiers (leur contenu est retiré du stockage juste après), vos liens publics et vos pages de devoirs ;</li>
+        <li>les dépôts, les cœurs et les réponses de sondage reçus sur vos documents ;</li>
+        <li>vos quiz en direct, historique et contenu (les plus anciens quelques instants plus tard, en arrière-plan) ;</li>
+        <li>le compteur de l’assistant IA et les essais faux notés pour votre adresse e-mail ou votre compte.</li>
+      </ul>
+      <p>Vous quittez vos espaces partagés. Un espace dont vous étiez le seul membre est effacé avec ses documents et ses comptes élèves. Sinon, l’espace et son contenu restent aux autres membres, et si vous en étiez propriétaire, ce rôle passe au membre le plus ancien. Supprimer un espace partagé efface de la même façon ses documents, ses classes et tout ce qui touche à leurs comptes élèves.</p>
+    </section>
+
+    <section id="avec-qui" aria-labelledby="t-avec-qui">
+      <h2 class="cf-h2" id="t-avec-qui"><span class="cf-num">6</span>Avec qui</h2>
+      <ul>
+        <li><strong>Cloudflare</strong>, seul sous-traitant : hébergement, base de données, fichiers, quiz en direct, assistant IA, journal technique et statistique de visites anonyme.</li>
+        <li><strong>Les personnes que vous choisissez</strong> : les membres de vos espaces partagés, et toute personne à qui vous donnez un lien public ou le lien d’une télécommande.</li>
+        <li><strong>Personne d’autre.</strong> Ni vente, ni publicité, ni réseau social. Guillaume Tschupp ne transmet vos données à personne, sauf si la loi l’y oblige.</li>
+      </ul>
+      <p>À part le script de la statistique de visites de Cloudflare, aucun script, aucune police et aucune image n’est chargé depuis un autre site, sauf dans ces deux cas, qui dépendent toujours d’un geste de votre part :</p>
+      <ul>
+        <li><strong>Vidéo YouTube ou Vimeo sur un mur</strong> : rien n’est chargé tant que vous ne cliquez pas sur la vidéo. Ensuite, le lecteur vient de <code>youtube-nocookie.com</code> ou de <code>player.vimeo.com</code> (avec l’option « ne pas suivre ») : ces services reçoivent alors votre adresse IP et appliquent leurs propres règles.</li>
+        <li><strong>Liens vers d’autres sites</strong> : ils ne s’ouvrent que si vous cliquez.</li>
+      </ul>
+      <p class="cf-note">Restent dans votre appareil : la caméra (lecture des cartes réponses, badges des élèves) et le micro (sonomètre de l’ardoise), traités dans le navigateur sans aucune image ni aucun son envoyé ; la lecture à voix haute des cartes mémoire, qui n’utilise que les voix installées sur l’appareil, jamais une voix en ligne (sans voix locale pour la langue, rien n’est lu).</p>
+    </section>
+
+    <section id="droits" aria-labelledby="t-droits">
+      <h2 class="cf-h2" id="t-droits"><span class="cf-num">7</span>Vos droits</h2>
+      <p>Vous pouvez savoir ce qui est gardé à votre sujet, en obtenir une copie, le faire corriger ou effacer, et vous opposer à un traitement. L’essentiel se fait directement dans l’Établi :</p>
+      <ul>
+        <li><strong>Voir et corriger</strong> : dans vos documents et dans Mon compte.</li>
+        <li><strong>Obtenir une copie</strong> : Mon compte, « Exporter toutes mes données ». Le fichier (JSON) contient vos documents, ceux de vos espaces partagés, la liste de vos espaces et la liste de vos fichiers avec leurs adresses de lecture. Le suivi d’une classe s’exporte à part, depuis l’onglet Suivi (fichier CSV).</li>
+        <li><strong>Effacer</strong> : un document, un fichier, un lien, un dépôt, une réponse, un compte élève, ou le compte entier.</li>
+      </ul>
+      <p>Pour une question, une copie de ce qui n’est pas dans l’export ou une donnée que vous ne pouvez pas effacer vous-même, écrivez à Guillaume Tschupp (voir <a href="#contact">Contact</a>).</p>
+      <p><strong>Élèves et familles</strong> : un compte élève, un mur, une galerie ou un sondage est géré par l’enseignant·e qui l’a créé. Adressez-vous d’abord à elle ou à lui ; vous pouvez aussi écrire à Guillaume Tschupp.</p>
+      <p>Vous pouvez enfin vous adresser à une autorité de protection des données : en Suisse, le Préposé fédéral à la protection des données et à la transparence (<a href="https://www.edoeb.admin.ch/" rel="noopener noreferrer">PFPDT</a>) ; dans l’Union européenne, l’autorité de votre pays.</p>
+    </section>
+
+    <section id="cookies" aria-labelledby="t-cookies">
+      <h2 class="cf-h2" id="t-cookies"><span class="cf-num">8</span>Cookies et stockage local</h2>
+      <h3>Cookies</h3>
+      <p>Deux cookies, tous deux strictement nécessaires, illisibles pour les scripts de la page (HttpOnly), envoyés seulement en connexion chiffrée (Secure) et protégés contre les requêtes venues d’autres sites (SameSite=Lax). Il n’y en a aucun autre, et donc aucune bannière à accepter.</p>
+      <div class="cf-carte">
+        <p><code>eb_s</code> : garde votre session d’enseignant·e ouverte. Posé seulement quand vous vous connectez ou créez un compte, il dure 30 jours, prolongés à l’usage, et s’efface à la déconnexion.</p>
+      </div>
+      <div class="cf-carte">
+        <p><code>eb_el</code> : garde ouverte la session d’un·e élève qui a un compte. Il dure 30 jours, prolongés à l’usage ; avec « Appareil partagé », il s’efface à la fermeture du navigateur et ne vaut de toute façon que 8 heures. Il s’efface aussi à la déconnexion. Un même navigateur peut avoir les deux cookies : les pages des élèves ne lisent que <code>eb_el</code>, celles des enseignant·es que <code>eb_s</code>.</p>
+      </div>
+
+      <h3>Stockage local</h3>
+      <p>Certaines informations restent dans votre navigateur, sur votre appareil. Le serveur ne les lit pas, sauf ce que la page lui envoie pour fonctionner (un identifiant de cœur, un jeton de modification d’une réponse, des progrès de révision).</p>
+      <ul>
+        <li><strong>Documents du mode essai</strong> et brouillons en attente d’envoi quand la connexion manque, effacés une fois envoyés (IndexedDB <code>etabli</code>).</li>
+        <li><strong>Préférences</strong> : mode (compte ou essai) et espace choisi, éléments récents de la recherche, réglages d’affichage de l’ardoise, de la fiche, de la projection et de la révision des cartes, code d’invitation en cours (3 heures au plus).</li>
+        <li><strong>Cartes mémoire</strong> : quand l’enseignant·e révise un paquet (aperçu, classe entière) ou qu’on le révise depuis sa page publique, les progrès restent dans ce navigateur, sans être envoyés (IndexedDB <code>etabli-memo</code>).</li>
+        <li><strong>Espace élève</strong> : le code de la classe et la case « Appareil partagé », pour la connexion suivante ; les progrès de révision qui attendent une connexion pour partir, 30 jours au plus (IndexedDB <code>etabli-eleve</code>).</li>
+        <li><strong>Quiz en direct</strong> : identifiant aléatoire et pseudo d’un·e participant·e, pour retrouver ses réponses après une coupure ; sur l’appareil de l’enseignant·e, la clé de la télécommande.</li>
+        <li><strong>Galeries</strong> : l’identifiant aléatoire des cœurs et les cœurs donnés.</li>
+        <li><strong>Sondages</strong> : votre réponse (identifiant, jeton de modification, nom), pour pouvoir la modifier.</li>
+        <li><strong>Le temps de l’onglet seulement</strong> (effacé à sa fermeture) : code d’accès d’une page publique, mode projection, prénom saisi dans une fiche interactive et son bilan, mots secrets en route vers la page des badges (effacés dès qu’elle les a lus).</li>
+      </ul>
+      <p class="cf-note">Les clés commencent par <code>etabli.</code> ou <code>fabrique.</code>. Pour tout effacer : réglages du navigateur, données du site <code>etabli.guillaumetschupp.com</code>.</p>
+    </section>
+
+    <section id="eleves" aria-labelledby="t-eleves">
+      <h2 class="cf-h2" id="t-eleves"><span class="cf-num">9</span>Comptes élèves, tâches et cartes mémoire</h2>
+      <p>Ces fonctions sont facultatives. C’est l’enseignant·e qui décide d’ouvrir des comptes pour une classe, après avoir vérifié avec son établissement que c’est permis.</p>
+
+      <h3>Le compte d’un·e élève</h3>
+      <ul>
+        <li>Un compte élève n’a <strong>ni adresse e-mail, ni nom de famille, ni date de naissance</strong> : le prénom de la liste de la classe (mis à jour si la liste change), des identifiants internes, la date de création, la dernière connexion (à l’heure près) et l’état du compte (actif, en pause, bloqué).</li>
+        <li><strong>Code de classe</strong> : 6 caractères, un par classe, que l’enseignant·e peut changer. Après ce code, l’écran de connexion montre les prénoms des comptes actifs de la classe, rien d’autre.</li>
+        <li><strong>Mot secret</strong> : un mot simple et un chiffre (par exemple « lune7 »), jamais stocké en clair (empreinte HMAC avec le poivre). L’enseignant·e ne le voit qu’à sa création ou à son renouvellement, pour imprimer les badges ; il n’est plus relisible ensuite.</li>
+        <li><strong>Badge</strong> : un QR code qui connecte directement l’élève. Son contenu, placé après le # de l’adresse, ne part pas au serveur avec la page : la page le lit, l’efface de la barre d’adresse et l’envoie dans une requête protégée.</li>
+        <li><strong>Protection</strong> : après 5 mots secrets faux, le compte se bloque 15 minutes. Les essais sont aussi limités par réseau, avec une empreinte de l’adresse IP, jamais l’adresse elle-même.</li>
+        <li><strong>Session</strong> : cookie <code>eb_el</code> (voir la <a href="#cookies">section 8</a>), 20 sessions au plus par élève (au-delà, les plus anciennes sont fermées). Se déconnecter, recevoir un nouveau mot secret ou voir son compte mis en pause ferme les sessions aussitôt.</li>
+      </ul>
+
+      <h3>Tâches et suivi</h3>
+      <ul>
+        <li>Une tâche : un titre, une consigne, le contenu visé (cartes mémoire, fiche, quiz en autonomie, mur, lien ou tâche libre), les élèves visé·es, des dates de début et d’échéance, et la façon de la valider.</li>
+        <li>Pour chaque élève et chaque tâche : le statut (à faire, en cours, fait, validé, à revoir), le score, le nombre d’essais, la durée, le détail d’un quiz ou d’une fiche (les réponses données ; une réponse libre compte 400 caractères au plus), un commentaire de l’élève (200 caractères au plus) et le retour de l’enseignant·e (500 caractères au plus).</li>
+        <li>Un quiz en autonomie est corrigé par le serveur : les bonnes réponses ne partent pas vers l’appareil de l’élève avant qu’il ou elle ait répondu.</li>
+      </ul>
+
+      <h3>Cartes mémoire</h3>
+      <ul>
+        <li>Pour chaque élève et chaque paquet donné en tâche : l’état de chaque carte (répétition espacée : stabilité, difficulté, dates de révision), des statistiques (cartes vues, ancrées, à réactiver) et l’activité par jour (nombre de réponses, bonnes réponses, durée), qui sert au suivi et à la série de jours de l’élève.</li>
+        <li>L’activité par jour est gardée 400 jours au plus.</li>
+        <li>L’assistant IA peut proposer des cartes, comme pour les quiz (voir la <a href="#donnees">section 2</a>).</li>
+      </ul>
+
+      <h3>Qui voit quoi</h3>
+      <p>Seul·es les enseignant·es de la classe (le compte propriétaire, ou les membres de l’espace partagé qui la contient) voient le suivi et peuvent l’exporter (fichier CSV). Un·e élève ne voit jamais les données des autres élèves, ni de classement ; seule la liste des prénoms de la classe apparaît à l’écran de connexion.</p>
+
+      <h3>Durée et effacement</h3>
+      <p>Comptes, code de classe, suivi et progrès des cartes restent jusqu’à ce que l’enseignant·e les efface : un compte à la fois, ou tous les comptes de la classe avec le code et le suivi (« Effacer les comptes et le suivi », prévu pour la fin d’année ; les tâches et les documents restent). Rien n’est effacé automatiquement en fin d’année. Effacer définitivement la classe, l’espace partagé qui la contient ou le compte de l’enseignant·e efface tout en cascade ; effacer définitivement un paquet de cartes efface les progrès des élèves sur ce paquet. Le ménage de chaque nuit efface les sessions expirées et l’activité de plus de 400 jours.</p>
+    </section>
+
+    <section id="contact" aria-labelledby="t-contact">
+      <h2 class="cf-h2" id="t-contact"><span class="cf-num">10</span>Contact</h2>
+      <p>Pour toute question ou demande sur vos données, écrivez à Guillaume Tschupp par message sur <a href="https://www.linkedin.com/in/guillaume-tschupp-9b24a7157/" rel="noopener noreferrer">LinkedIn</a>. Indiquez l’adresse e-mail de votre compte, mais jamais votre mot de passe ni votre code de secours : personne ne vous les demandera.</p>
+      <p class="cf-note">Cette page change avec l’outil. La date en haut indique sa dernière mise à jour.</p>
+      <p class="cf-haut"><a href="#contenu">Retour en haut</a></p>
+    </section>
+  </main>
+
+  <footer class="pub-pied">
+    <p>L’Établi, prototype en test · outil personnel de Guillaume Tschupp</p>
+    <p><a href="/">Ouvrir l’Établi</a></p>
+  </footer>
+</div>
+</body>
+</html>

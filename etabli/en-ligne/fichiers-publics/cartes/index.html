@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartes à imprimer · L’Établi</title>
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/etabli.css">
+<link rel="stylesheet" href="/live/live.css">
+<style>
+  .ecran { max-width: 1120px; margin: 0 auto; padding: 24px 16px 8px; }
+  .intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: start; }
+  .intro h1 { font-size: clamp(24px, 3vw, 34px); margin: 4px 0 10px; }
+  .intro p { max-width: 62ch; color: var(--muted); }
+  .eyebrow { color: var(--t-quiz); }
+  .mini-carte { width: 132px; aspect-ratio: 1; position: relative; display: grid; place-items: center; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); color: #141A1E; }
+  .mini-carte .mq { width: 58%; aspect-ratio: 1; }
+  .mini-carte .mq svg { width: 100%; height: 100%; display: block; }
+  .mini-carte .l { position: absolute; font: 800 15px/1 var(--font-display); }
+  .mini-carte .l.a { top: 6px; left: 50%; transform: translateX(-50%); color: #fff; background: var(--t-quiz); padding: 2px 5px; border-radius: 3px; }
+  .mini-carte .l.b { right: 8px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+  .mini-carte .l.c { bottom: 6px; left: 50%; transform: translateX(-50%) rotate(180deg); }
+  .mini-carte .l.d { left: 8px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+  .reglages { display: grid; grid-template-columns: minmax(220px, 2fr) minmax(140px, 1fr) minmax(220px, 2fr) auto; gap: 14px; align-items: end; margin: 22px 0 14px; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+  .reglages .btn { min-height: 44px; }
+  .resume { font-size: 15px; color: var(--muted); margin: 0 0 12px; }
+  .resume b { color: var(--fg); }
+  .conseils { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .apercu { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 1120px; margin: 0 auto; padding: 20px 16px 60px; }
+  .eb-etat[data-etat="propre"] { display: none; }
+  .cadre { width: calc(210mm * var(--z)); height: calc(297mm * var(--z)); overflow: hidden; background: #fff; box-shadow: var(--shadow); border-radius: 2px; flex: none; }
+  .cadre .feuille { transform: scale(var(--z)); transform-origin: top left; }
+  .feuille { width: 210mm; height: 297mm; display: grid; background: #fff; color: #141A1E; font-family: var(--font-display); }
+  .f1 { grid-template: 1fr / 1fr; }
+  .f2 { grid-template: 1fr 1fr / 1fr; }
+  .f4 { grid-template: 1fr 1fr / 1fr 1fr; }
+  .carte { position: relative; border: .2mm dashed #B9C4C0; display: grid; place-items: center; overflow: hidden; }
+  .carte.vide { border: 0; }
+  .carte .mq { display: block; }
+  .carte .mq svg { display: block; width: 100%; height: 100%; }
+  .carte .l { position: absolute; font-weight: 800; color: #141A1E; line-height: 1; }
+  .carte .l.a { top: var(--m); left: 50%; transform: translateX(-50%); }
+  .carte .l.b { right: var(--m); top: 50%; transform: translateY(-50%) rotate(90deg); }
+  .carte .l.c { bottom: var(--m); left: 50%; transform: translateX(-50%) rotate(180deg); }
+  .carte .l.d { left: var(--m); top: 50%; transform: translateY(-50%) rotate(-90deg); }
+  .carte .no { position: absolute; top: var(--m); left: var(--m); font-weight: 800; line-height: 1.1; color: #141A1E; max-width: 34%; }
+  .carte .no small { display: block; font-weight: 700; font-family: var(--font-eleve); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .carte .no.bis { top: auto; left: auto; bottom: var(--m); right: var(--m); transform: rotate(180deg); }
+  .f1 .carte { --m: 7mm; } .f1 .mq { width: 150mm; height: 150mm; } .f1 .l { font-size: 12mm; } .f1 .no { font-size: 9mm; } .f1 .no small { font-size: 5.5mm; }
+  .f2 .carte { --m: 5mm; } .f2 .mq { width: 100mm; height: 100mm; } .f2 .l { font-size: 8mm; } .f2 .no { font-size: 7mm; } .f2 .no small { font-size: 5mm; }
+  .f4 .carte { --m: 4mm; } .f4 .mq { width: 64mm; height: 64mm; } .f4 .l { font-size: 6mm; } .f4 .no { font-size: 5mm; } .f4 .no small { font-size: 3.8mm; }
+  @media (max-width: 860px) {
+    .reglages { grid-template-columns: 1fr 1fr; }
+    .reglages .btn { grid-column: 1 / -1; }
+    .intro { grid-template-columns: 1fr; }
+    .mini-carte { display: none; }
+  }
+  @media (max-width: 480px) { .reglages { grid-template-columns: 1fr; } }
+  @media print {
+    @page { size: A4 portrait; margin: 0; }
+    html, body { margin: 0; background: #fff; }
+    .eb-barre, .ecran, .eb-toasts { display: none !important; }
+    .apercu { display: block; padding: 0; }
+    .cadre { width: auto; height: auto; overflow: visible; box-shadow: none; border-radius: 0; }
+    .cadre .feuille { transform: none; }
+    .feuille { break-after: page; page-break-after: always; }
+    .cadre:last-child .feuille { break-after: auto; page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="ecran">
+  <div class="intro">
+    <div>
+      <p class="eyebrow">Quiz en direct · mode cartes</p>
+      <h1>Cartes à imprimer</h1>
+      <p>Chaque élève reçoit une carte. Pour répondre, elle ou il la tient face au tableau, <b>la lettre choisie en haut</b>. Tu scannes la salle avec ton téléphone : la lettre en haut donne la réponse, le numéro dit qui a répondu.</p>
+    </div>
+    <div class="mini-carte" id="mini" aria-hidden="true"></div>
+  </div>
+  <div class="reglages">
+    <label class="field"><span>Classe</span><select class="select" id="classe"><option value="">Sans classe (numéros seulement)</option></select></label>
+    <label class="field"><span>Nombre de cartes</span><input class="input" id="nombre" type="number" min="1" max="63" value="30" inputmode="numeric"></label>
+    <label class="field"><span>Format</span>
+      <select class="select" id="format">
+        <option value="2">2 cartes par page A4 (salle de classe)</option>
+        <option value="1">1 carte par page A4 (grande salle)</option>
+        <option value="4">4 cartes par page A4 (petite salle)</option>
+      </select></label>
+    <button class="btn btn-primary" id="imprimer" type="button"></button>
+  </div>
+  <p class="resume" id="resume" role="status"></p>
+  <div class="conseils">
+    <div class="lv-encart info"><span class="ic" data-ic="info"></span><span>Imprime à 100&#8239;% (taille réelle, sans «&#8239;ajuster à la page&#8239;»), en noir sur papier blanc mat, idéalement épais.</span></div>
+    <div class="lv-encart"><span class="ic" data-ic="cartes"></span><span>Le numéro d’une carte est la place de l’élève dans la liste de la classe. Une carte perdue se réimprime seule&#8239;: elle reste la même.</span></div>
+  </div>
+  <div id="avertissement"></div>
+</div>
+<div class="apercu" id="apercu"></div>
+<script src="/js/etabli-client.js"></script>
+<script src="/js/etabli-ui.js"></script>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/live-commun.js"></script>
+<script src="/js/live-cartes-dico.js"></script>
+<script>
+(async () => {
+  'use strict';
+  const { h, $, $$ } = Live;
+  const barre = EtabliUI.barre({ titre: 'Cartes à imprimer', type: 'quiz', editable: false });
+  document.title = 'Cartes à imprimer · L’Établi';
+  $$('[data-ic]').forEach((s) => { s.innerHTML = Live.icone(s.dataset.ic); s.setAttribute('aria-hidden', 'true'); });
+  $('#imprimer').append(Live.ic('imprimer'), 'Imprimer');
+  $('#mini').innerHTML = '<span class="mq">' + CartesML.svgMarqueur(6) + '</span><span class="l a">A</span><span class="l b">B</span><span class="l c">C</span><span class="l d">D</span>';
+  const selClasse = $('#classe'), nombre = $('#nombre'), format = $('#format'), apercu = $('#apercu');
+  const voulue = Etabli.param('classe');
+
+  await Etabli.pret;
+  const classes = new Map(); // id -> { titre, noms }
+  let entetes = [];
+  if (Etabli.mode() !== 'aucun') {
+    try { entetes = await Etabli.docs.lister({ type: 'classe' }); } catch (e) { Live.toast(e.message, 'erreur'); }
+  }
+  for (const c of entetes) selClasse.append(h('option', { value: c.id }, c.titre + (c.resume && c.resume.n ? ' (' + c.resume.n + ')' : '')));
+  async function chargerClasse(id) {
+    if (!id) return null;
+    if (classes.has(id)) return classes.get(id);
+    const d = await Etabli.docs.lire(id);
+    const noms = ((d.data && d.data.eleves) || []).map((e) => String((e && e.prenom) || '').trim());
+    const c = { id, titre: d.titre || 'Classe', noms };
+    classes.set(id, c);
+    if (!Array.from(selClasse.options).some((o) => o.value === id)) selClasse.append(h('option', { value: id }, c.titre));
+    return c;
+  }
+  if (voulue) {
+    try {
+      await chargerClasse(voulue);
+      selClasse.value = voulue;
+      // retour vers la classe sur le pupitre (dans son espace partagé, s'il y en a un dans l'adresse)
+      const lien = h('a', { class: 'btn btn-sm btn-ghost', href: Etabli.urlOutil ? Etabli.urlOutil('classe', voulue) : '/#classes/' + encodeURIComponent(voulue) }, Live.ic('classe'), h('span', {}, 'Ouvrir la classe'));
+      barre.actions.appendChild(lien);
+    }
+    catch (e) {
+      const pasDeCompte = Etabli.mode() === 'aucun';
+      $('#avertissement').replaceChildren(h('div', { class: 'lv-encart attention', style: { marginBottom: '16px' } }, Live.ic('attention'),
+        h('span', {}, pasDeCompte ? 'Connecte-toi ou commence un essai pour retrouver cette classe. En attendant, tu peux imprimer des cartes numérotées.' : 'Cette classe est introuvable : elle a peut-être été supprimée. Tu peux choisir une autre classe ou imprimer des cartes numérotées.')));
+    }
+  }
+
+  function carte(n, nom) {
+    return h('div', { class: 'carte' },
+      h('span', { class: 'mq', html: CartesML.svgMarqueur(n - 1) }),
+      h('span', { class: 'l a' }, 'A'), h('span', { class: 'l b' }, 'B'), h('span', { class: 'l c' }, 'C'), h('span', { class: 'l d' }, 'D'),
+      h('span', { class: 'no' }, String(n), nom ? h('small', {}, nom) : null),
+      h('span', { class: 'no bis' }, String(n), nom ? h('small', {}, nom) : null));
+  }
+
+  let jeton = 0;
+  async function dessiner() {
+    const moi = ++jeton;
+    let c = null;
+    if (selClasse.value) {
+      try { c = await chargerClasse(selClasse.value); } catch (e) { Live.toast(e.message, 'erreur'); }
+    }
+    if (moi !== jeton) return;
+    let cartes;
+    let resume;
+    if (c) {
+      const tous = c.noms.map((nom, i) => ({ n: i + 1, nom }));
+      cartes = tous.slice(0, Live.MAX_CARTES).filter((x) => x.nom);
+      nombre.disabled = true;
+      nombre.value = cartes.length;
+      resume = [h('b', {}, Live.pluriel(cartes.length, 'carte', 'cartes')), ' pour la classe ', h('b', {}, c.titre), ', dans l’ordre de la liste.'];
+      if (tous.length > Live.MAX_CARTES) resume.push(' Attention : le mode cartes compte 63 cartes au plus, les élèves suivant·es n’ont pas de carte.');
+      if (!cartes.length) resume = ['Cette classe n’a pas encore d’élèves. Ajoute des prénoms depuis le pupitre, ou imprime des cartes numérotées.'];
+    } else {
+      nombre.disabled = false;
+      const n = Math.max(1, Math.min(Live.MAX_CARTES, Number(nombre.value) || 1));
+      cartes = Array.from({ length: n }, (_, i) => ({ n: i + 1, nom: '' }));
+      resume = [h('b', {}, Live.pluriel(n, 'carte numérotée', 'cartes numérotées')), ' (de 1 à ' + n + ').'];
+    }
+    const parPage = Number(format.value);
+    const feuilles = [];
+    for (let i = 0; i < cartes.length; i += parPage) {
+      const lot = cartes.slice(i, i + parPage);
+      while (lot.length < parPage) lot.push(null);
+      feuilles.push(h('div', { class: 'cadre' }, h('div', { class: 'feuille f' + parPage }, lot.map((x) => (x ? carte(x.n, x.nom) : h('div', { class: 'carte vide' }))))));
+    }
+    const pages = feuilles.length;
+    if (pages) resume.push(' ' + Live.pluriel(pages, 'page', 'pages') + ' A4.');
+    $('#resume').replaceChildren(...resume.map((x) => (typeof x === 'string' ? Live.typo(x) : x)));
+    const largeur = Math.min(window.innerWidth, 1120) - 32;
+    const parLigne = largeur > 700 ? 3 : largeur > 460 ? 2 : 1;
+    const z = Math.max(0.2, Math.min(0.42, (largeur - 20 * (parLigne - 1)) / parLigne / 794));
+    apercu.style.setProperty('--z', z);
+    apercu.replaceChildren(...feuilles);
+    $('#imprimer').disabled = !cartes.length;
+  }
+  [selClasse, nombre, format].forEach((el) => el.addEventListener('input', dessiner));
+  selClasse.addEventListener('change', () => {
+    const q = new URLSearchParams(location.search);
+    if (selClasse.value) q.set('classe', selClasse.value); else q.delete('classe');
+    try { history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '')); } catch (e) {}
+  });
+  let rt = null;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(dessiner, 150); });
+  $('#imprimer').addEventListener('click', () => window.print());
+  dessiner();
+})();
+</script>
+</body>
+</html>

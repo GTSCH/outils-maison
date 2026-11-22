@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Mes séances</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/seances.css">
+<style>
+  main { max-width: 980px; margin: 0 auto; padding: 32px 20px 60px; display: grid; gap: 22px; }
+  .tete { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .tete h1 { font-size: 30px; flex: 1; }
+  .carte { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+  .carte h2 { font-size: 19px; }
+  .carte p { color: var(--muted); font-size: 14px; }
+  .carte .rang { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .liste { display: grid; gap: 10px; }
+  .vide { padding: 30px; text-align: center; color: var(--muted); background: var(--surface); border-radius: 10px; }
+  @media (max-width: 640px) { .carte { grid-template-columns: 1fr; } .carte .rang { justify-content: flex-start; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="tete">
+    <h1>Mes séances</h1>
+    <span class="prototype">prototype</span>
+    <button class="btn" id="b-corbeille">Corbeille</button>
+    <button class="btn primaire" id="b-nouvelle">+ Nouvelle séance</button>
+  </div>
+  <div class="liste" id="liste"></div>
+</main>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script>
+(async function () {
+  const { api, h, $, toast, copier, adresseParticipant, cle } = SE;
+  let corbeille = false;
+  if (!cle()) {
+    $("main").innerHTML = "<h1>Mes séances</h1><p>Ouvrez cette page depuis votre lien personnel : il contient votre clé et ne se partage pas.</p>";
+    return;
+  }
+  async function charger() {
+    const z = $("#liste");
+    try {
+      const r = await api("GET", "/espace" + (corbeille ? "?corbeille=1" : ""));
+      z.innerHTML = "";
+      if (!r.seances.length) { z.append(h("p", { class: "vide" }, corbeille ? "La corbeille est vide." : "Aucune séance pour l'instant.")); return; }
+      for (const s of r.seances) z.append(h("article", { class: "carte" },
+        h("div", null, h("h2", null, s.titre || "Sans titre"), h("p", null, `Modifiée le ${new Date(s.updated_at).toLocaleString("fr-CH", { dateStyle: "medium", timeStyle: "short" })} · ${adresseParticipant(s.id).replace(/^https?:\/\//, "")}`)),
+        h("div", { class: "rang" }, corbeille
+          ? h("button", { class: "btn petit", onclick: async () => { await api("POST", `/s/${s.id}/restaurer`); toast("Séance restaurée"); charger(); } }, "Restaurer")
+          : [
+            h("a", { class: "btn petit", href: `/s/${s.id}/editer` }, "Modifier"),
+            h("a", { class: "btn petit", href: `/s/${s.id}/presentateur`, target: "_blank" }, "Présenter"),
+            h("button", { class: "btn petit", onclick: () => copier(adresseParticipant(s.id)) }, "Lien participant·es"),
+          ])));
+    } catch (e) { z.innerHTML = ""; z.append(h("p", { class: "vide" }, e.message)); }
+  }
+  $("#b-nouvelle").onclick = async () => {
+    const t = prompt("Titre de la nouvelle séance ?", "");
+    if (t === null) return;
+    const r = await api("POST", "/s", { titre: t });
+    location.href = `/s/${r.id}/editer`;
+  };
+  $("#b-corbeille").onclick = () => { corbeille = !corbeille; $("#b-corbeille").textContent = corbeille ? "Retour à mes séances" : "Corbeille"; charger(); };
+  charger();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+--- etabli-index.orig.js	2026-10-26 19:35:55.911302276 +0100
++++ deploy/etabli/index.js	2026-10-26 19:54:08.314589386 +0100
+@@ -7545,6 +7545,7 @@
+ var ENTETES_BADGES = { "referrer-policy": "no-referrer", "x-robots-tag": "noindex, nofollow", "cache-control": "no-store" };
+ var PAGES_SESSION = [
+   [/^\/(?:r\/)?\d{6}\/?$/, "/live/participant"],
++  [/^\/(?:r|rejoindre)\/?$/, "/live/participant"],
+   [/^\/projeter\/\d{6}\/?$/, "/live/projeter"],
+   [/^\/pilote\/\d{6}\/?$/, "/live/pilote"],
+   [/^\/stats\/\d{6}\/?$/, "/live/stats"],
+@@ -7556,6 +7557,42 @@
+   // étape 4 : paquet de cartes mémoire partagé
+   [/^\/a\/[A-Za-z0-9_-]{20,64}\/?$/, "/p/memo", ENTETES_PUBLIC]
+ ];
++var REJOINDRE_ACCUEIL = `<style>
++#eb-rejoindre { background: var(--surface); border-bottom: 1px solid var(--line); padding: 14px clamp(16px, 4vw, 48px); }
++#eb-rejoindre form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; max-width: 1440px; margin: 0 auto; }
++#eb-rejoindre label { flex: 1 1 260px; min-width: 0; font: 700 18px/1.3 var(--font-display); }
++#eb-rejoindre .ligne { display: flex; gap: 8px; flex: 1 1 260px; min-width: 0; max-width: 440px; }
++#eb-rejoindre .input { flex: 1 1 0; width: 0; min-width: 0; min-height: 52px; font: 600 24px/1 var(--font-display); letter-spacing: .1em; text-align: center; }
++#eb-rejoindre .btn { flex: 0 0 auto; min-height: 52px; }
++#eb-rejoindre .erreur { flex-basis: 100%; margin: 0; color: var(--bad); font-size: 15px; }
++#eb-rejoindre .erreur:empty { display: none; }
++body.pp-en-shell #eb-rejoindre { display: none; }
++</style>
++<section id="eb-rejoindre" aria-label="Rejoindre un quiz en direct">
++<form novalidate>
++<label for="eb-code">Tu rejoins un quiz en direct&#8239;? Entre le code affiché au tableau.</label>
++<div class="ligne"><input class="input" id="eb-code" name="code" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="123 456" aria-describedby="eb-code-erreur"><button class="btn btn-primary" type="submit">Rejoindre</button></div>
++<p class="erreur" id="eb-code-erreur" aria-live="polite"></p>
++</form>
++</section>
++<script>
++(function () {
++  var f = document.querySelector('#eb-rejoindre form'), c = document.getElementById('eb-code'), m = document.getElementById('eb-code-erreur');
++  if (!f || !c) return;
++  c.addEventListener('input', function () {
++    var v = c.value.replace(/\\D/g, '').slice(0, 6);
++    c.value = v.length > 3 ? v.slice(0, 3) + ' ' + v.slice(3) : v;
++    m.textContent = '';
++  });
++  f.addEventListener('submit', function (e) {
++    e.preventDefault();
++    var v = c.value.replace(/\\D/g, '');
++    if (v.length !== 6) { m.textContent = 'Le code compte six chiffres.'; c.focus(); return; }
++    location.href = '/' + v;
++  });
++})();
++</script>
++`;
+ var ENTETES_HTML = {
+   "x-content-type-options": "nosniff",
+   "referrer-policy": "strict-origin-when-cross-origin",
+@@ -7687,7 +7724,13 @@
+     rep = await servirAsset(env, new URL(cible[1], url), req);
+     if (rep.status === 404 || rep.status >= 300) rep = await servirAsset(env, new URL("/404", url), req, 404);
+   } else {
+-    rep = await env.ASSETS.fetch(req);
++    const accueil = url.pathname === "/";
++    rep = accueil ? await servirAsset(env, url, req) : await env.ASSETS.fetch(req);
++    if (accueil && rep.status === 200 && (rep.headers.get("content-type") || "").includes("text/html")) {
++      rep = new HTMLRewriter().on("body", { element: /* @__PURE__ */ __name((el) => el.prepend(REJOINDRE_ACCUEIL, { html: true }), "element") }).transform(rep);
++      rep = new Response(rep.body, rep);
++      rep.headers.delete("etag");
++    }
+   }
+   const ch = url.pathname;
+   const extra = cible ? cible[2] : ch.startsWith("/p/") ? ENTETES_PUBLIC : ch === "/eleve" || ch.startsWith("/eleve/") ? ENTETES_ELEVE : ch === "/badges" || ch.startsWith("/badges/") ? ENTETES_BADGES : null;
+@@ -7720,4 +7763,4 @@
+   Session,
+   index_default as default
+ };
+-//# sourceMappingURL=index.js.map
++

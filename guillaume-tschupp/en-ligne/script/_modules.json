@@ -1,0 +1,99 @@
+{
+ "worker": "guillaume-tschupp",
+ "module_principal": "worker.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "278cf7c004bb637272f767ef3c002e33cca499adf971b1bb49a88311c18657fe",
+ "modules": [
+  {
+   "nom": "police-spline-latinext-400.woff2",
+   "fichier": "police-spline-latinext-400.woff2",
+   "type": "application/octet-stream",
+   "sha256": "011b0d5173f19deaeaba00f5070430a8d6f2ed65c85cc5e82d383ff2df76ea4a",
+   "octets": 8492
+  },
+  {
+   "nom": "police-spline-latinext-500.woff2",
+   "fichier": "police-spline-latinext-500.woff2",
+   "type": "application/octet-stream",
+   "sha256": "99537be36549a310d34e93796a9c12987f3ebadbaebb9e1e7fbb9bd995c28b42",
+   "octets": 8352
+  },
+  {
+   "nom": "worker.js",
+   "fichier": "worker.js",
+   "type": "application/javascript+module",
+   "sha256": "278cf7c004bb637272f767ef3c002e33cca499adf971b1bb49a88311c18657fe",
+   "octets": 117267
+  },
+  {
+   "nom": "656c30201bb3ebf2107aa15dc1dc0e1163ce10f3-4becc8b01c583981f7ab0c6ee67afde0cce8267f-styles.css",
+   "fichier": "656c30201bb3ebf2107aa15dc1dc0e1163ce10f3-4becc8b01c583981f7ab0c6ee67afde0cce8267f-styles.css",
+   "type": "text/plain",
+   "sha256": "76036ac6d047bd7da2ad1b527aa4b45b832369a5f1339ad1c5be3386b1ffa8d2",
+   "octets": 14995
+  },
+  {
+   "nom": "police-literata-latin-italic.woff2",
+   "fichier": "police-literata-latin-italic.woff2",
+   "type": "application/octet-stream",
+   "sha256": "97bc5aa317653eb249d66782c8533e5f1bd7d27a97b5265155a3d1700e785b7b",
+   "octets": 113180
+  },
+  {
+   "nom": "police-literata-latinext-italic.woff2",
+   "fichier": "police-literata-latinext-italic.woff2",
+   "type": "application/octet-stream",
+   "sha256": "09e48237261b84a90f2d6011c050d10d4bacd060cd884a10fe4edf69c0bf3870",
+   "octets": 91424
+  },
+  {
+   "nom": "police-literata-latinext-normal.woff2",
+   "fichier": "police-literata-latinext-normal.woff2",
+   "type": "application/octet-stream",
+   "sha256": "1160835f4cdae6a86572ed501c13b62b341480cc7c13fc88ba0c21efdf1fcd73",
+   "octets": 89668
+  },
+  {
+   "nom": "police-schibsted-latin.woff2",
+   "fichier": "police-schibsted-latin.woff2",
+   "type": "application/octet-stream",
+   "sha256": "4c8b93f431d462c696e12b9d6a033feb3394d36e66e781357c496b95d8a75e05",
+   "octets": 46752
+  },
+  {
+   "nom": "police-spline-latin-400.woff2",
+   "fichier": "police-spline-latin-400.woff2",
+   "type": "application/octet-stream",
+   "sha256": "af7360e11effa088510c57bd6c327cacd1e53ce8b0f3ef1e2445284df777e5d6",
+   "octets": 12888
+  },
+  {
+   "nom": "police-spline-latin-500.woff2",
+   "fichier": "police-spline-latin-500.woff2",
+   "type": "application/octet-stream",
+   "sha256": "9179bba9265604145aefeea0ae786db5190893e0862c4b8236d90fa3fc2a4bcc",
+   "octets": 12784
+  },
+  {
+   "nom": "3566ec569f63b0ef3bd3e248d8dd2f9a42911cb8-3566ec569f63b0ef3bd3e248d8dd2f9a42911cb8-favicon.svg",
+   "fichier": "3566ec569f63b0ef3bd3e248d8dd2f9a42911cb8-3566ec569f63b0ef3bd3e248d8dd2f9a42911cb8-favicon.svg",
+   "type": "text/plain",
+   "sha256": "942e9e3ba753a15c4efa13c138f78f9cfe370866b8ac8b63e05817387b93d624",
+   "octets": 293
+  },
+  {
+   "nom": "police-literata-latin-normal.woff2",
+   "fichier": "police-literata-latin-normal.woff2",
+   "type": "application/octet-stream",
+   "sha256": "29de894c768689feef6ab4ef274a9a16d19bfc5b0c3cbfcdac80ef220816210c",
+   "octets": 110080
+  },
+  {
+   "nom": "police-schibsted-latinext.woff2",
+   "fichier": "police-schibsted-latinext.woff2",
+   "type": "application/octet-stream",
+   "sha256": "ee9eeb232cc1fe7979dad813a570f4b19f1eb4496daf56c94ec9de63abdb2936",
+   "octets": 20924
+  }
+ ]
+}

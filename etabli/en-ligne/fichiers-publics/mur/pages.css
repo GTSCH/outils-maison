@@ -1,0 +1,55 @@
+/*
+ * L'Établi : pages publiques des murs et des galeries (/m/<jeton>, /g/<jeton>). Complète /p/public.css et
+ * /mur/rendu.css. Le fond choisi pour le mur colore toute la page ; l'en-tête suit sa couleur de texte.
+ */
+body.pub[data-fond] .pub-tete, body.pub[data-fond] .pub-pied { color: var(--fond-fg); }
+body.pub[data-fond] .pub-desc, body.pub[data-fond] .pub-pied, body.pub[data-fond] .pg-actions .pub-aide { color: var(--fond-muted); }
+body.pub[data-fond] .pub-pied { border-top-color: var(--fond-ligne); }
+body.pub[data-fond="ardoise"] .pub-surtitre, body.pub[data-fond="nuit"] .pub-surtitre { color: #C9E89B; }
+body.pub[data-fond="ardoise"] .pub-outils .pub-btn, body.pub[data-fond="nuit"] .pub-outils .pub-btn { color: var(--fond-fg); }
+.pub .mr-post-tete { font-family: var(--font); }
+.pg-actions { margin-top: 6px; }
+.pg-actions .pub-aide { font-size: 15px; }
+.pub .mr-section-titre { font-size: 21px; }
+.pub .mr-post-titre { font-size: 20px; }
+.pub .mr-post-texte { font-size: 18px; }
+.pub .mr-section-vide { font-size: 16px; }
+html.pub-projection { --mr-col: 420px; }
+html.pub-projection .mr-section-titre { font-size: 28px; }
+html.pub-projection .mr-post-titre { font-size: 27px; }
+html.pub-projection .mr-post-texte { font-size: 24px; }
+html.pub-projection .mr-pour, html.pub-projection .mr-depot-nom { font-size: 18px; }
+html.pub-projection .mr-lien-txt b, html.pub-projection .mr-doc-txt b { font-size: 21px; }
+html.pub-projection .mr-tuile-titre { font-size: 22px; }
+html.pub-projection .mr-tuile-auteur { font-size: 19px; }
+html.pub-projection .mr-mosaique { --h: 320px; }
+.pg-mur .mr-sections { padding-bottom: 12px; }
+/* formulaire de dépôt */
+.pg-depot { display: grid; gap: 14px; }
+.pg-depot-note { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--mark-soft); font-size: 15.5px; }
+.pg-depot-note svg { width: 20px; height: 20px; flex: none; margin-top: 2px; color: var(--mark-fg); }
+.pg-depot .pub-aide { margin-top: -8px; }
+.pub-fichier label.pub-btn { cursor: pointer; }
+.pub-fichier:has(input[type="file"]:focus-visible) label.pub-btn { outline: 3px solid color-mix(in srgb, var(--accent) 75%, transparent); outline-offset: 2px; }
+.pg-photo { display: none; }
+@media (pointer: coarse) { .pg-photo { display: inline-flex; } }
+.pg-apercu img { display: block; max-width: 100%; max-height: 220px; border-radius: 10px; border: 1px solid var(--line); }
+.pg-merci { margin: 0; }
+
+/* ---------- galerie ---------- */
+.pg-galerie { display: grid; gap: 34px; }
+.pg-section { display: grid; gap: 14px; }
+.pg-section h2 { display: flex; align-items: baseline; gap: 10px; font-size: 24px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.pg-section h2 small { font-size: 16px; font-weight: 400; color: var(--muted); }
+html.pub-projection .pg-section h2 { font-size: 34px; }
+.pub .mr-mosaique { --h: 250px; }
+.pg-expo .mr-mosaique { --h: 360px; gap: 22px; }
+.pg-expo .mr-tuile-titre { font-size: 19px; }
+.pg-expo-appel { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; padding: 18px 20px; border-radius: var(--radius-xl); background: color-mix(in srgb, var(--genre) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--genre) 30%, var(--line)); }
+.pg-expo-appel p { flex: 1 1 260px; font-size: 17px; }
+.pg-depot-galerie .mr-tuile-img { outline: 2px dashed color-mix(in srgb, var(--genre) 55%, transparent); outline-offset: 2px; }
+@media (max-width: 560px) {
+  .pub .mr-mosaique { --h: 140px; }
+  .pg-expo .mr-mosaique { --h: 200px; }
+  .pub .mr-section-titre { font-size: 20px; }
+}

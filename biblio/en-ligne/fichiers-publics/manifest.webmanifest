@@ -1,0 +1,16 @@
+{
+  "name": "Atelier de recherche",
+  "short_name": "Atelier",
+  "description": "Bibliothèque d'articles, lecteur PDF annotable, briques de connaissance, documents et projets, avec Claude.",
+  "lang": "fr",
+  "start_url": "/#atelier",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#23466e",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

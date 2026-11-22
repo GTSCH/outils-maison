@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Statistiques · Main levée</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  .chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 20px 0 28px; }
+  .chiffre { border-top: 6px solid var(--rouge); background: var(--rd-10); padding: 12px 14px; }
+  .chiffre b { font-family: var(--font-din); font-size: 38px; line-height: 1.05; display: block; }
+  .q-stat { border: 1px solid var(--rd-25); border-left: 8px solid var(--rouge); padding: 18px; margin-bottom: 18px; break-inside: avoid; }
+  .q-stat .num { font-family: var(--font-din); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 15px; }
+  .q-stat h3 { font-size: 22px; white-space: pre-wrap; margin: 4px 0 14px; }
+  .q-stat .resume-q { font-size: 15px; margin-top: 10px; }
+  .res-echelle { height: 160px; max-width: 700px; }
+  .res-echelle-legende { max-width: 700px; }
+  .res-nuage { font-size: 15px; padding: 10px 0; }
+  .res-qcm { max-width: 900px; }
+  .ok { color: var(--fp); font-weight: 700; }
+  .ko { color: var(--rouge); font-weight: 700; }
+  .barre-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 0; }
+  @media print {
+    .entete, .barre-actions, .pas-imprimer { display: none !important; }
+    body { font-size: 12pt; }
+    .page { padding: 0; max-width: none; }
+    .tableau th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .res-ligne .barre i, .res-echelle .b, .lettre, .chiffre { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<header class="entete">
+  <a class="marque" href="/espace#/historique"><b>Main levée</b><span>Statistiques</span></a>
+  <div class="droite" id="logo"></div>
+</header>
+<main class="page" id="app"><p>Chargement…</p></main>
+<footer class="pas-imprimer" style="padding: 14px var(--gouttiere) 22px; text-align: center; font-size: 15px;"><a href="/confidentialite">Protection des données</a></footer>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script src="/js/resultats.js"></script>
+<script>
+(async () => {
+  const { h, $, icone, LETTRES, TYPES } = ML;
+  $("#logo").innerHTML = ML.LOGO;
+  const app = $("#app");
+  const code = ML.codeDansAdresse();
+  const jeton = new URLSearchParams(location.hash.slice(1)).get("jeton");
+  let D;
+  try {
+    D = await ML.api("GET", `/sessions/${code}`, undefined, jeton ? { "X-Jeton": jeton } : {});
+  } catch (e) {
+    app.replaceChildren(h("h1", {}, "Statistiques indisponibles"), h("p", {}, "Cette session n'existe pas, ou elle appartient à un autre espace. Ouvrez-la depuis votre espace."), h("a", { class: "btn primaire", href: "/espace#/historique" }, "Mon historique"));
+    return;
+  }
+  const C = D.config, Q = C.questions;
+  document.title = `${C.titre} · Statistiques · Main levée`;
+
+  // participant·es ayant répondu au moins une fois, dans l'ordre d'arrivée
+  const repPar = new Map();
+  for (const r of D.reponses) {
+    if (!repPar.has(r.pid)) repPar.set(r.pid, new Map());
+    repPar.get(r.pid).set(r.q, r.valeur);
+  }
+  let anonyme = 0;
+  const personnes = D.participants
+    .filter((p) => repPar.has(p.id))
+    .sort((a, b) => (a.carte ?? 1e9) - (b.carte ?? 1e9) || a.rejoint - b.rejoint)
+    .map((p) => ({
+      id: p.id,
+      nom: p.carte !== null ? `Carte ${p.carte}${p.pseudo ? " · " + p.pseudo : ""}` : p.pseudo || `Anonyme ${++anonyme}`,
+      rep: repPar.get(p.id),
+    }));
+
+  const bonnesDe = (q) => (q.type === "qcm" ? q.options.map((o, i) => (o.bonne ? i : -1)).filter((i) => i >= 0) : []);
+  const posees = new Set(D.reponses.map((r) => r.q));
+  const notees = Q.map((q, i) => ({ q, i, b: bonnesDe(q) })).filter((x) => x.b.length && posees.has(x.i));
+  const score = (p) => notees.reduce((s, x) => s + (p.rep.has(x.i) && x.b.includes(Number(p.rep.get(x.i))) ? 1 : 0), 0);
+  let totalNote = 0, totalJuste = 0;
+  for (const x of notees) for (const p of personnes) if (p.rep.has(x.i)) { totalNote++; if (x.b.includes(Number(p.rep.get(x.i)))) totalJuste++; }
+  const reussite = totalNote ? Math.round((100 * totalJuste) / totalNote) : null;
+  const affiche = (q, v) => (v === undefined ? "" : q.type === "qcm" ? `${LETTRES[v]} · ${q.options[v]?.texte ?? ""}` : v);
+  const duree = D.etat.debut && D.etat.fin ? Math.max(1, Math.round((D.etat.fin - D.etat.debut) / 60000)) : null;
+
+  // ---------- exports ----------
+  const csvCellule = (v) => {
+    let s = String(v ?? "");
+    if (/^[=+\-@\t]/.test(s)) s = "'" + s; // pas de formule Excel venue d'une réponse
+    return /[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  function exportCsv() {
+    const L = [];
+    L.push([`Main levée · ${C.titre}`]);
+    L.push([`Session ${C.code} du ${ML.date(C.cree)}`, C.mode === "cartes" ? "Mode cartes" : "Mode appareils"]);
+    L.push([]);
+    L.push(["Participant·e", ...Q.map((q, i) => `Q${i + 1} · ${q.texte.replace(/\s+/g, " ").slice(0, 60)}`), ...(notees.length ? [`Score (sur ${notees.length})`] : [])]);
+    for (const p of personnes) {
+      L.push([p.nom, ...Q.map((q, i) => {
+        const v = p.rep.get(i);
+        if (v === undefined) return "";
+        if (q.type === "qcm") {
+          const b = bonnesDe(q);
+          return `${LETTRES[v]} · ${q.options[v]?.texte ?? ""}${b.length ? (b.includes(Number(v)) ? " (juste)" : " (faux)") : ""}`;
+        }
+        return v;
+      }), ...(notees.length ? [score(p)] : [])]);
+    }
+    L.push([]);
+    L.push(["Résumé par question"]);
+    L.push(["Question", "Type", "Réponses", "Détail", "Taux de réussite"]);
+    Q.forEach((q, i) => {
+      const r = Resultats.agreger(q, i, D.reponses);
+      let detail = "";
+      if (q.type === "qcm") detail = q.options.map((o, k) => `${LETTRES[k]} ${o.texte} : ${r.comptes[k]}`).join(" | ");
+      if (q.type === "echelle") detail = `Moyenne ${r.moyenne === null ? "" : r.moyenne.toFixed(2).replace(".", ",")} | ` + Object.entries(r.comptes).map(([v, n]) => `${v} : ${n}`).join(" | ");
+      if (q.type === "nuage") detail = r.mots.slice(0, 30).map((m) => `${m.mot} (${m.n})`).join(" | ");
+      const b = bonnesDe(q);
+      const t = b.length && r.total ? Math.round((100 * b.reduce((s, k) => s + r.comptes[k], 0)) / r.total) + " %" : "";
+      L.push([`Q${i + 1} · ${q.texte.replace(/\s+/g, " ")}`, TYPES[q.type], r.total, detail, t]);
+    });
+    const csv = "﻿" + L.map((l) => l.map(csvCellule).join(";")).join("\r\n");
+    ML.telecharger(`main-levee-${C.code}.csv`, csv, "text/csv;charset=utf-8");
+  }
+  function exportJson() {
+    ML.telecharger(`main-levee-${C.code}.json`, JSON.stringify({ format: "main-levee-session", version: 1, ...D }, null, 2), "application/json");
+  }
+
+  // ---------- page ----------
+  const tableau = personnes.length
+    ? h("div", { class: "table-defile" }, h("table", { class: "tableau" },
+        h("thead", {}, h("tr", {}, h("th", {}, "Participant·e"), Q.map((q, i) => h("th", { title: q.texte }, `Q${i + 1}`)), notees.length ? h("th", {}, "Score") : null)),
+        h("tbody", {}, personnes.map((p) => h("tr", {},
+          h("td", { class: "nowrap" }, p.nom),
+          Q.map((q, i) => {
+            const v = p.rep.get(i);
+            if (v === undefined) return h("td", { class: "muet" }, "·");
+            if (q.type === "qcm") {
+              const b = bonnesDe(q);
+              const juste = b.includes(Number(v));
+              return h("td", { class: "nowrap", title: q.options[v]?.texte || "" }, LETTRES[v], b.length ? h("span", { class: juste ? "ok" : "ko" }, juste ? " ✓" : " ✗") : null);
+            }
+            return h("td", { title: v }, String(v).length > 24 ? String(v).slice(0, 24) + "…" : String(v));
+          }),
+          notees.length ? h("td", { class: "nowrap" }, h("b", {}, `${score(p)} / ${notees.length}`)) : null)))))
+    : h("p", { class: "vide" }, "Aucune réponse enregistrée pour cette session.");
+
+  app.replaceChildren(
+    h("p", { class: "muet petit", style: { margin: 0 } }, `Session ${ML.formatCode(C.code)} · ${ML.date(C.cree)} · ${C.mode === "cartes" ? "mode cartes" : "appareils"}${C.classe ? " · " + C.classe.nom : ""}`),
+    h("h1", { class: "titre-barre" }, C.titre),
+    h("div", { class: "barre-actions" },
+      h("button", { class: "btn primaire", onclick: exportCsv }, icone("telecharger"), "Télécharger pour Excel"),
+      h("button", { class: "btn", onclick: exportJson }, icone("telecharger"), "Fichier complet (.json)"),
+      h("button", { class: "btn", onclick: () => print() }, icone("imprimer"), "Imprimer ou PDF"),
+      h("a", { class: "btn discret", href: `/projeter/${C.code}${jeton ? "#jeton=" + jeton : ""}` }, icone("play"), "Rouvrir la projection")),
+    h("div", { class: "chiffres" },
+      h("div", { class: "chiffre" }, h("b", {}, String(personnes.length)), personnes.length > 1 ? "participant·es" : "participant·e"),
+      h("div", { class: "chiffre" }, h("b", {}, String(D.reponses.length)), "réponses"),
+      reussite !== null ? h("div", { class: "chiffre" }, h("b", {}, `${reussite} %`), "de bonnes réponses") : null,
+      duree ? h("div", { class: "chiffre" }, h("b", {}, `${duree} min`), "de session") : null),
+    h("h2", { class: "titre-barre" }, "Question par question"),
+    ...Q.map((q, i) => {
+      const r = Resultats.agreger(q, i, D.reponses, D.etat.masques?.[i] || []);
+      const b = bonnesDe(q);
+      const taux = b.length && r.total ? Math.round((100 * b.reduce((s, k) => s + r.comptes[k], 0)) / r.total) : null;
+      return h("section", { class: "q-stat" },
+        h("p", { class: "num" }, `Question ${i + 1} · ${TYPES[q.type]}`),
+        h("h3", {}, q.texte),
+        Resultats.rendre(q, r, { revele: true, tailleMax: 3, montrerMasques: true }),
+        h("p", { class: "resume-q muet" }, `${ML.pluriel(r.total, "réponse", "réponses")}`, taux !== null ? ` · ${taux} % de bonnes réponses` : ""));
+    }),
+    h("h2", { class: "titre-barre", style: { marginTop: "36px" } }, "Réponses par participant·e"),
+    tableau);
+})();
+</script>
+</body>
+</html>

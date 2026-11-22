@@ -1,0 +1,43 @@
+{
+ "worker": "etabli",
+ "module_principal": "index.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "80085b36932d686ca8473645f1ed938e0b2aaae49e728922c3baefac4cacf4c7",
+ "modules": [
+  {
+   "nom": "index.js",
+   "fichier": "index.js",
+   "type": "application/javascript+module",
+   "sha256": "80085b36932d686ca8473645f1ed938e0b2aaae49e728922c3baefac4cacf4c7",
+   "octets": 357918
+  },
+  {
+   "nom": "./0fa701d5e9a396b330cb1789113e62be5a406cf2-schema.sql",
+   "fichier": "0fa701d5e9a396b330cb1789113e62be5a406cf2-schema.sql",
+   "type": "text/plain",
+   "sha256": "48486647c5da55699b83ab65aaebc37dd422bdd6439d41afebc0765e053fff7d",
+   "octets": 13106
+  },
+  {
+   "nom": "./2c6d9b3d06cf7d6e80801ad5bd506f18f624d5b5-0004_eleves.sql",
+   "fichier": "2c6d9b3d06cf7d6e80801ad5bd506f18f624d5b5-0004_eleves.sql",
+   "type": "text/plain",
+   "sha256": "7ba562d2137bb56b06fa2cd239413a1777bca4cbf48b511d8ad47d93481163c6",
+   "octets": 5529
+  },
+  {
+   "nom": "./4bdc14511f5f34a239af243cafdc8bf99221b337-0003_partages.sql",
+   "fichier": "4bdc14511f5f34a239af243cafdc8bf99221b337-0003_partages.sql",
+   "type": "text/plain",
+   "sha256": "42261c40b43df583f98eaac8f86ce16c6f401d943780fc863ff96640b399993b",
+   "octets": 4813
+  },
+  {
+   "nom": "./cb78b644cb6f0a8d2869431ccf3785a8f53cc62c-0002_espaces.sql",
+   "fichier": "cb78b644cb6f0a8d2869431ccf3785a8f53cc62c-0002_espaces.sql",
+   "type": "text/plain",
+   "sha256": "fd150788fb85726bfa85776120cfcbd14ebefb4dd0a259830ae15c82c948e287",
+   "octets": 3172
+  }
+ ]
+}

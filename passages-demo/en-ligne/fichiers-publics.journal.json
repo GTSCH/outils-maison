@@ -1,0 +1,148 @@
+{
+ "base": "https://passages-demo.gtschupp.workers.dev",
+ "fichiers": {
+  "icons/maskable-192.png": [
+   "/icons/maskable-192.png",
+   "image/png",
+   4439
+  ],
+  "icons/icon-192.png": [
+   "/icons/icon-192.png",
+   "image/png",
+   1222
+  ],
+  "icons/icon-512.png": [
+   "/icons/icon-512.png",
+   "image/png",
+   3841
+  ],
+  "login.html": [
+   "/login.html",
+   "text/html",
+   1581
+  ],
+  "index.html": [
+   "/",
+   "text/html",
+   15744
+  ],
+  "static/style.css": [
+   "/static/style.css",
+   "text/css",
+   45066
+  ],
+  "icons/maskable-512.png": [
+   "/icons/maskable-512.png",
+   "image/png",
+   12696
+  ],
+  "manifest.webmanifest": [
+   "/manifest.webmanifest",
+   "application/manifest+json",
+   622
+  ],
+  "p/index.html": [
+   "/p/",
+   "text/html; charset=utf-8",
+   1859
+  ],
+  "favicon.svg": [
+   "/favicon.svg",
+   "image/svg+xml",
+   198
+  ],
+  "static/app.js": [
+   "/static/app.js",
+   "application/javascript",
+   73577
+  ],
+  "static/notes.js": [
+   "/static/notes.js",
+   "application/javascript",
+   6823
+  ],
+  "static/ocr.js": [
+   "/static/ocr.js",
+   "application/javascript",
+   3955
+  ],
+  "static/reader.js": [
+   "/static/reader.js",
+   "application/javascript",
+   56649
+  ],
+  "static/vendor/exportall.js": [
+   "/static/vendor/exportall.js",
+   "application/javascript",
+   10498
+  ],
+  "static/core.js": [
+   "/static/core.js",
+   "application/javascript",
+   6226
+  ],
+  "static/dashboard.js": [
+   "/static/dashboard.js",
+   "application/javascript",
+   17427
+  ],
+  "sw.js": [
+   "/sw.js",
+   "application/javascript",
+   3658
+  ],
+  "static/demarrage.js": [
+   "/static/demarrage.js",
+   "application/javascript",
+   28135
+  ],
+  "static/vendor/chunk-SQE76S5B.js": [
+   "/static/vendor/chunk-SQE76S5B.js",
+   "application/javascript",
+   577
+  ],
+  "static/vendor/pdfannot.js": [
+   "/static/vendor/pdfannot.js",
+   "application/javascript",
+   432859
+  ]
+ },
+ "non_trouves": [
+  "/404.html",
+  "/Abb",
+  "/_gjdlslqwbgbfpsb",
+  "/_nlfmfqlivfdlsfq/Vkbafqfpwlzmvm",
+  "/_qglabybqbdlybs/Mdjmbppl",
+  "/favicon.ico",
+  "/home/web_user",
+  "/json/version",
+  "/manifest.json",
+  "/static/${PDFJS_WORKER}",
+  "/static/annotations.md",
+  "/static/atelier/atelier.css",
+  "/static/atelier/common.js",
+  "/static/atelier/extension.js",
+  "/static/atelier/home.js",
+  "/static/atelier/palette.js",
+  "/static/atelier/record.js",
+  "/static/atelier/tables.js",
+  "/static/atelier/vendor/editor.js",
+  "/static/bibliographie-apa.txt",
+  "/static/login.css",
+  "/static/vendor/LISEZMOI.txt",
+  "/static/vendor/bibliotheque/annotations.md",
+  "/static/vendor/bibliotheque/bibliographie-apa.txt",
+  "/static/vendor/sauvegarde-complete.json"
+ ],
+ "autres_echecs": [
+  [
+   "/mcp/",
+   401
+  ],
+  [
+   "/mcp",
+   401
+  ]
+ ],
+ "note": "robots.txt retiré : contenu ajouté par Cloudflare (signaux de contenu), pas un fichier de l'outil"
+}

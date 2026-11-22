@@ -1,0 +1,195 @@
+{
+ "base": "https://main-levee.guillaumetschupp.com",
+ "fichiers": {
+  "404/index.html": [
+   "/404.html",
+   "text/html",
+   1166
+  ],
+  "espace/index.html": [
+   "/espace/",
+   "text/html",
+   4792
+  ],
+  "projeter/index.html": [
+   "/projeter/",
+   "text/html",
+   18956
+  ],
+  "index.html": [
+   "/",
+   "text/html",
+   4376
+  ],
+  "essai/index.html": [
+   "/essai/",
+   "text/html",
+   18067
+  ],
+  "participant/index.html": [
+   "/participant/",
+   "text/html",
+   13710
+  ],
+  "stats/index.html": [
+   "/stats",
+   "text/html",
+   10672
+  ],
+  "pilote/index.html": [
+   "/pilote/",
+   "text/html",
+   15848
+  ],
+  "favicon.svg": [
+   "/favicon.svg",
+   "image/svg+xml",
+   1124
+  ],
+  "confidentialite/index.html": [
+   "/confidentialite",
+   "text/html",
+   18825
+  ],
+  "js/resultats.js": [
+   "/js/resultats.js",
+   "text/javascript",
+   5705
+  ],
+  "css/polices.css": [
+   "/css/polices.css",
+   "text/css",
+   6601
+  ],
+  "js/vendor/qrcode.js": [
+   "/js/vendor/qrcode.js",
+   "text/javascript",
+   56694
+  ],
+  "js/scanner-worker.js": [
+   "/js/scanner-worker.js",
+   "text/javascript",
+   1679
+  ],
+  "js/commun.js": [
+   "/js/commun.js",
+   "text/javascript",
+   11308
+  ],
+  "js/espace.js": [
+   "/js/espace.js",
+   "text/javascript",
+   37510
+  ],
+  "css/style.css": [
+   "/css/style.css",
+   "text/css",
+   9737
+  ],
+  "fonts/carlito-latin-400-normal.woff2": [
+   "/fonts/carlito-latin-400-normal.woff2",
+   "font/woff2",
+   30156
+  ],
+  "js/vendor/aruco.js": [
+   "/js/vendor/aruco.js",
+   "text/javascript",
+   26213
+  ],
+  "fonts/carlito-latin-ext-400-normal.woff2": [
+   "/fonts/carlito-latin-ext-400-normal.woff2",
+   "font/woff2",
+   80796
+  ],
+  "fonts/barlow-latin-400-normal.woff2": [
+   "/fonts/barlow-latin-400-normal.woff2",
+   "font/woff2",
+   22196
+  ],
+  "fonts/carlito-latin-ext-700-normal.woff2": [
+   "/fonts/carlito-latin-ext-700-normal.woff2",
+   "font/woff2",
+   83932
+  ],
+  "fonts/barlow-latin-500-normal.woff2": [
+   "/fonts/barlow-latin-500-normal.woff2",
+   "font/woff2",
+   22008
+  ],
+  "fonts/barlow-latin-ext-500-normal.woff2": [
+   "/fonts/barlow-latin-ext-500-normal.woff2",
+   "font/woff2",
+   14416
+  ],
+  "fonts/barlow-semi-condensed-latin-ext-700-normal.woff2": [
+   "/fonts/barlow-semi-condensed-latin-ext-700-normal.woff2",
+   "font/woff2",
+   15076
+  ],
+  "fonts/carlito-latin-ext-400-italic.woff2": [
+   "/fonts/carlito-latin-ext-400-italic.woff2",
+   "font/woff2",
+   85488
+  ],
+  "fonts/barlow-semi-condensed-latin-ext-500-normal.woff2": [
+   "/fonts/barlow-semi-condensed-latin-ext-500-normal.woff2",
+   "font/woff2",
+   14524
+  ],
+  "js/vendor/cv.js": [
+   "/js/vendor/cv.js",
+   "text/javascript",
+   16649
+  ],
+  "fonts/barlow-latin-700-normal.woff2": [
+   "/fonts/barlow-latin-700-normal.woff2",
+   "font/woff2",
+   22788
+  ],
+  "fonts/barlow-semi-condensed-latin-700-normal.woff2": [
+   "/fonts/barlow-semi-condensed-latin-700-normal.woff2",
+   "font/woff2",
+   23244
+  ],
+  "fonts/carlito-latin-700-normal.woff2": [
+   "/fonts/carlito-latin-700-normal.woff2",
+   "font/woff2",
+   31464
+  ],
+  "js/cartes-dico.js": [
+   "/js/cartes-dico.js",
+   "text/javascript",
+   2211
+  ],
+  "fonts/carlito-latin-400-italic.woff2": [
+   "/fonts/carlito-latin-400-italic.woff2",
+   "font/woff2",
+   30476
+  ],
+  "fonts/barlow-latin-ext-400-normal.woff2": [
+   "/fonts/barlow-latin-ext-400-normal.woff2",
+   "font/woff2",
+   14268
+  ],
+  "fonts/barlow-semi-condensed-latin-500-normal.woff2": [
+   "/fonts/barlow-semi-condensed-latin-500-normal.woff2",
+   "font/woff2",
+   22428
+  ],
+  "fonts/barlow-latin-ext-700-normal.woff2": [
+   "/fonts/barlow-latin-ext-700-normal.woff2",
+   "font/woff2",
+   14836
+  ]
+ },
+ "non_trouves": [
+  "/carte/",
+  "/favicon.ico",
+  "/js/, { activites, classes })",
+  "/manifest.json",
+  "/manifest.webmanifest",
+  "/ws/"
+ ],
+ "autres_echecs": [],
+ "note": "robots.txt retiré : contenu ajouté par Cloudflare (signaux de contenu), pas un fichier de l'outil"
+}

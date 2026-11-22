@@ -1,0 +1,68 @@
+{
+ "base": "https://biblio.gtschupp.workers.dev",
+ "fichiers": {
+  "login.html": [
+   "/manifest.json",
+   "text/html",
+   1581
+  ],
+  "p/index.html": [
+   "/p/",
+   "text/html; charset=utf-8",
+   1859
+  ],
+  "icons/maskable-512.png": [
+   "/icons/maskable-512.png",
+   "image/png",
+   12696
+  ],
+  "icons/icon-192.png": [
+   "/icons/icon-192.png",
+   "image/png",
+   1222
+  ],
+  "static/style.css": [
+   "/static/style.css",
+   "text/css",
+   46444
+  ],
+  "icons/icon-512.png": [
+   "/icons/icon-512.png",
+   "image/png",
+   3841
+  ],
+  "manifest.webmanifest": [
+   "/manifest.webmanifest",
+   "application/manifest+json",
+   622
+  ],
+  "index.html": [
+   "/",
+   "text/html; charset=utf-8",
+   1581
+  ],
+  "favicon.svg": [
+   "/favicon.svg",
+   "image/svg+xml",
+   198
+  ],
+  "icons/maskable-192.png": [
+   "/icons/maskable-192.png",
+   "image/png",
+   4439
+  ]
+ },
+ "non_trouves": [
+  "/static/login.css"
+ ],
+ "autres_echecs": [
+  [
+   "/mcp",
+   401
+  ],
+  [
+   "/mcp/",
+   401
+  ]
+ ]
+}

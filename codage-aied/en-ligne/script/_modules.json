@@ -1,0 +1,22 @@
+{
+ "worker": "codage-aied",
+ "module_principal": "index.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "413913dace7ec78055f14f7e75e91b93b1b1e4783592a94f4efeb15554c933f1",
+ "modules": [
+  {
+   "nom": "index.js",
+   "fichier": "index.js",
+   "type": "application/javascript+module",
+   "sha256": "413913dace7ec78055f14f7e75e91b93b1b1e4783592a94f4efeb15554c933f1",
+   "octets": 40463
+  },
+  {
+   "nom": "index.js.map",
+   "fichier": "index.js.map",
+   "type": "application/source-map",
+   "sha256": "33de755fcfd652733042e95e8f1928664bc28e488fce3068c4b23c4c0df5290c",
+   "octets": 73268
+  }
+ ]
+}

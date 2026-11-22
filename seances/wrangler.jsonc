@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "seances",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "seances", "database_id": "1f649047-d0d0-4d90-be56-c6042ce736df" }
+  ],
+  "r2_buckets": [
+    { "binding": "FICHIERS", "bucket_name": "seances-fichiers-eu", "jurisdiction": "eu" }
+  ],
+  "observability": { "enabled": true }
+}

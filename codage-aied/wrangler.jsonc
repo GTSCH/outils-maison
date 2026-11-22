@@ -1,0 +1,15 @@
+// Configuration de TRAVAIL LOCAL pour l'outil de codage AIED (reconstituée le 26.10.2026), pas celle de la mise en ligne.
+// - essayer en local : npx --yes wrangler@4 dev --persist-to ~/.cache/outils-maison-ia/codage-aied   (http://127.0.0.1:8787)
+// - mettre en ligne (depuis le dossier parent, avec accord) : node outils/mettre-en-ligne.mjs codage-aied --construire --essai
+// En ligne, BIBLIO et PDFS sont la base et le stockage de la bibliothèque. Ne rien mettre en ligne sans l'accord de Guillaume.
+{
+  "name": "codage-aied-local",
+  "main": "source-reconstituee/src/index.js",
+  "compatibility_date": "2025-09-15",
+  "assets": { "directory": "en-ligne/fichiers-publics", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "codage-aied-local", "database_id": "local-uniquement" },
+    { "binding": "BIBLIO", "database_name": "biblio-local", "database_id": "local-uniquement-biblio" }
+  ],
+  "r2_buckets": [{ "binding": "PDFS", "bucket_name": "biblio-pdfs-local" }]
+}

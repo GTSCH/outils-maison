@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Main levée</title>
+<meta name="description" content="Questions en direct en classe, sans compte. Prototype en test.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Main levée">
+<meta property="og:description" content="Questions en direct en classe, sans compte. Avec les téléphones ou avec des cartes imprimées.">
+<meta property="og:image" content="https://main-levee.gtschupp.workers.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body { min-height: 100vh; display: flex; flex-direction: column; }
+  .accueil { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 40px var(--gouttiere); }
+  .boite { width: min(100%, 560px); }
+  .boite h1 { font-size: clamp(34px, 7vw, 56px); margin-bottom: .2em; }
+  .boite .sous { font-size: 20px; margin-bottom: 32px; }
+  .code-form { display: flex; gap: 0; border: 3px solid var(--encre); }
+  .code-form input {
+    border: 0; font-family: var(--font-din); font-weight: 700; font-size: clamp(30px, 8vw, 44px);
+    letter-spacing: .18em; text-align: center; padding: 14px 10px; min-width: 0; width: 100%; flex: 1;
+  }
+  .code-form input::placeholder { color: var(--rd-50); letter-spacing: .1em; }
+  .code-form button { border: 0; min-width: 104px; font-size: 22px; flex: none; }
+  .message { min-height: 1.6em; margin-top: 10px; font-weight: 700; color: var(--rouge); }
+  .prof { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--rd-25); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .prof p { margin: 0; }
+  footer { padding: 18px var(--gouttiere); border-top: 1px solid var(--rd-25); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 15px; }
+  footer .logo { height: 20px; }
+</style>
+</head>
+<body>
+<main class="accueil">
+  <div class="boite">
+    <h1 class="titre-barre">Main levée</h1>
+    <p class="sous">Entrez le code affiché par votre enseignant·e.</p>
+    <form class="code-form" id="form" autocomplete="off">
+      <label class="sr" for="code">Code à 6 chiffres</label>
+      <input id="code" name="code" size="7" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" placeholder="123 456" autofocus>
+      <button class="btn primaire" type="submit">Entrer</button>
+    </form>
+    <p class="message" id="message" role="alert"></p>
+    <div class="prof">
+      <p><b>Vous enseignez ?</b> Créez vos questions, sans compte.</p>
+      <div class="btns"><a class="btn primaire" href="/essai">Essayer en une minute</a><a class="btn" href="/espace">Mon espace</a></div>
+    </div>
+  </div>
+</main>
+<footer>
+  <span>Prototype en test, pas un produit fini · outil personnel de Guillaume Tschupp · <a href="/confidentialite">Protection des données</a></span>
+  <span id="logo"></span>
+</footer>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script>
+  ML.$("#logo").innerHTML = ML.LOGO;
+  const champ = ML.$("#code");
+  const msg = ML.$("#message");
+  champ.addEventListener("input", () => {
+    const c = champ.value.replace(/\D/g, "").slice(0, 6);
+    champ.value = c.length > 3 ? c.slice(0, 3) + " " + c.slice(3) : c;
+    msg.textContent = "";
+  });
+  ML.$("#form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const c = champ.value.replace(/\D/g, "");
+    if (c.length !== 6) { msg.textContent = "Le code compte 6 chiffres."; return; }
+    try {
+      await ML.api("GET", `/sessions/${c}/public`);
+      location.href = "/" + c;
+    } catch (err) {
+      msg.textContent = "Aucune session avec ce code. Vérifiez les chiffres.";
+    }
+  });
+</script>
+</body>
+</html>

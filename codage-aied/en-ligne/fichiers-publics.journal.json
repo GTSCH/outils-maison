@@ -1,0 +1,62 @@
+{
+ "base": "https://codage-aied.gtschupp.workers.dev",
+ "fichiers": {
+  "index.html": [
+   "/",
+   "text/html",
+   1150
+  ],
+  "favicon.svg.html": [
+   "/favicon.svg",
+   "text/html",
+   1150
+  ],
+  "robots.txt.html": [
+   "/robots.txt",
+   "text/html",
+   1150
+  ],
+  "404.html": [
+   "/404.html",
+   "text/html",
+   1150
+  ],
+  "favicon.ico.html": [
+   "/favicon.ico",
+   "text/html",
+   1150
+  ],
+  "manifest.webmanifest.html": [
+   "/manifest.webmanifest",
+   "text/html",
+   1150
+  ],
+  "manifest.json.html": [
+   "/manifest.json",
+   "text/html",
+   1150
+  ],
+  "prompt-v0.2.txt": [
+   "/prompt-v0.2.txt",
+   "text/plain",
+   4421
+  ],
+  "app.css": [
+   "/app.css",
+   "text/css",
+   22126
+  ],
+  "criteria.js": [
+   "/criteria.js",
+   "text/javascript",
+   4434
+  ],
+  "app.js": [
+   "/app.js",
+   "text/javascript",
+   68505
+  ]
+ },
+ "non_trouves": [],
+ "autres_echecs": []
+}

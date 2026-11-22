@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Projection · L’Établi</title>
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/etabli.css">
+<link rel="stylesheet" href="/live/live.css">
+<style>
+  html, body { height: 100%; }
+  body { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; background: var(--surface); font-size: clamp(17px, 1.55vw, 34px); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto 0; height: 5px; background: var(--t-quiz); z-index: 5; }
+  .p-haut { grid-row: 1; }
+  #scene { grid-row: 2; }
+  .p-commandes { grid-row: 3; }
+
+  /* ---------- bandeau du haut ---------- */
+  .p-haut { display: flex; align-items: center; justify-content: space-between; gap: 2vw; padding: 1.2vh 2.4vw; padding-top: calc(1.2vh + 5px); min-height: 9vh; border-bottom: 1px solid var(--line); }
+  .p-rejoindre { display: flex; align-items: center; gap: 1vw; min-width: 0; font-size: 1em; line-height: 1.2; }
+  .p-rejoindre .qr { width: 7.2vh; height: 7.2vh; min-width: 44px; min-height: 44px; flex: none; border-radius: 6px; overflow: hidden; }
+  .p-rejoindre .qr svg { width: 100%; height: 100%; display: block; }
+  .p-rejoindre .hote { font-family: var(--font-display); font-weight: 600; }
+  .p-rejoindre b.code { font: 800 1.5em/1 var(--font-display); letter-spacing: .05em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .p-rejoindre .mode-cartes { display: inline-flex; align-items: center; gap: .5em; font: 600 1em var(--font-display); }
+  .p-rejoindre .mode-cartes svg { width: 1.4em; height: 1.4em; color: var(--t-quiz); }
+  .p-titre { font: 600 .9em/1.2 var(--font-display); color: var(--muted); text-align: right; min-width: 0; max-width: 45vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ---------- scène ---------- */
+  #scene { overflow: auto; padding: 3.6vh 14vw 3vh 5vw; padding-top: calc(3.6vh + 5px); position: relative; }
+  #scene.large { padding-right: 5vw; }
+  .p-num { display: flex; align-items: center; gap: .8em; margin: 0 0 1.6vh; font: 700 .85em/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .08em; color: var(--t-quiz); }
+  .p-num .type { color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; }
+  .p-q { font-family: var(--font-eleve); font-weight: 700; font-size: clamp(30px, 3.5vw, 80px); line-height: 1.15; margin: 0 0 4vh; white-space: pre-wrap; overflow-wrap: anywhere; max-width: 32ch; text-wrap: pretty; }
+  .p-q.long { font-size: clamp(26px, 2.6vw, 60px); max-width: 44ch; }
+  .p-options { display: grid; gap: 1.8vh 3vw; font-size: 1.4em; max-width: 1500px; }
+  .p-options.deux { grid-template-columns: 1fr 1fr; }
+  .p-opt { display: flex; align-items: center; gap: .7em; font-family: var(--font-eleve); font-weight: 700; padding: .45em 0; border-bottom: 2px solid var(--line); line-height: 1.2; overflow-wrap: anywhere; }
+  .p-opt .lv-lettre { font-size: .9em; }
+  #scene .lv-res-qcm { font-size: 1.35em; gap: 2vh; max-width: 1500px; }
+  #scene .lv-res-ligne .lv-barre { height: 1.7vh; min-height: 10px; }
+  #scene .lv-res-echelle { height: 36vh; font-size: 1.2em; max-width: 1400px; }
+  #scene .lv-res-echelle-legende, #scene .lv-res-moyenne { font-size: 1.1em; max-width: 1400px; }
+  #scene .lv-res-nuage { font-size: clamp(20px, 2vw, 44px); min-height: 30vh; padding: 2vh 0; }
+  #scene .lv-res-libre { font-size: 1.2em; columns: 3 360px; column-gap: 1.2vw; max-width: 1600px; }
+  #scene .lv-bulle { padding: .55em .8em; }
+  #scene .lv-masquer { font-size: 15px; }
+  .p-echelle { display: flex; justify-content: space-between; align-items: center; gap: 2vw; font: 1.3em/1.3 var(--font-eleve); max-width: 1400px; border-top: 3px solid var(--fg); padding-top: 1.6vh; }
+  .p-echelle b { font: 800 1.5em/1 var(--font-display); }
+  .p-echelle .fin { text-align: right; }
+  .p-attente-res { display: flex; align-items: center; justify-content: center; gap: .6em; font-size: 1.1em; padding: 6vh 2vw; text-align: center; color: var(--muted); border: 2px dashed var(--line-strong); border-radius: var(--radius-xl); max-width: 1400px; }
+  .p-attente-res svg { width: 1.4em; height: 1.4em; flex: none; }
+  .p-compteur { position: fixed; right: 2.4vw; bottom: calc(10vh + 2.4vh); z-index: 3; text-align: right; background: var(--surface); padding: .4em .7em; border-radius: var(--radius-lg); border: 1px solid var(--line); line-height: 1.15; }
+  .p-compteur b { display: block; font: 800 2.6em/1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .p-compteur small { display: block; color: var(--muted); font-size: .75em; }
+  .p-hors-cartes { margin-top: 3vh; font-size: .9em; max-width: 1400px; }
+
+  /* attente (mode appareils) */
+  .p-accueil { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 4vw; align-items: center; min-height: 100%; }
+  .p-accueil h1 { font-family: var(--font-display); font-size: clamp(34px, 4vw, 86px); line-height: 1.1; margin: .2em 0 4vh; overflow-wrap: anywhere; }
+  .p-etapes { display: grid; gap: 3.5vh; font-size: 1.4em; line-height: 1.3; }
+  .p-etape { display: grid; grid-template-columns: auto 1fr; gap: .2em .8em; align-items: baseline; }
+  .p-etape > i { font: 800 .8em/1 var(--font-display); font-style: normal; display: inline-grid; place-items: center; width: 1.7em; height: 1.7em; border-radius: 50%; background: var(--t-quiz); color: var(--surface); }
+  .p-grand-hote { grid-column: 2; font: 700 1.15em/1.15 var(--font-display); overflow-wrap: anywhere; }
+  .p-grand-code { grid-column: 2; font: 800 3.1em/1 var(--font-display); letter-spacing: .05em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .p-qr-grand { justify-self: center; width: min(58vh, 36vw); padding: 1.6vh; background: #fff; border-radius: var(--radius-xl); border: 1px solid var(--line); }
+  .p-qr-grand svg { width: 100%; display: block; }
+  .p-presents { display: flex; align-items: center; gap: .5em; margin-top: 4vh; font-size: 1.15em; }
+  .p-presents svg { width: 1.3em; height: 1.3em; color: var(--muted); }
+  .p-presents b { font: 800 1.4em/1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .p-puces { display: flex; flex-wrap: wrap; gap: .4em; margin-top: 1.4vh; font-size: .8em; max-height: 17vh; overflow: hidden; font-family: var(--font-eleve); }
+  .p-puces span { background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: .15em .7em; }
+
+  /* attente (mode cartes) */
+  .p-cartes-intro { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3vw; align-items: center; max-width: 1500px; }
+  .p-cartes-intro h1 { font-family: var(--font-display); font-size: clamp(32px, 3.6vw, 78px); line-height: 1.1; margin: .2em 0 2.4vh; overflow-wrap: anywhere; }
+  .p-cartes-intro p:not(.p-num) { font: 1.2em/1.4 var(--font-eleve); margin-bottom: 1.2vh; max-width: 40ch; }
+  .p-carte-demo { width: min(30vh, 22vw); aspect-ratio: 1; position: relative; display: grid; place-items: center; background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--line); color: #141A1E; }
+  .p-carte-demo .mq { width: 66%; aspect-ratio: 1; }
+  .p-carte-demo .mq svg { width: 100%; height: 100%; display: block; }
+  .p-carte-demo .l { position: absolute; font: 800 1.1em/1 var(--font-display); }
+  .p-carte-demo .l.a { top: 4%; left: 50%; transform: translateX(-50%); color: #fff; background: var(--t-quiz); padding: .1em .35em; border-radius: 4px; }
+  .p-carte-demo .l.b { right: 5%; top: 50%; transform: translateY(-50%) rotate(90deg); }
+  .p-carte-demo .l.c { bottom: 4%; left: 50%; transform: translateX(-50%) rotate(180deg); }
+  .p-carte-demo .l.d { left: 5%; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+  .p-classe { margin: 1vh 0 0; color: var(--muted); }
+  .p-classe b { color: var(--fg); }
+
+  /* grille des cartes */
+  .p-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.8em, 1fr)); gap: .45em; margin-top: 3vh; font-size: 1em; max-width: 1600px; }
+  .p-grille.dense { font-size: .8em; gap: .35em; margin-top: 2.4vh; }
+  .p-c { appearance: none; border: 2px solid var(--line-strong); background: var(--surface); color: var(--fg); border-radius: var(--radius); padding: .25em .3em; text-align: center; line-height: 1.1; min-height: 2.7em; cursor: pointer; font: inherit; min-width: 0; }
+  .p-c b { display: block; font: 800 1.25em/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .p-c small { display: block; font: .72em/1.2 var(--font-eleve); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .p-c.ok { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+  .p-c:hover { border-color: var(--accent); }
+
+  /* fin */
+  .p-fin { text-align: center; padding-top: 5vh; display: grid; justify-items: center; gap: 3vh; }
+  .p-fin h1 { font-family: var(--font-display); font-size: clamp(40px, 5vw, 110px); }
+  .p-chiffres { display: flex; justify-content: center; gap: 7vw; font-size: 1.1em; }
+  .p-chiffres b { display: block; font: 800 3.2em/1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .p-chiffres span { color: var(--muted); }
+  .p-fin .btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+  /* superposition « rejoindre » en grand */
+  .p-voile-rejoindre { position: fixed; inset: 0; z-index: 600; background: var(--surface); display: grid; place-items: center; padding: 4vh 4vw; }
+  .p-voile-rejoindre .p-accueil { width: min(100%, 1600px); }
+  .p-voile-rejoindre .fermer { position: absolute; top: 2vh; right: 2vw; }
+
+  /* ---------- commandes ---------- */
+  .p-commandes { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 1.1vh 2.4vw; min-height: 9vh; border-top: 1px solid var(--line); background: var(--surface-2); font-size: 16px; transition: opacity .3s; }
+  .p-commandes .grp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .p-commandes .btn { font-size: 16px; }
+  .p-commandes .grand { min-height: 52px; padding: 0 22px; font-size: 18px; }
+  .p-commandes .progres { font: 600 15px/1 var(--font-display); color: var(--muted); margin-left: 6px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .p-commandes .actif { background: var(--ok-soft); border-color: var(--ok); color: var(--fg); }
+  body.plein .p-commandes { opacity: .1; }
+  body.plein .p-commandes:hover, body.plein .p-commandes:focus-within { opacity: 1; }
+  .message-plein { display: grid; place-items: center; min-height: 100%; text-align: center; padding: 4vw; }
+  .message-plein > div { display: grid; gap: 18px; justify-items: center; max-width: 720px; }
+  .message-plein h1 { font-size: clamp(28px, 3vw, 54px); }
+  .message-plein p { font-size: 20px; color: var(--muted); }
+  .message-plein .btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+  @media (max-width: 900px) {
+    body { overflow: auto; height: auto; min-height: 100%; }
+    #scene { padding: 24px 16px 120px; }
+    .p-accueil, .p-cartes-intro { grid-template-columns: 1fr; }
+    .p-qr-grand { width: min(80vw, 360px); }
+    .p-carte-demo { width: 180px; }
+    .p-options.deux { grid-template-columns: 1fr; }
+    .p-commandes { position: sticky; bottom: 0; flex-wrap: wrap; padding: 8px 12px; }
+    .p-commandes .lib { display: none; }
+    .p-compteur { bottom: 96px; }
+    .p-titre { display: none; }
+  }
+
+  /* ======================================================== étape 3 */
+  .p-q-ligne { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3vw; align-items: start; max-width: 1600px; }
+  .p-q-ligne.avec-image { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+  .p-q-ligne .lv-image { margin: 0; justify-content: flex-end; }
+  .p-q-ligne .lv-image img { max-height: 38vh; }
+  .p-q-ligne.diapo .lv-image img { max-height: 58vh; }
+  .p-diapo-corps { font: 1.35em/1.45 var(--font-eleve); white-space: pre-wrap; overflow-wrap: anywhere; max-width: 46ch; margin-top: -1.5vh; }
+  .p-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.2vh; font-size: 1.3em; max-width: 1400px; }
+  .p-items li { display: flex; align-items: center; gap: .7em; font-family: var(--font-eleve); font-weight: 700; padding: .35em 0; border-bottom: 2px solid var(--line); }
+  .p-items .lv-rang { background: var(--surface-3); color: var(--fg); }
+  #scene .lv-res-classement { font-size: 1.3em; max-width: 1500px; gap: 2vh; }
+  #scene .lv-res-cl .lv-barre { height: 1.6vh; min-height: 10px; }
+
+  /* compte à rebours (jeu) */
+  .p-chrono { position: relative; width: 11vh; height: 11vh; min-width: 72px; min-height: 72px; flex: none; }
+  .p-chrono svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+  .p-chrono circle { fill: none; stroke-width: 9; }
+  .p-chrono .fond { stroke: var(--surface-3); }
+  .p-chrono .arc { stroke: var(--t-quiz); stroke-linecap: round; transition: stroke .3s; }
+  .p-chrono.urgent .arc { stroke: var(--bad); }
+  .p-chrono b { position: absolute; inset: 0; display: grid; place-items: center; font: 800 1.9em/1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .p-jeu-tete { display: flex; align-items: center; gap: 2vw; justify-content: space-between; max-width: 1600px; }
+  .p-jeu-tete .p-num { margin: 0; }
+  .p-jeu-tete .rep { font: 700 1em/1.2 var(--font-display); color: var(--muted); text-align: right; }
+  .p-jeu-tete .rep b { display: block; font-size: 2em; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .p-q.jeu { margin-bottom: 3vh; }
+
+  /* tuiles (jeu) */
+  .p-tuiles { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6vh 1.4vw; max-width: 1600px; font-size: 1.3em; }
+  .p-tuile { --c: #2350B8; position: relative; overflow: hidden; display: flex; align-items: center; gap: .6em; min-height: 13vh; padding: .5em .8em; border-radius: var(--radius-xl); background: var(--c); color: #fff; font: 700 1em/1.2 var(--font-eleve); box-shadow: inset 0 -6px 0 rgb(0 0 0 / .2); }
+  .p-tuile .lj-forme { width: 1.9em; height: 1.9em; flex: none; position: relative; z-index: 1; }
+  .p-tuile .l { font: 800 .8em/1 var(--font-display); opacity: .85; position: relative; z-index: 1; }
+  .p-tuile .t { flex: 1; min-width: 0; overflow-wrap: anywhere; position: relative; z-index: 1; }
+  .p-tuile .n { font: 800 1.3em/1 var(--font-display); font-variant-numeric: tabular-nums; position: relative; z-index: 1; }
+  .p-tuile .remplissage { position: absolute; inset: 0 auto 0 0; background: rgb(255 255 255 / .18); transition: width .8s cubic-bezier(.2, .7, .2, 1); }
+  .p-tuile.fausse { opacity: .32; filter: saturate(.4); }
+  .p-tuile.bonne { outline: .22em solid var(--ok); outline-offset: .18em; }
+  .p-tuile .ok { width: 1.4em; height: 1.4em; flex: none; display: grid; place-items: center; border-radius: 50%; background: #fff; color: #1B7546; position: relative; z-index: 1; }
+  .p-tuile .ok svg { width: 1em; height: 1em; stroke-width: 3; }
+
+  /* classement (jeu) */
+  .p-classement { max-width: 1300px; margin: 0 auto; }
+  .p-classement h1 { font: 700 clamp(30px, 3.4vw, 72px)/1.1 var(--font-display); margin: 0 0 4vh; text-align: center; }
+  .p-cl-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.6vh; }
+  .p-cl { --w: 100%; position: relative; display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto auto; gap: 1em; align-items: center; padding: .55em 1em; font-size: 1.45em; border-radius: var(--radius-xl); background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+  .p-cl::before { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--w); background: color-mix(in srgb, var(--t-quiz) 16%, transparent); transform-origin: left; animation: p-barre 1s cubic-bezier(.2, .7, .2, 1) both; }
+  .p-cl > * { position: relative; }
+  .p-cl .r { font: 800 1em/1 var(--font-display); display: grid; place-items: center; width: 1.9em; height: 1.9em; border-radius: 50%; background: var(--fg); color: var(--bg); }
+  .p-cl:nth-child(1) .r { background: var(--mark); color: #141A1E; }
+  .p-cl .ps { font: 700 1em/1.2 var(--font-eleve); overflow-wrap: anywhere; }
+  .p-cl .pts { font: 800 1em/1 var(--font-display); font-variant-numeric: tabular-nums; }
+  .p-cl .mv { font: 700 .7em/1 var(--font-display); color: var(--ok); min-width: 2.6em; text-align: right; }
+  .p-cl .mv.bas { color: var(--muted); }
+  .p-cl-reste { text-align: center; color: var(--muted); margin-top: 2vh; }
+  @keyframes p-barre { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes p-monte { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .p-cl { animation: p-monte .5s cubic-bezier(.2, .8, .3, 1) both; }
+  .p-cl:nth-child(2) { animation-delay: .08s; } .p-cl:nth-child(3) { animation-delay: .16s; } .p-cl:nth-child(4) { animation-delay: .24s; } .p-cl:nth-child(5) { animation-delay: .32s; }
+
+  /* podium (jeu) */
+  .p-podium { display: grid; justify-items: center; gap: 2vh; padding-top: 2vh; }
+  .p-podium h1 { font: 700 clamp(32px, 3.6vw, 76px)/1.1 var(--font-display); }
+  .p-marches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 1.6vw; width: min(100%, 1200px); height: 56vh; }
+  .p-marche { display: grid; grid-template-rows: auto auto 1fr; justify-items: center; height: 100%; align-content: end; }
+  .p-marche .ps { font: 800 1.5em/1.15 var(--font-eleve); text-align: center; overflow-wrap: anywhere; max-width: 100%; padding: 0 .4em; }
+  .p-marche .pts { font: 700 1.05em/1.3 var(--font-display); color: var(--muted); margin-bottom: 1vh; font-variant-numeric: tabular-nums; }
+  .p-marche .bloc { width: 100%; border-radius: var(--radius-xl) var(--radius-xl) 0 0; display: grid; place-items: start center; padding-top: 2vh; color: #fff; font: 800 3em/1 var(--font-display); transform-origin: bottom; }
+  .p-marche.m1 .bloc { height: 100%; background: #B8860B; }
+  .p-marche.m2 .bloc { height: 72%; background: #5F6F78; }
+  .p-marche.m3 .bloc { height: 52%; background: #8A5A3B; }
+  .p-marche.vide { visibility: hidden; }
+  @keyframes p-leve { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes p-apparait { from { opacity: 0; transform: translateY(16px) scale(.9); } to { opacity: 1; transform: none; } }
+  .p-podium.anime .m3 .bloc { animation: p-leve .7s cubic-bezier(.2, .8, .3, 1) .3s both; }
+  .p-podium.anime .m3 .ps, .p-podium.anime .m3 .pts { animation: p-apparait .5s ease-out .9s both; }
+  .p-podium.anime .m2 .bloc { animation: p-leve .7s cubic-bezier(.2, .8, .3, 1) 1.4s both; }
+  .p-podium.anime .m2 .ps, .p-podium.anime .m2 .pts { animation: p-apparait .5s ease-out 2s both; }
+  .p-podium.anime .m1 .bloc { animation: p-leve .9s cubic-bezier(.2, .8, .3, 1) 2.6s both; }
+  .p-podium.anime .m1 .ps, .p-podium.anime .m1 .pts { animation: p-apparait .6s cubic-bezier(.2, .8, .3, 1.3) 3.4s both; }
+  .p-confettis { position: fixed; inset: 0; pointer-events: none; z-index: 4; overflow: hidden; }
+  .p-confettis i { position: absolute; top: -4vh; width: 1.1vh; height: 1.8vh; border-radius: 2px; animation: p-tombe 3.2s linear both; }
+  @keyframes p-tombe { to { transform: translateY(112vh) rotate(540deg); } }
+  @media (prefers-reduced-motion: reduce) { .p-confettis { display: none; } .p-cl, .p-cl::before { animation: none !important; } }
+
+  /* attente (jeu) : pseudos qui arrivent */
+  .p-puces button { appearance: none; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: .15em .7em; font: inherit; color: var(--fg); cursor: pointer; animation: lj-pop .35s cubic-bezier(.2, .8, .3, 1.2); }
+  .p-puces button:hover { border-color: var(--bad); }
+  .p-puces.jeu { max-height: 30vh; font-size: .95em; }
+
+  /* tableau participatif */
+  .p-tab-tete { display: flex; align-items: flex-end; justify-content: space-between; gap: 2vw; max-width: 1700px; margin-bottom: 2vh; }
+  .p-tab-tete .p-q { margin: 0; font-size: clamp(28px, 2.8vw, 64px); }
+  .p-tab-info { color: var(--muted); font: 600 .85em/1.3 var(--font-display); text-align: right; white-space: nowrap; }
+  .p-tab-info b { color: var(--fg); font-size: 1.6em; display: block; font-variant-numeric: tabular-nums; }
+  .p-tab { max-width: 1700px; }
+  .p-tab-cols { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 1.2vw; align-items: start; }
+  .p-tab-col h2 { font: 700 1em/1.2 var(--font-display); margin: 0 0 1vh; padding: .3em .6em; border-radius: var(--radius); background: var(--surface-2); border-bottom: 3px solid var(--t-quiz); overflow-wrap: anywhere; }
+  .p-tab-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15em), 1fr)); gap: 1.2vh 1vw; align-items: start; }
+  .p-tab-cols .p-tab-liste { grid-template-columns: 1fr; }
+  .p-note { appearance: none; text-align: left; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5em; align-items: start; padding: .55em .7em; border-radius: var(--radius-lg); background: var(--paper); color: var(--paper-ink); border: 1px solid var(--line); border-top: 5px solid var(--t-quiz); font: 700 1em/1.3 var(--font-eleve); cursor: pointer; box-shadow: 0 1px 2px rgb(16 24 22 / .08); animation: p-note .4s cubic-bezier(.2, .8, .3, 1.2) both; }
+  .p-note:hover { border-color: var(--accent); }
+  .p-note .t { overflow-wrap: anywhere; white-space: pre-wrap; }
+  .p-note .v { display: inline-flex; align-items: center; gap: .25em; font: 800 .9em/1 var(--font-display); color: var(--paper-ink); background: #EEF1EF; padding: .25em .45em; border-radius: 999px; font-variant-numeric: tabular-nums; }
+  .p-note .v svg { width: 1em; height: 1em; }
+  .p-note.repondue { border-top-color: var(--ok); opacity: .62; }
+  .p-note.repondue .t::before { content: "\2713\00a0"; color: #1D7F4A; }
+  .p-note.avant { border-top-color: var(--mark); box-shadow: 0 0 0 3px var(--mark); }
+  .p-tab.dense .p-tab-liste { font-size: .8em; grid-template-columns: repeat(auto-fill, minmax(min(100%, 12em), 1fr)); }
+  .p-tab.tres-dense .p-tab-liste { font-size: .62em; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10em), 1fr)); gap: .8vh .6vw; }
+  .p-tab-reste { margin-top: 1.4vh; color: var(--muted); font-size: .85em; }
+  .p-tab-vide { padding: 6vh 2vw; text-align: center; color: var(--muted); border: 2px dashed var(--line-strong); border-radius: var(--radius-xl); font-size: 1.1em; }
+  .p-avant-voile { position: fixed; inset: 0; z-index: 29; background: rgb(15 21 19 / .6); }
+  .p-avant { position: fixed; inset: 0 8vw; margin: auto 0; height: fit-content; max-height: 80vh; overflow: auto; z-index: 30; background: var(--paper); color: var(--paper-ink); border-radius: var(--radius-xl); border-top: 10px solid var(--mark); box-shadow: var(--shadow-lg); padding: 4vh 4vw; display: grid; gap: 2vh; font: 700 clamp(28px, 3.4vw, 72px)/1.25 var(--font-eleve); animation: lj-pop .4s cubic-bezier(.2, .8, .3, 1.2); }
+  .p-avant .t { overflow-wrap: anywhere; white-space: pre-wrap; }
+  .p-avant .bas { display: flex; justify-content: space-between; align-items: center; gap: 2vw; font: 600 .45em/1.2 var(--font-ui); color: #56646A; }
+  .p-avant .btn { font-size: 16px; }
+  @keyframes p-note { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .p-note, .p-avant { animation: none; } }
+  .p-commandes .compte { display: inline-grid; place-items: center; min-width: 1.6em; height: 1.6em; padding: 0 .35em; border-radius: 999px; background: var(--warn); color: #fff; font: 700 13px/1 var(--font-display); }
+  .p-joueurs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 60vh; overflow: auto; }
+  .p-joueurs li { display: grid; grid-template-columns: 2.4em minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .p-joueurs .r { font: 700 15px/1 var(--font-display); color: var(--muted); }
+  .p-joueurs b { font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+  .p-joueurs .hors { color: var(--muted); }
+  @media (max-width: 900px) {
+    .p-q-ligne, .p-q-ligne.avec-image { grid-template-columns: 1fr; }
+    .p-tuiles { grid-template-columns: 1fr; }
+    .p-tab-cols { grid-auto-flow: row; }
+    .p-marches { height: 44vh; }
+    .p-avant { inset: 0 16px; }
+    .p-cl { grid-template-columns: 2.2em minmax(0, 1fr) auto; }
+    .p-cl .mv { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="p-haut">
+  <div id="rejoindre" class="p-rejoindre"></div>
+  <div class="p-titre" id="titre"></div>
+</header>
+<main id="scene" aria-live="polite"><div class="message-plein"><div><div class="lv-points" aria-hidden="true"><i></i><i></i><i></i></div><p>Connexion à la session…</p></div></div></main>
+<footer class="p-commandes" id="commandes"></footer>
+<script src="/js/etabli-client.js"></script>
+<script src="/js/etabli-ui.js"></script>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/live-commun.js"></script>
+<script src="/js/live-jeu.js"></script>
+<script src="/js/live-resultats.js"></script>
+<script src="/js/live-cartes-dico.js"></script>
+<script src="/js/live-scanner.js"></script>
+<script>
+(async () => {
+  'use strict';
+  const { h, $, LETTRES } = Live;
+  const Son = LiveJeu.Son;
+  const CLE_THEME = 'etabli.live.theme';
+  Live.appliquerTheme(CLE_THEME);
+  const code = Live.codeDansAdresse();
+  let jeton = code ? Live.jetonSession(code) : null;
+  const scene = $('#scene');
+  let S = null;
+  let cx = null;
+  let voileRejoindre = null;
+  const lienEleves = code ? Live.lienParticipant(code) : '';
+  const hote = Live.hoteCourt();
+  const reduit = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function messagePlein(titre, texte, boutons) {
+    scene.replaceChildren(h('div', { class: 'message-plein' }, h('div', {}, h('h1', {}, titre), h('p', {}, texte), boutons ? h('div', { class: 'btns' }, boutons) : null)));
+    $('#commandes').replaceChildren(h('div', { class: 'grp' }, h('a', { class: 'btn btn-ghost', href: '/' }, h('span', { html: EtabliUI.icone('logo') }), 'Pupitre')));
+  }
+
+  if (!code) {
+    messagePlein('Adresse incomplète', 'Lance le quiz depuis son éditeur pour ouvrir la projection.', [h('a', { class: 'btn btn-primary', href: '/' }, 'Aller au pupitre')]);
+    return;
+  }
+
+  // la session existe-t-elle ? (évite de tenter le WebSocket en boucle sur un code inconnu)
+  try { await Live.infosPubliques(code); }
+  catch (e) {
+    if (e.code === 'reseau') messagePlein('Pas de connexion', 'Le serveur de l’Établi ne répond pas. Vérifie le réseau, puis recharge la page.', [h('button', { type: 'button', class: 'btn btn-primary', onclick: () => location.reload() }, 'Recharger')]);
+    else messagePlein('Session introuvable', 'Aucune session ne correspond au code ' + Live.formatCode(code) + '. Elle a peut-être été supprimée.', [h('a', { class: 'btn btn-primary', href: '/' }, 'Aller au pupitre')]);
+    return;
+  }
+
+  // le son n'est permis qu'après un geste : premier clic ou première touche (mode jeu seulement)
+  const geste = () => { if (S && S.config.jeu) Son.deverrouiller(); };
+  document.addEventListener('pointerdown', geste, true);
+  document.addEventListener('keydown', geste, true);
+
+  cx = Live.connecter(code, () => (jeton ? { t: 'hello', role: 'staff', jeton } : { t: 'hello', role: 'staff' }), {
+    onMessage(m) {
+      if (m.t === 'etat') {
+        Live.synchroniser(m);
+        // navigation rapide (plusieurs flèches de suite) : un état encore en retard sur la dernière commande
+        // « aller » ne doit pas ramener l'affichage en arrière ; le serveur confirme dans la foulée
+        if (attenduNav && Date.now() < attenduNav.t && S && (m.etat.statut !== 'question' || m.etat.index !== attenduNav.index)) return;
+        attenduNav = null;
+        const avant = S;
+        S = m;
+        if (S.config && S.config.jeton && S.config.jeton !== jeton) { jeton = S.config.jeton; Live.memoriserJeton(code, jeton); }
+        rendre(avant);
+        scanner.maj();
+      } else if (m.t === 'notes') recevoirNotes(m);
+      else if (m.t === 'refus') Live.toast(m.message || 'Accès refusé.', 'erreur');
+      else if (m.t === 'info') Live.toast(m.message);
+    },
+    onStatut(s, c) {
+      if (s === 'coupe' && S) Live.toast('Connexion interrompue, reconnexion…');
+      if (s === 'refuse') {
+        scanner.fermer();
+        Son.musique(null);
+        if (c === 4004) messagePlein('Session supprimée', 'Cette session n’existe plus.', [h('a', { class: 'btn btn-primary', href: '/' }, 'Aller au pupitre')]);
+        else messagePlein('Accès refusé', 'La projection est réservée à l’enseignant·e qui a lancé la session. Connecte-toi avec ce compte, puis relance la projection depuis l’éditeur du quiz.',
+          [h('a', { class: 'btn btn-primary', href: '/#connexion' }, 'Se connecter'), h('a', { class: 'btn', href: '/' }, 'Pupitre')]);
+      }
+    },
+  });
+  const cmd = (m) => {
+    const r = cx.envoyer(m);
+    if (r === 'file') Live.toast('Reconnexion en cours : la commande partira dès le retour de la connexion.');
+    else if (!r) Live.toast('Pas de connexion pour l’instant.', 'erreur');
+    return r !== false;
+  };
+
+  const questionCourante = () => (S ? S.config.questions[S.etat.index] : null);
+  const noms = () => Live.nomsClasse(S && S.config.classe);
+  const nomCarte = (n) => noms()[n - 1] || '';
+  const quizId = () => S && (S.config.quizId || S.config.activiteId);
+  const scanner = LiveScanner.creer({ etat: () => S, envoyer: (m) => cx.envoyer(m), nomCarte });
+  const enJeu = () => !!(S && S.config.jeu);
+  const bonnesDe = (q) => (q && q.type === 'qcm' ? q.options.map((o, i) => (o.bonne ? i : -1)).filter((i) => i >= 0) : []);
+  const infoJeu = () => (S && S.etat.jeu && S.etat.jeu.q ? S.etat.jeu.q[S.etat.index] : null);
+  const chronoOuvert = () => { const i = infoJeu(); return !!(enJeu() && S.etat.statut === 'question' && i && !i.close); };
+  const questionFermee = () => { const i = infoJeu(); return !!(i && i.close); };
+
+  /* ---------- rendu ---------- */
+  function rendreHaut() {
+    const zone = $('#rejoindre');
+    $('#titre').textContent = Live.typo(S.config.titre || '');
+    document.title = (S.config.titre ? S.config.titre + ' · ' : '') + 'Projection · L’Établi';
+    if (S.config.mode === 'cartes') {
+      if (zone.dataset.fait === 'cartes') return;
+      zone.dataset.fait = 'cartes';
+      zone.replaceChildren(h('span', { class: 'mode-cartes', html: Live.icone('cartes') + '<span>Mode cartes</span>' }));
+      return;
+    }
+    const attente = S.etat.statut === 'attente';
+    zone.hidden = attente;
+    // l'écran d'attente montre déjà le titre, le code et le QR en grand
+    $('.p-haut').hidden = attente;
+    if (zone.dataset.fait === 'appareils') return;
+    zone.dataset.fait = 'appareils';
+    zone.replaceChildren(
+      h('span', { class: 'qr', html: Live.qrSvg(lienEleves, { marge: 1, label: 'QR code pour rejoindre' }) }),
+      h('span', {}, 'Réponds sur ', h('span', { class: 'hote' }, hote), h('br'), 'avec le code ', h('b', { class: 'code' }, Live.formatCode(code))));
+  }
+
+  function grilleCartes(repondues) {
+    const n = noms();
+    const vues = S.cartesVues || [];
+    const nb = Math.max(n.filter(Boolean).length ? n.length : 0, ...vues, 0);
+    if (!nb) return h('p', { class: 'p-classe' }, 'Les cartes scannées apparaîtront ici.');
+    const ok = new Set(repondues);
+    const cases = [];
+    for (let i = 1; i <= nb; i++) {
+      if (n.length && !n[i - 1] && vues.indexOf(i) === -1) continue;
+      const repondue = ok.has(i);
+      cases.push(h('button', {
+        type: 'button', class: 'p-c' + (repondue ? ' ok' : ''), 'data-carte': String(i),
+        'aria-label': 'Carte ' + i + (n[i - 1] ? ', ' + n[i - 1] : '') + (repondue ? ', a répondu' : ', pas encore lue'),
+        title: 'Saisir ou corriger la réponse de cette carte',
+        onclick: (ev) => menuCarte(i, ev.currentTarget),
+      }, h('b', {}, String(i)), n[i - 1] ? h('small', {}, n[i - 1]) : null));
+    }
+    return h('div', { class: 'p-grille' + (cases.length > 30 || S.etat.revele ? ' dense' : '') }, cases);
+  }
+
+  function menuCarte(n, ancre) {
+    const q = questionCourante();
+    if (!S || S.etat.statut !== 'question' || !Live.compatibleCartes(q)) return;
+    const deja = (S.cartes || []).find((x) => x.carte === n);
+    const items = [{ info: 'Carte ' + n + (nomCarte(n) ? ' · ' + nomCarte(n) : '') + (deja ? ' : lue' : '') }];
+    q.options.forEach((o, i) => items.push({ label: 'Réponse ' + LETTRES[i] + (o.texte ? ' · ' + o.texte.slice(0, 30) : ''), fn: () => cmd({ t: 'carte', q: S.etat.index, carte: n, lettre: LETTRES[i] }) }));
+    if (deja) { items.push('sep'); items.push({ label: 'Retirer sa réponse', icone: 'fermer', fn: () => cmd({ t: 'retirerCarte', q: S.etat.index, carte: n }) }); }
+    EtabliUI.menu(ancre, items);
+  }
+
+  /** Pseudos des joueur·euses (jeu) : un clic propose de retirer un pseudo inapproprié. */
+  function pucesJoueurs() {
+    const liste = (S.joueurs || []).filter((j) => j.connecte);
+    if (!liste.length) return null;
+    return h('div', { class: 'p-puces jeu' }, liste.slice(-150).map((j) => h('button', { type: 'button', title: 'Retirer ce pseudo', onclick: (ev) => menuJoueur(j, ev.currentTarget) }, j.pseudo)));
+  }
+  function menuJoueur(j, ancre) {
+    EtabliUI.menu(ancre, [{ info: j.pseudo }, { label: 'Retirer ce pseudo de la partie', icone: 'fermer', danger: true, fn: () => exclure(j) }]);
+  }
+  async function exclure(j) {
+    const ok = await EtabliUI.confirmer({ titre: 'Retirer « ' + j.pseudo + ' » ?', message: Live.typo('Cette personne quitte la session et ne peut pas revenir avec le même appareil sans changer de navigateur. Ses notes sont masquées.'), ok: 'Retirer', danger: true });
+    if (ok) cmd({ t: 'exclure', pid: j.pid });
+  }
+
+  function blocRejoindre() {
+    const c = S.config;
+    const jeu = enJeu();
+    const nb = S.connectes || 0;
+    return h('div', { class: 'p-accueil' },
+      h('div', {},
+        h('p', { class: 'p-num' }, jeu ? 'Jeu en direct' : 'Quiz en direct'),
+        h('h1', {}, c.titre || 'Quiz'),
+        h('div', { class: 'p-etapes' },
+          h('div', { class: 'p-etape' }, h('i', {}, '1'), h('span', {}, 'Scanne le QR code ou va sur'), h('span', { class: 'p-grand-hote' }, hote)),
+          h('div', { class: 'p-etape' }, h('i', {}, '2'), h('span', {}, 'Entre le code'), h('span', { class: 'p-grand-code' }, Live.formatCode(code)))),
+        h('p', { class: 'p-presents', html: Live.icone('personnes') }, h('b', {}, String(nb)),
+          jeu ? (nb > 1 ? ' joueur·euses' : ' joueur·euse') : nb > 1 ? ' participant·es connecté·es' : ' participant·e connecté·e'),
+        jeu ? pucesJoueurs() : S.pseudos && S.pseudos.length ? h('div', { class: 'p-puces' }, S.pseudos.map((p) => h('span', {}, p))) : null),
+      h('div', { class: 'p-qr-grand', html: Live.qrSvg(lienEleves, { label: 'QR code pour rejoindre le quiz' }) }));
+  }
+
+  function vueAttente() {
+    const c = S.config;
+    if (c.mode === 'cartes') {
+      const nomC = Live.nomClasse(c.classe);
+      return h('div', {},
+        h('div', { class: 'p-cartes-intro' },
+          h('div', { class: 'p-carte-demo', 'aria-hidden': 'true' },
+            h('span', { class: 'mq', html: CartesML.svgMarqueur(6) }),
+            h('span', { class: 'l a' }, 'A'), h('span', { class: 'l b' }, 'B'), h('span', { class: 'l c' }, 'C'), h('span', { class: 'l d' }, 'D')),
+          h('div', {},
+            h('p', { class: 'p-num' }, 'Quiz en direct · mode cartes'),
+            h('h1', {}, c.titre || 'Quiz'),
+            h('p', {}, 'Prépare ta carte. Pour répondre, tiens-la face au tableau avec la lettre choisie en haut.'),
+            h('p', {}, 'Garde les doigts en dehors du carré noir.'),
+            nomC ? h('p', { class: 'p-classe' }, 'Classe : ', h('b', {}, nomC)) : null)),
+        grilleCartes([]));
+    }
+    return blocRejoindre();
+  }
+
+  /** Question et image côte à côte (l'image passe dessous sur un écran étroit). */
+  function ligneQuestion(q, cls, extra) {
+    const fig = Live.figureImage(q.image);
+    return h('div', { class: 'p-q-ligne' + (fig ? ' avec-image' : '') + (q.type === 'diapo' ? ' diapo' : '') },
+      h('div', {}, h('h1', { class: 'p-q' + ((q.texte || '').length > 140 ? ' long' : '') + (cls ? ' ' + cls : '') }, q.texte || (q.type === 'diapo' ? '' : '(question sans texte)')), extra || null),
+      fig);
+  }
+
+  function tuilesJeu(q, res, fermee) {
+    const T = LiveJeu.TUILES;
+    const b = bonnesDe(q);
+    const total = (res && res.total) || 0;
+    return h('div', { class: 'p-tuiles' }, q.options.map((o, i) => {
+      const n = (res && res.comptes && res.comptes[i]) || 0;
+      const cls = fermee && b.length ? (b.indexOf(i) !== -1 ? ' bonne' : ' fausse') : '';
+      return h('div', { class: 'p-tuile' + cls, style: { '--c': T[i % T.length].couleur } },
+        fermee ? h('span', { class: 'remplissage', style: { width: Live.pourcent(n, total) + '%' } }) : null,
+        h('span', { html: LiveJeu.forme(i) }),
+        h('span', { class: 'l' }, LETTRES[i]),
+        h('span', { class: 't' }, o.texte || ''),
+        fermee && b.indexOf(i) !== -1 ? h('span', { class: 'ok', html: Live.icone('check') + '<span class="lv-sr">bonne réponse</span>' }) : null,
+        fermee ? h('span', { class: 'n' }, String(n)) : null);
+    }));
+  }
+
+  function vueQuestion() {
+    const c = S.config, e = S.etat, q = questionCourante(), res = S.resultats;
+    if (q.type === 'idees') return vueTableau(q);
+    const jeu = enJeu() && !Live.TYPES_SANS_CHRONO.includes(q.type);
+    const info = infoJeu();
+    const fermee = jeu && info && !!info.close;
+    const blocs = [];
+    if (jeu && info && !info.close) {
+      blocs.push(h('div', { class: 'p-jeu-tete' },
+        h('p', { class: 'p-num' }, 'Question ' + (e.index + 1) + ' / ' + c.questions.length, h('span', { class: 'type' }, Live.TYPES[q.type] || '')),
+        h('div', { class: 'rep' }, h('b', { 'data-zone': 'rep' }, String((res && res.total) || 0)), 'réponses'),
+        h('div', { class: 'p-chrono', role: 'timer', 'aria-label': 'Temps restant' },
+          h('span', { html: '<svg viewBox="0 0 100 100"><circle class="fond" cx="50" cy="50" r="44"/><circle class="arc" cx="50" cy="50" r="44" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/></svg>' }),
+          h('b', {}, ''))));
+    } else {
+      blocs.push(h('p', { class: 'p-num' }, (q.type === 'diapo' ? 'Étape ' : 'Question ') + (e.index + 1) + ' / ' + c.questions.length, h('span', { class: 'type' }, Live.TYPES[q.type] || '')));
+    }
+    if (q.type === 'diapo') {
+      blocs.push(ligneQuestion(q, '', q.corps ? h('p', { class: 'p-diapo-corps' }, q.corps) : null));
+      return blocs;
+    }
+    blocs.push(ligneQuestion(q, jeu ? 'jeu' : ''));
+    if (q.type === 'qcm') {
+      if (jeu) blocs.push(tuilesJeu(q, res, fermee));
+      else if (e.revele) blocs.push(LiveVue.qcm(q, res, { revele: true }));
+      else blocs.push(h('div', { class: 'p-options' + (q.options.length >= 4 && q.options.every((o) => (o.texte || '').length < 40) ? ' deux' : '') },
+        q.options.map((o, i) => h('div', { class: 'p-opt' }, h('span', { class: 'lv-lettre' }, LETTRES[i]), h('span', {}, o.texte || '')))));
+    } else if (q.type === 'echelle') {
+      if (e.revele) blocs.push(LiveVue.echelle(q, res));
+      else blocs.push(h('div', { class: 'p-echelle' },
+        h('span', {}, h('b', {}, String(q.min)), q.etiquettes && q.etiquettes[0] ? ' ' + q.etiquettes[0] : ''),
+        h('span', { class: 'fin' }, q.etiquettes && q.etiquettes[1] ? q.etiquettes[1] + ' ' : '', h('b', {}, String(q.max)))));
+    } else if (q.type === 'classement') {
+      if (e.revele) blocs.push(LiveVue.classement(q, res));
+      else blocs.push(h('ul', { class: 'p-items' }, q.items.map((it) => h('li', {}, h('span', { class: 'lv-rang', html: Live.icone('classer') }), h('span', {}, it.texte || '')))));
+    } else if (e.revele) {
+      blocs.push(q.type === 'nuage'
+        ? LiveVue.nuage(res)
+        : LiveVue.libre(res, { montrerMasques: true, cacherMasques: true, onMasquer: (t) => cmd({ t: 'masquer', q: e.index, pid: t.pid, valeur: !t.masque }) }));
+    } else {
+      blocs.push(h('div', { class: 'p-attente-res', html: Live.icone('oeilBarre') }, h('span', {}, jeu ? 'Les réponses s’afficheront à la fin du temps.' : 'Les réponses restent cachées. Elles s’afficheront avec « Afficher les résultats ».')));
+    }
+    if (c.mode === 'cartes') {
+      if (Live.compatibleCartes(q)) blocs.push(grilleCartes((S.cartes || []).map((x) => x.carte)));
+      else blocs.push(h('div', { class: 'lv-encart info p-hors-cartes' }, Live.ic('info'), h('span', {}, 'Cette question ne se fait pas avec les cartes (choix multiple de 4 réponses au plus). Elle reste affichée pour la discussion.')));
+    }
+    if (!(jeu && info && !info.close)) {
+      const total = (res && res.total) || 0;
+      blocs.push(h('div', { class: 'p-compteur', 'aria-live': 'polite' }, h('b', {}, String(total)), total > 1 ? 'réponses' : 'réponse',
+        c.mode !== 'cartes' ? h('small', {}, 'sur ' + (S.connectes || 0) + ' connecté·e' + ((S.connectes || 0) > 1 ? 's' : '')) : null));
+    }
+    return blocs;
+  }
+
+  /* ---------- compte à rebours (jeu) ---------- */
+  let rafChrono = null;
+  let dernierTic = null;
+  function animerChrono() {
+    cancelAnimationFrame(rafChrono);
+    const pas = () => {
+      rafChrono = null;
+      const info = infoJeu();
+      const el = scene.querySelector('.p-chrono');
+      if (!el || !info || info.close) return;
+      const reste = Math.max(0, info.fin - Live.maintenantServeur());
+      const sec = Math.ceil(reste / 1000);
+      el.querySelector('b').textContent = String(sec);
+      el.querySelector('.arc').setAttribute('stroke-dashoffset', String(100 - (100 * reste) / (info.duree * 1000)));
+      el.classList.toggle('urgent', sec <= 5);
+      if (sec <= 5 && sec > 0 && dernierTic !== sec) { dernierTic = sec; Son.tic(); }
+      Son.musique(sec <= 5 ? 'tension' : 'question');
+      if (reste > 0) rafChrono = requestAnimationFrame(pas);
+    };
+    pas();
+  }
+
+  /* ---------- classement et podium (jeu) ---------- */
+  function vueClassement() {
+    const liste = S.classement || [];
+    const top = liste.slice(0, 5);
+    const max = Math.max(1, ...top.map((x) => x.points));
+    return h('div', { class: 'p-classement' },
+      h('h1', {}, 'Classement'),
+      top.length ? h('ol', { class: 'p-cl-liste' }, top.map((x) => {
+        const mv = x.rangAvant ? x.rangAvant - x.rang : 0;
+        return h('li', { class: 'p-cl', style: { '--w': Math.max(6, (100 * x.points) / max) + '%' } },
+          h('span', { class: 'r' }, String(x.rang)),
+          h('span', { class: 'ps' }, x.pseudo),
+          h('span', { class: 'mv' + (mv < 0 ? ' bas' : '') }, mv > 0 ? '+' + mv : mv < 0 ? String(mv) : ''),
+          h('span', { class: 'pts' }, LiveJeu.points(x.points)));
+      })) : h('p', { class: 'p-tab-vide' }, 'Personne n’a encore marqué de points.'),
+      liste.length > 5 ? h('p', { class: 'p-cl-reste' }, 'Et ' + Live.pluriel(liste.length - 5, 'autre joueur·euse', 'autres joueur·euses') + ' : chacun·e voit sa place sur son téléphone.') : null);
+  }
+
+  let podiumJoue = false;
+  function vuePodium() {
+    const l = S.classement || [];
+    const marche = (place, cls) => {
+      const x = l[place - 1];
+      if (!x) return h('div', { class: 'p-marche ' + cls + ' vide' }, h('span', { class: 'ps' }, '·'), h('span', { class: 'pts' }, ''), h('div', { class: 'bloc' }, ''));
+      return h('div', { class: 'p-marche ' + cls },
+        h('span', { class: 'ps' }, x.pseudo), h('span', { class: 'pts' }, LiveJeu.points(x.points) + ' pts'),
+        h('div', { class: 'bloc', 'aria-hidden': 'true' }, String(x.rang)));
+    };
+    const anime = !podiumJoue && !reduit();
+    const el = h('div', { class: 'p-podium' + (anime ? ' anime' : '') },
+      h('p', { class: 'p-num' }, 'Fin du jeu'),
+      h('h1', {}, 'Le podium'),
+      h('div', { class: 'p-marches', role: 'list', 'aria-label': 'Podium' },
+        h('div', { role: 'listitem' }, marche(2, 'm2')), h('div', { role: 'listitem' }, marche(1, 'm1')), h('div', { role: 'listitem' }, marche(3, 'm3'))));
+    el.querySelectorAll('[role=listitem]').forEach((d) => { d.style.display = 'contents'; });
+    if (anime) {
+      podiumJoue = true;
+      Son.musique(null);
+      setTimeout(() => Son.podium(3), 300);
+      setTimeout(() => Son.podium(2), 1400);
+      setTimeout(() => { Son.podium(1); confettis(); }, 2600);
+    }
+    return el;
+  }
+  function confettis() {
+    if (reduit()) return;
+    const couleurs = LiveJeu.TUILES.map((t) => t.couleur).concat(['#F2B21B', '#F2B21B']);
+    const z = h('div', { class: 'p-confettis', 'aria-hidden': 'true' });
+    for (let i = 0; i < 70; i++) {
+      z.appendChild(h('i', { style: { left: Math.random() * 100 + 'vw', background: couleurs[i % couleurs.length], animationDelay: (Math.random() * 1.6) + 's', animationDuration: (2.4 + Math.random() * 1.6) + 's' } }));
+    }
+    document.body.appendChild(z);
+    setTimeout(() => z.remove(), 5200);
+  }
+
+  function vueFin() {
+    if (enJeu() && (S.classement || []).length) return vuePodium();
+    const r = S.resume || {};
+    const id = quizId();
+    return h('div', { class: 'p-fin' },
+      h('p', { class: 'p-num' }, 'Fin du quiz'),
+      h('h1', {}, 'Merci !'),
+      h('div', { class: 'p-chiffres' },
+        h('div', {}, h('b', {}, String(r.participants == null ? 0 : r.participants)), h('span', {}, r.participants > 1 ? 'participant·es' : 'participant·e')),
+        r.reussite !== null && r.reussite !== undefined ? h('div', {}, h('b', {}, Math.round(r.reussite) + ' %'), h('span', {}, 'de bonnes réponses')) : null),
+      h('div', { class: 'btns' },
+        h('a', { class: 'btn btn-primary grand', href: '/stats/' + code, target: '_blank', rel: 'noopener' }, Live.ic('stats'), 'Voir les résultats détaillés'),
+        id ? h('a', { class: 'btn', href: '/quiz/?doc=' + encodeURIComponent(id) }, Live.ic('quiz'), 'Revenir à l’éditeur') : h('a', { class: 'btn', href: '/' }, 'Pupitre')));
+  }
+
+  /* ---------- tableau participatif ---------- */
+  const LIMITE_NOTES = 150;
+  const T = { q: null, notes: new Map(), els: new Map(), racine: null, listes: new Map(), raf: null };
+
+  function recevoirNotes(m) {
+    if (!S || m.q !== S.etat.index) return;
+    if (T.q !== m.q || (m.complet && !m.suite)) { T.notes = new Map(); T.q = m.q; }
+    for (const n of m.notes || []) T.notes.set(n.id, n);
+    for (const n of m.maj || []) T.notes.set(n.id, n);
+    for (const id of m.suppr || []) T.notes.delete(id);
+    planifierTableau();
+  }
+  function planifierTableau() {
+    if (T.raf) return;
+    T.raf = requestAnimationFrame(() => { T.raf = null; majTableau(); });
+  }
+
+  function vueTableau(q) {
+    T.els = new Map();
+    T.listes = new Map();
+    const cols = q.colonnes || [];
+    const questions = q.variante === 'questions';
+    let corps;
+    if (cols.length) {
+      corps = h('div', { class: 'p-tab-cols' }, cols.map((c) => {
+        const l = h('div', { class: 'p-tab-liste' });
+        T.listes.set(c.id, l);
+        return h('section', { class: 'p-tab-col' }, h('h2', {}, c.titre || 'Colonne'), l);
+      }));
+    } else {
+      const l = h('div', { class: 'p-tab-liste' });
+      T.listes.set('', l);
+      corps = l;
+    }
+    T.racine = h('div', { class: 'p-tab' }, corps, h('p', { class: 'p-tab-reste', 'data-zone': 'reste' }), h('div', { 'data-zone': 'vide' }));
+    T.avant = h('div', { 'data-zone': 'avant' });
+    const res = S.resultats || {};
+    const blocs = [
+      h('p', { class: 'p-num' }, 'Question ' + (S.etat.index + 1) + ' / ' + S.config.questions.length, h('span', { class: 'type' }, questions ? 'Questions de la salle' : 'Tableau participatif')),
+      h('div', { class: 'p-tab-tete' },
+        h('h1', { class: 'p-q' }, q.texte || (questions ? 'Vos questions' : 'Vos idées')),
+        h('p', { class: 'p-tab-info', 'data-zone': 'info' }, infoTableau(res))),
+    ];
+    const fig = Live.figureImage(q.image);
+    if (fig) blocs.push(fig);
+    blocs.push(T.racine, T.avant);
+    setTimeout(majTableau, 0);
+    return blocs;
+  }
+  function infoTableau(res) {
+    const t = S.tableau || {};
+    return [h('b', {}, String(res.visibles || 0)), (res.visibles || 0) > 1 ? 'notes' : 'note',
+      res.votes ? ' · ' + Live.pluriel(res.votes, 'vote', 'votes') : '',
+      t.votes ? h('span', { style: { display: 'block' } }, 'Votes ouverts') : null,
+      t.depots === false ? h('span', { style: { display: 'block' } }, 'Dépôts fermés') : null];
+  }
+
+  function majTableau() {
+    if (!S || !T.racine || !T.racine.isConnected) return;
+    const q = questionCourante();
+    if (!q || q.type !== 'idees') return;
+    const avecVotes = (q.votes || 0) > 0;
+    const visibles = Array.from(T.notes.values()).filter((n) => n.statut === 'ok')
+      .sort((a, b) => (b.votes || 0) - (a.votes || 0) || (b.t || 0) - (a.t || 0));
+    const montrees = visibles.slice(0, LIMITE_NOTES);
+    const garder = new Set(montrees.map((n) => n.id));
+    for (const [id, el] of T.els) if (!garder.has(id)) { el.remove(); T.els.delete(id); }
+    const cols = q.colonnes || [];
+    const parListe = new Map();
+    for (const n of montrees) {
+      const cle = cols.length ? (T.listes.has(n.col) ? n.col : cols[0].id) : '';
+      if (!parListe.has(cle)) parListe.set(cle, []);
+      let el = T.els.get(n.id);
+      const sig = [n.texte, n.votes, n.repondue, n.avant].join('|');
+      if (!el) {
+        el = h('button', { type: 'button', class: 'p-note', 'data-id': n.id, onclick: (ev) => menuNote(ev.currentTarget.dataset.id, ev.currentTarget) });
+        T.els.set(n.id, el);
+      }
+      if (el.dataset.sig !== sig) {
+        el.dataset.sig = sig;
+        el.className = 'p-note' + (n.repondue ? ' repondue' : '') + (n.avant ? ' avant' : '');
+        el.replaceChildren(h('span', { class: 't' }, n.texte), avecVotes ? h('span', { class: 'v', html: Live.icone('pouce') }, String(n.votes || 0)) : null);
+        el.setAttribute('aria-label', n.texte + (avecVotes ? ', ' + Live.pluriel(n.votes || 0, 'vote', 'votes') : '') + (n.repondue ? ', répondue' : ''));
+      }
+      parListe.get(cle).push(el);
+    }
+    for (const [cle, l] of T.listes) {
+      const voulus = parListe.get(cle) || [];
+      voulus.forEach((el, i) => { if (l.children[i] !== el) l.insertBefore(el, l.children[i] || null); });
+      while (l.children.length > voulus.length) l.lastChild.remove();
+    }
+    const nb = montrees.length;
+    T.racine.classList.toggle('dense', nb > 24 && nb <= 60);
+    T.racine.classList.toggle('tres-dense', nb > 60);
+    const reste = T.racine.querySelector('[data-zone="reste"]');
+    reste.textContent = visibles.length > nb ? Live.typo('+ ' + (visibles.length - nb) + ' autres notes (les plus votées et les plus récentes sont affichées)') : '';
+    const vide = T.racine.querySelector('[data-zone="vide"]');
+    vide.replaceChildren(visibles.length ? '' : h('p', { class: 'p-tab-vide' }, q.variante === 'questions' ? 'Les questions de la salle apparaîtront ici.' : 'Les notes apparaîtront ici dès qu’elles arrivent.'));
+    // note mise en avant : en grand
+    const avant = visibles.find((n) => n.avant);
+    const zoneAvant = T.avant;
+    if (zoneAvant && zoneAvant.dataset.id !== (avant ? avant.id + (avant.texte) : '')) {
+      zoneAvant.dataset.id = avant ? avant.id + avant.texte : '';
+      const fermerAvant = () => cmd({ t: 'moderer', q: S.etat.index, note: avant.id, avant: false });
+      zoneAvant.replaceChildren(...(avant ? [h('div', { class: 'p-avant-voile', onclick: fermerAvant }), h('div', { class: 'p-avant', role: 'dialog', 'aria-label': 'Note mise en avant' },
+        h('span', { class: 't' }, avant.texte),
+        h('div', { class: 'bas' }, avecVotes ? h('span', {}, Live.pluriel(avant.votes || 0, 'vote', 'votes')) : h('span'),
+          h('button', { type: 'button', class: 'btn btn-sm', onclick: fermerAvant }, Live.ic('fermer'), 'Fermer')))] : []));
+    }
+  }
+
+  function menuNote(id, ancre) {
+    const n = T.notes.get(id);
+    const q = questionCourante();
+    if (!n || !q) return;
+    const qi = S.etat.index;
+    const items = [{ info: n.texte.slice(0, 60) + (n.auteur ? ' · ' + n.auteur : '') }];
+    items.push({ label: n.avant ? 'Ne plus mettre en avant' : 'Mettre en avant', icone: 'projeter', fn: () => cmd({ t: 'moderer', q: qi, note: id, avant: !n.avant }) });
+    if (q.variante === 'questions') items.push({ label: n.repondue ? 'Marquer comme pas encore répondue' : 'Marquer comme répondue', icone: 'check', fn: () => cmd({ t: 'moderer', q: qi, note: id, repondue: !n.repondue }) });
+    (q.colonnes || []).filter((c) => c.id !== n.col).forEach((c) => items.push({ label: 'Déplacer vers « ' + (c.titre || 'Colonne') + ' »', icone: 'suivant', fn: () => cmd({ t: 'moderer', q: qi, note: id, col: c.id }) }));
+    items.push('sep');
+    items.push({ label: 'Masquer cette note', icone: 'fermer', danger: true, fn: () => cmd({ t: 'moderer', q: qi, note: id, statut: 'masque' }) });
+    EtabliUI.menu(ancre, items);
+  }
+
+  /** Notes à valider (modération) et notes masquées : liste pour l'enseignant·e. */
+  function dialogueModeration() {
+    const qi = S.etat.index;
+    const contenu = h('div', { style: { display: 'grid', gap: '12px' } });
+    const dessiner = () => {
+      const att = Array.from(T.notes.values()).filter((n) => n.statut === 'attente').sort((a, b) => a.t - b.t);
+      const masq = Array.from(T.notes.values()).filter((n) => n.statut === 'masque').sort((a, b) => a.t - b.t);
+      const ligne = (n, boutons) => h('li', { class: 'lv-note-l ' + n.statut }, h('span', { class: 'lv-note-txt' }, n.texte),
+        h('span', { class: 'lv-note-meta' }, n.auteur ? h('span', {}, n.auteur) : null, h('span', { style: { marginLeft: 'auto', display: 'flex', gap: '6px' } }, boutons)));
+      contenu.replaceChildren(
+        att.length ? h('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } }, h('b', {}, Live.pluriel(att.length, 'note à valider', 'notes à valider')),
+          h('button', { type: 'button', class: 'btn btn-sm btn-primary', onclick: () => cmd({ t: 'moderer', q: qi, tout: 'ok' }) }, Live.ic('check'), 'Tout valider')) : h('p', { class: 'muted' }, 'Aucune note en attente.'),
+        att.length ? h('ul', { class: 'lv-notes-liste' }, att.map((n) => ligne(n, [
+          h('button', { type: 'button', class: 'btn btn-sm', onclick: () => cmd({ t: 'moderer', q: qi, note: n.id, statut: 'ok' }) }, Live.ic('check'), 'Valider'),
+          h('button', { type: 'button', class: 'btn btn-sm btn-ghost', onclick: () => cmd({ t: 'moderer', q: qi, note: n.id, statut: 'masque' }) }, 'Masquer')]))) : null,
+        masq.length ? h('p', { class: 'label' }, Live.pluriel(masq.length, 'note masquée', 'notes masquées')) : null,
+        masq.length ? h('ul', { class: 'lv-notes-liste' }, masq.map((n) => ligne(n, [
+          h('button', { type: 'button', class: 'btn btn-sm', onclick: () => cmd({ t: 'moderer', q: qi, note: n.id, statut: 'ok' }) }, 'Réafficher')]))) : null);
+    };
+    dessiner();
+    const iv = setInterval(() => { if (!contenu.isConnected) { clearInterval(iv); return; } dessiner(); }, 700);
+    EtabliUI.dialogue({ titre: 'Modération du tableau', contenu, large: true, actions: [{ label: 'Fermer', primaire: true, valeur: null }] });
+  }
+
+  /* ---------- joueur·euses (jeu) ---------- */
+  function dialogueJoueurs() {
+    const contenu = h('div', {});
+    const dessiner = () => {
+      const cl = new Map((S.classement || []).map((x) => [x.pid, x]));
+      const joueurs = (S.joueurs || []).slice().sort((a, b) => ((cl.get(a.pid) || {}).rang || 1e6) - ((cl.get(b.pid) || {}).rang || 1e6) || String(a.pseudo).localeCompare(String(b.pseudo), 'fr'));
+      contenu.replaceChildren(
+        joueurs.length ? h('ol', { class: 'p-joueurs' }, joueurs.map((j) => {
+          const x = cl.get(j.pid);
+          return h('li', {},
+            h('span', { class: 'r' }, x ? LiveJeu.rang(x.rang) : ''),
+            h('span', { class: j.connecte ? '' : 'hors' }, j.pseudo, j.connecte ? '' : ' (déconnecté·e)'),
+            h('b', {}, x ? LiveJeu.points(x.points) + ' pts' : ''),
+            h('button', { type: 'button', class: 'btn btn-sm btn-ghost', onclick: () => exclure(j) }, Live.ic('fermer'), 'Retirer'));
+        })) : h('p', { class: 'muted' }, enJeu() ? 'Personne n’a encore rejoint la partie.' : 'Personne n’a encore rejoint la session.'),
+        (S.exclus || []).length ? h('div', { style: { marginTop: '16px' } }, h('p', { class: 'label' }, 'Pseudos retirés'),
+          h('ul', { class: 'p-joueurs' }, S.exclus.map((x) => h('li', {}, h('span'), h('span', { class: 'hors' }, x.pseudo || 'Sans pseudo'), h('span'),
+            h('button', { type: 'button', class: 'btn btn-sm btn-ghost', onclick: () => cmd({ t: 'exclure', pid: x.pid, valeur: false }) }, 'Réintégrer'))))) : null);
+    };
+    dessiner();
+    const iv = setInterval(() => { if (!contenu.isConnected) { clearInterval(iv); return; } dessiner(); }, 1000);
+    EtabliUI.dialogue({ titre: enJeu() ? 'Joueur·euses et classement complet' : 'Participant·es', contenu, large: true, actions: [{ label: 'Fermer', primaire: true, valeur: null }] });
+  }
+
+  /* ---------- rendu général ---------- */
+  // On ne reconstruit que ce qui a changé : un clic qui tombe pendant une mise à jour n'est pas perdu.
+  let cleScene = '';
+  let cleCommandes = '';
+  function rendre(avant) {
+    rendreHaut();
+    const e = S.etat;
+    const q = questionCourante();
+    const idees = e.statut === 'question' && q && q.type === 'idees';
+    const info = infoJeu();
+    const chrono = chronoOuvert();
+    // pendant le chrono, le compteur de réponses change sans tout reconstruire
+    const resCle = chrono ? null : idees ? null : S.resultats;
+    const cleS = JSON.stringify([e.statut, e.index, e.revele, resCle, S.cartes, S.cartesVues, chrono || idees ? null : S.connectes,
+      e.statut === 'attente' ? [S.pseudos, (S.joueurs || []).filter((j) => j.connecte).map((j) => j.pid)] : null,
+      S.resume, (e.masques || {})[e.index], S.config.titre, info ? [info.close, info.fin] : null,
+      e.statut === 'classement' || e.statut === 'terminee' ? S.classement : null, idees ? [e.index, (q.colonnes || []).length] : null]);
+    if (cleS !== cleScene) {
+      cleScene = cleS;
+      const justeRevele = e.revele && avant && !avant.etat.revele && avant.etat.index === e.index;
+      let contenu;
+      if (e.statut === 'attente') contenu = vueAttente();
+      else if (e.statut === 'terminee') contenu = vueFin();
+      else if (e.statut === 'classement') contenu = vueClassement();
+      else contenu = vueQuestion();
+      scene.classList.toggle('large', e.statut !== 'question' || idees);
+      const defil = scene.scrollTop;
+      scene.replaceChildren(...[contenu].flat().filter(Boolean));
+      if (avant && avant.etat.index === e.index && avant.etat.statut === e.statut) scene.scrollTop = defil;
+      if (justeRevele && !reduit()) {
+        const barres = Array.from(scene.querySelectorAll('.lv-barre i, .lv-res-echelle .lv-b'));
+        const cibles = barres.map((b) => (b.classList.contains('lv-b') ? b.style.height : b.style.width));
+        barres.forEach((b) => (b.classList.contains('lv-b') ? (b.style.height = '0%') : (b.style.width = '0%')));
+        requestAnimationFrame(() => requestAnimationFrame(() =>
+          barres.forEach((b, i) => (b.classList.contains('lv-b') ? (b.style.height = cibles[i]) : (b.style.width = cibles[i])))));
+      }
+      if (chrono) animerChrono();
+      if (voileRejoindre) majVoileRejoindre();
+    }
+    // zones vivantes
+    const rep = scene.querySelector('[data-zone="rep"]');
+    if (rep) rep.textContent = String((S.resultats && S.resultats.total) || 0);
+    const infoT = scene.querySelector('[data-zone="info"]');
+    if (infoT && idees) infoT.replaceChildren(...infoTableau(S.resultats || {}).filter(Boolean));
+    if (idees) planifierTableau();
+    sons(avant);
+    const cleC = [e.statut, e.index, e.revele, !!e.simulation, S.config.questions.length, info ? !!info.close : '', JSON.stringify(S.tableau || null),
+      idees ? (S.resultats || {}).attente : '', Son.actif(), (S.joueurs || []).length > 0].join('|');
+    if (cleC !== cleCommandes) { cleCommandes = cleC; rendreCommandes(); }
+  }
+
+  /** Musique et sons du jeu, selon les changements d'état. */
+  let derniersConnectes = null;
+  function sons(avant) {
+    if (!enJeu()) return;
+    Son.autoriser(S.config.jeu.musique !== false);
+    const e = S.etat;
+    const ai = avant && avant.etat.jeu && avant.etat.jeu.q ? avant.etat.jeu.q[avant.etat.index] : null;
+    const info = infoJeu();
+    if (e.statut === 'attente') {
+      Son.musique('attente');
+      const n = (S.joueurs || []).length;
+      if (derniersConnectes !== null && n > derniersConnectes) Son.arrivee();
+      derniersConnectes = n;
+    } else if (e.statut === 'question' && info && !info.close) {
+      // musique gérée par la minuterie
+    } else if (e.statut === 'classement') {
+      Son.musique('attente');
+      if (avant && avant.etat.statut !== 'classement') Son.classement();
+    } else if (e.statut === 'terminee') {
+      Son.musique(null);
+    } else {
+      Son.musique(null);
+    }
+    if (info && info.close && avant && avant.etat.index === e.index && ai && !ai.close) { Son.musique(null); Son.fin(); }
+    if (e.statut !== 'terminee') podiumJoue = false;
+  }
+
+  function bouton(libelle, ic, action, cls, titre) {
+    const b = h('button', { type: 'button', class: 'btn ' + (cls || ''), onclick: action, title: titre || undefined, 'aria-label': !libelle && titre ? titre : undefined }, ic ? Live.ic(ic) : null, libelle ? h('span', { class: 'lib' }, libelle) : null);
+    if (!libelle) b.classList.add('btn-icon');
+    return b;
+  }
+
+  function rendreCommandes() {
+    const e = S.etat, n = S.config.questions.length, c = S.config, q = questionCourante();
+    const gauche = [], droite = [];
+    const jeu = enJeu();
+    const prec = () => { const b = bouton('', 'precedent', () => aller(e.index - 1), '', 'Question précédente (flèche gauche)'); b.disabled = e.index === 0; return b; };
+    const suivante = (primaire) => (e.index < n - 1
+      ? bouton('Suivante', 'suivant', () => aller(e.index + 1), primaire ? 'btn-primary grand' : '', 'Question suivante (flèche droite)')
+      : bouton(jeu && (S.jeu || {}).notees ? 'Podium' : 'Terminer', jeu ? 'podium' : 'stop', () => cmd({ t: 'terminer' }), primaire ? 'btn-primary grand' : ''));
+    if (e.statut === 'attente') {
+      gauche.push(bouton(jeu ? 'Lancer la partie' : 'Commencer', 'jouer', () => { Son.deverrouiller(); cmd({ t: 'demarrer' }); }, 'btn-primary grand', 'Commencer (flèche droite)'));
+    } else if (e.statut === 'classement') {
+      gauche.push(prec());
+      gauche.push(suivante(true));
+      gauche.push(h('span', { class: 'progres' }, (e.index + 1) + ' / ' + n));
+    } else if (e.statut === 'question') {
+      gauche.push(prec());
+      if (q.type === 'idees') {
+        const t = S.tableau || {};
+        if ((q.votes || 0) > 0) gauche.push(bouton(t.votes ? 'Fermer les votes' : 'Ouvrir les votes', 'pouce', () => cmd({ t: 'tableau', q: e.index, votes: !t.votes }), t.votes ? 'actif' : 'btn-primary', 'Les élèves votent pour les notes'));
+        gauche.push(bouton(t.depots === false ? 'Rouvrir les dépôts' : 'Fermer les dépôts', t.depots === false ? 'plus' : 'pause', () => cmd({ t: 'tableau', q: e.index, depots: t.depots === false }), '', 'Autoriser ou non de nouvelles notes'));
+        const att = (S.resultats || {}).attente || 0;
+        if (q.moderation || att) { const b = bouton('À valider', 'check', dialogueModeration, att ? 'btn-primary' : '', 'Notes en attente de validation'); if (att) b.append(h('span', { class: 'compte' }, String(att))); gauche.push(b); }
+        gauche.push(suivante(false));
+      } else if (q.type === 'diapo') {
+        gauche.push(suivante(true));
+      } else if (jeu && chronoOuvert()) {
+        gauche.push(bouton('Arrêter le temps', 'stop', () => cmd({ t: 'fermer' }), '', 'Fermer la question tout de suite (flèche droite)'));
+      } else if (jeu) {
+        if (bonnesDe(q).length) gauche.push(bouton('Classement', 'podium', () => cmd({ t: 'classement' }), 'btn-primary grand', 'Montrer le classement (flèche droite)'));
+        if (q.type === 'libre') gauche.push(bouton(e.revele ? 'Masquer les réponses' : 'Afficher les réponses', e.revele ? 'oeilBarre' : 'oeil', () => reveler(!e.revele), '', 'Touche R'));
+        gauche.push(suivante(!bonnesDe(q).length));
+      } else {
+        gauche.push(bouton(e.revele ? 'Masquer les résultats' : 'Afficher les résultats', e.revele ? 'oeilBarre' : 'oeil', () => reveler(!e.revele), e.revele ? '' : 'btn-primary grand', 'Touche R'));
+        gauche.push(suivante(e.revele));
+      }
+      gauche.push(h('span', { class: 'progres' }, (e.index + 1) + ' / ' + n));
+    } else {
+      if (jeu) gauche.push(bouton('Classement complet', 'podium', dialogueJoueurs, 'btn-primary', 'Tous les joueur·euses et leurs points'));
+      gauche.push(bouton('Reprendre la session', 'jouer', () => cmd({ t: 'reprendre' })));
+    }
+    if (c.demo && e.statut !== 'terminee') {
+      droite.push(bouton(e.simulation ? 'Classe fictive active' : 'Classe fictive', e.simulation ? 'check' : 'personnes', () => cmd({ t: 'simuler', valeur: !e.simulation }), e.simulation ? 'actif' : '', e.simulation ? 'Retirer la classe fictive et ses réponses' : 'Ajouter 24 élèves fictifs qui répondent tout seuls'));
+    }
+    if (c.mode === 'cartes' && e.statut === 'question' && Live.compatibleCartes(q)) {
+      droite.push(bouton('Scanner', 'camera', () => scanner.ouvrir(), '', 'Scanner les cartes avec la caméra (touche S)'));
+    }
+    if (jeu && c.jeu.musique !== false) {
+      const actif = Son.actif();
+      droite.push(bouton('', actif ? 'son' : 'sonCoupe', () => { Son.activer(!Son.actif()); cleCommandes = ''; rendre(S); }, 'btn-ghost', actif ? 'Couper la musique (touche M)' : 'Mettre la musique (touche M)'));
+    }
+    if (jeu || (S.joueurs || []).length) droite.push(bouton('', 'personnes', dialogueJoueurs, 'btn-ghost', jeu ? 'Joueur·euses et pseudos' : 'Participant·es (retirer un prénom)'));
+    droite.push(bouton('Télécommande', 'telephone', ouvrirTelecommande, 'btn-ghost', 'Piloter depuis ton téléphone et scanner les cartes'));
+    droite.push(bouton('', 'plein', pleinEcran, 'btn-ghost', 'Plein écran (touche F)'));
+    const plus = bouton('', 'menu', () => menuPlus(plus), 'btn-ghost', 'Plus d’options');
+    plus.setAttribute('aria-haspopup', 'menu');
+    droite.push(plus);
+    $('#commandes').replaceChildren(h('div', { class: 'grp' }, gauche), h('div', { class: 'grp' }, droite));
+  }
+
+  function menuPlus(ancre) {
+    const e = S.etat, c = S.config, id = quizId();
+    const items = [];
+    if (c.mode === 'cartes' && e.statut === 'question') items.push({ label: 'Saisir une carte à la main', icone: 'crayon', fn: () => LiveScanner.saisieManuelle({ etat: () => S, envoyer: (m) => cx.envoyer(m), nomCarte }) });
+    if (c.mode !== 'cartes') items.push({ label: 'Montrer le code pour rejoindre (Q)', icone: 'projeter', fn: basculerVoileRejoindre });
+    if (enJeu() || (S.joueurs || []).length) items.push({ label: enJeu() ? 'Joueur·euses et pseudos' : 'Participant·es', icone: 'classe', fn: dialogueJoueurs });
+    const q = questionCourante();
+    if (e.statut === 'question' && q && q.type === 'idees') items.push({ label: 'Modération du tableau', icone: 'check', fn: dialogueModeration });
+    items.push({ label: 'Thème clair ou sombre', icone: 'reglages', fn: () => Live.basculerTheme(CLE_THEME) });
+    items.push({ label: 'Résultats détaillés', icone: 'lien', href: '/stats/' + code });
+    if (e.statut === 'question' || e.statut === 'classement') items.push({ label: 'Revenir à l’écran d’attente', icone: 'pause', fn: () => cmd({ t: 'attente' }) });
+    if (e.statut !== 'terminee') items.push({ label: 'Terminer la session', icone: 'fermer', fn: terminer });
+    items.push('sep');
+    if (id) items.push({ label: 'Éditeur du quiz', icone: 'quiz', href: '/quiz/?doc=' + encodeURIComponent(id) });
+    items.push({ label: 'Pupitre', icone: 'logo', href: '/' });
+    EtabliUI.menu(ancre, items);
+  }
+
+  async function terminer() {
+    if (await EtabliUI.confirmer({ titre: 'Terminer la session ?', message: enJeu() ? 'Le podium s’affiche et chacun·e voit sa place.' : 'Les élèves verront leur score. Tu pourras reprendre la session ensuite.', ok: 'Terminer' })) cmd({ t: 'terminer' });
+  }
+
+  /* ---------- « rejoindre » en grand ---------- */
+  function majVoileRejoindre() {
+    if (!voileRejoindre || !S) return;
+    voileRejoindre.replaceChildren(blocRejoindre(), bouton('Fermer', 'fermer', basculerVoileRejoindre, 'fermer'));
+  }
+  function basculerVoileRejoindre() {
+    if (!S || S.config.mode === 'cartes') return;
+    if (voileRejoindre) { voileRejoindre.remove(); voileRejoindre = null; return; }
+    voileRejoindre = h('div', { class: 'p-voile-rejoindre', role: 'dialog', 'aria-label': 'Rejoindre le quiz' });
+    document.body.appendChild(voileRejoindre);
+    majVoileRejoindre();
+  }
+
+  /* ---------- avancer, reculer, plein écran ---------- */
+  // Affichage immédiat (le serveur confirme dans la foulée) : plusieurs appuis rapides sur les flèches s'enchaînent.
+  function optimiste(etat, extra) {
+    const avant = S;
+    S = Object.assign({}, S, extra || {}, { etat: Object.assign({}, S.etat, etat) });
+    rendre(avant);
+    scanner.maj();
+  }
+  let attenduNav = null;
+  function aller(i) {
+    if (!S || i < 0 || i >= S.config.questions.length) return;
+    // en jeu, l'ouverture (chrono) vient du serveur : pas d'affichage anticipé
+    if (enJeu()) { cmd({ t: 'aller', index: i }); return; }
+    if (cmd({ t: 'aller', index: i }) !== false) {
+      attenduNav = { index: i, t: Date.now() + 1500 };
+      optimiste({ statut: 'question', index: i, revele: false }, { resultats: null, cartes: [] });
+    }
+  }
+  function reveler(v) {
+    if (!S || S.etat.statut !== 'question') return;
+    if (cmd({ t: 'reveler', valeur: !!v }) !== false) optimiste({ revele: !!v });
+  }
+  function avancer() {
+    if (!S) return;
+    const e = S.etat, n = S.config.questions.length, q = questionCourante();
+    const suite = () => (e.index < n - 1 ? aller(e.index + 1) : cmd({ t: 'terminer' }));
+    if (e.statut === 'attente') return cmd({ t: 'demarrer' });
+    if (e.statut === 'classement') return suite();
+    if (e.statut !== 'question') return;
+    if (q.type === 'idees' || q.type === 'diapo') return suite();
+    if (enJeu()) {
+      if (chronoOuvert()) return cmd({ t: 'fermer' });
+      if (bonnesDe(q).length && questionFermee()) return cmd({ t: 'classement' });
+      return suite();
+    }
+    if (!e.revele) return reveler(true);
+    suite();
+  }
+  function reculer() {
+    if (S && (S.etat.statut === 'question' || S.etat.statut === 'classement') && S.etat.index > 0) aller(S.etat.index - 1);
+  }
+  function pleinEcran() {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => Live.toast('Le plein écran n’est pas disponible ici.'));
+  }
+  document.addEventListener('fullscreenchange', () => document.body.classList.toggle('plein', !!document.fullscreenElement));
+
+  function ouvrirTelecommande() {
+    if (!jeton) {
+      EtabliUI.dialogue({ titre: 'Télécommande indisponible', contenu: '<p>' + EtabliUI.esc(Live.typo('Le lien de la télécommande n’est pas connu de ce navigateur. Rouvre la projection depuis l’éditeur du quiz : le QR code de la télécommande s’y affiche aussi.')) + '</p>' });
+      return;
+    }
+    const lien = Live.lienPilote(code, jeton);
+    const contenu = h('div', { style: { display: 'grid', gap: '12px' } },
+      h('p', {}, 'Scanne ce code avec ton téléphone pour changer de question et, en mode cartes, scanner les cartes de la classe.'),
+      h('div', { style: { width: 'min(300px, 70vw)', margin: '4px auto', padding: '10px', background: '#fff', borderRadius: '10px' }, html: Live.qrSvg(lien, { label: 'QR code de la télécommande' }) }),
+      h('div', { class: 'lv-encart attention' }, Live.ic('attention'), h('span', {}, 'Ce code donne le contrôle de la session : ferme cette fenêtre une fois scanné.')));
+    EtabliUI.dialogue({ titre: 'Télécommande sur ton téléphone', contenu, actions: [{ label: 'Copier le lien', valeur: () => { Live.copier(lien, 'Lien de la télécommande copié'); return undefined; } }, { label: 'Fermer', primaire: true, valeur: null }] });
+  }
+
+  document.addEventListener('keydown', (ev) => {
+    if (!S || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    if (document.querySelector('.eb-voile, .eb-menu') || scanner.ouvert()) return;
+    if (ev.target.closest('input, textarea, select')) return;
+    if (ev.target.closest('button, a') && (ev.key === ' ' || ev.key === 'Enter')) return;
+    if (ev.key === 'Escape' && voileRejoindre) { basculerVoileRejoindre(); return; }
+    if (ev.key === 'Escape' && document.querySelector('.p-avant')) { const b = document.querySelector('.p-avant button'); if (b) b.click(); return; }
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].indexOf(ev.key) !== -1) { ev.preventDefault(); avancer(); }
+    else if (['ArrowLeft', 'PageUp'].indexOf(ev.key) !== -1) { ev.preventDefault(); reculer(); }
+    else if (ev.key === 'r' || ev.key === 'R') { if (S.etat.statut === 'question') reveler(!S.etat.revele); }
+    else if (ev.key === 'f' || ev.key === 'F') pleinEcran();
+    else if (ev.key === 'q' || ev.key === 'Q') basculerVoileRejoindre();
+    else if ((ev.key === 'm' || ev.key === 'M') && enJeu()) { Son.activer(!Son.actif()); cleCommandes = ''; rendre(S); }
+    else if ((ev.key === 's' || ev.key === 'S') && S.config.mode === 'cartes') scanner.ouvrir();
+  });
+
+  window.__projection = { etat: () => S, notes: () => T.notes, son: Son };
+})();
+</script>
+</body>
+</html>

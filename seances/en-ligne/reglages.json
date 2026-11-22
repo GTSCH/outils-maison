@@ -1,0 +1,52 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "observability": {
+   "enabled": true,
+   "head_sampling_rate": 1,
+   "redact_query_string": false,
+   "logs": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "persist": true,
+    "invocation_logs": true
+   },
+   "traces": {
+    "enabled": false,
+    "persist": true,
+    "head_sampling_rate": 1
+   }
+  },
+  "annotations": {
+   "workers/triggered_by": "version_upload"
+  },
+  "bindings": [
+   {
+    "name": "ASSETS",
+    "type": "assets"
+   },
+   {
+    "database_id": "1f649047-d0d0-4d90-be56-c6042ce736df",
+    "id": "1f649047-d0d0-4d90-be56-c6042ce736df",
+    "name": "DB",
+    "type": "d1"
+   },
+   {
+    "bucket_name": "seances-fichiers-eu",
+    "jurisdiction": "eu",
+    "name": "FICHIERS",
+    "type": "r2_bucket"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": true
+ }
+}

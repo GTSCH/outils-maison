@@ -1,0 +1,15 @@
+{
+ "worker": "passages-demo",
+ "module_principal": "index-bibliotheque.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "3c7e636e5b67e66398461d990d028d4020448433df69063e4c3b8f1607cb5bc5",
+ "modules": [
+  {
+   "nom": "index-bibliotheque.js",
+   "fichier": "index-bibliotheque.js",
+   "type": "application/javascript+module",
+   "sha256": "3c7e636e5b67e66398461d990d028d4020448433df69063e4c3b8f1607cb5bc5",
+   "octets": 3514338
+  }
+ ]
+}

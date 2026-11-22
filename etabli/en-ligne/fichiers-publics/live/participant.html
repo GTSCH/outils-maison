@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#E9EEEB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1513" media="(prefers-color-scheme: dark)">
+<title>Quiz en direct · L’Établi</title>
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/etabli.css">
+<link rel="stylesheet" href="/live/live.css">
+<style>
+  html, body { min-height: 100%; }
+  body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); }
+  .tete { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 16px; padding-top: calc(6px + env(safe-area-inset-top, 0px)); background: var(--surface); border-bottom: 1px solid var(--line); }
+  .tete::before { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--t-quiz); }
+  .tete .lv-logo span { font-size: 15px; }
+  .tete .titre { margin-left: auto; min-width: 0; font: 600 15px/1.2 var(--font-display); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+  .bandeau { position: sticky; top: 52px; z-index: 19; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 9px 16px; background: var(--fg); color: var(--bg); font-size: 15px; text-align: center; }
+  main { flex: 1; width: min(100%, 620px); margin: 0 auto; padding: 22px 16px calc(48px + env(safe-area-inset-bottom, 0px)); }
+  .centre { text-align: center; padding-top: 7vh; display: grid; justify-items: center; gap: 12px; }
+  .centre h1 { font-family: var(--font-eleve); font-size: clamp(26px, 7vw, 34px); font-weight: 700; }
+  .centre p { font-size: 18px; max-width: 34ch; }
+  .centre .discret { font-size: 15px; color: var(--muted); }
+  .vie-privee { margin-top: 36px; font-size: 14px !important; color: var(--muted); max-width: 40ch !important; }
+  .pseudo { display: grid; gap: 14px; padding-top: 4vh; }
+  .pseudo h1 { font-family: var(--font-eleve); font-size: clamp(26px, 7vw, 32px); }
+  .pseudo p { font-size: 17px; color: var(--muted); }
+  .pseudo .input { font: 22px/1.3 var(--font-eleve); min-height: 56px; }
+  .grand { min-height: 56px; font-size: 18px; width: 100%; }
+  .score { font: 800 64px/1 var(--font-display); font-variant-numeric: tabular-nums; margin: 4px 0 6px; color: var(--fg); }
+  .score small { font-size: 28px; color: var(--muted); font-weight: 600; }
+  .code-form { display: flex; gap: 8px; width: 100%; max-width: 360px; margin-top: 8px; }
+  .code-form .input { font: 700 28px/1 var(--font-display); letter-spacing: .14em; text-align: center; min-height: 58px; }
+  .code-form .btn { min-height: 58px; }
+  .message-erreur { color: var(--bad); font-weight: 700; min-height: 1.5em; }
+  .cartes-icone svg { width: 64px; height: 64px; color: var(--t-quiz); }
+  .moi { font-size: 15px; color: var(--muted); }
+  .moi b { color: var(--fg); }
+  .pseudo .regle { font-size: 15px; color: var(--muted); }
+  .jeu-tete { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; font: 600 15px/1.2 var(--font-display); color: var(--muted); }
+  .jeu-tete .pts { color: var(--fg); font-variant-numeric: tabular-nums; }
+  .jeu-tete .sec { font: 800 22px/1 var(--font-display); color: var(--fg); font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; }
+  .jeu-tete .sec.urgent { color: var(--bad); }
+  .podium-moi { font: 800 clamp(34px, 10vw, 52px)/1.05 var(--font-display); color: var(--t-quiz); }
+</style>
+</head>
+<body>
+<header class="tete">
+  <span class="lv-logo" id="logo"></span>
+  <span class="titre" id="titre"></span>
+</header>
+<div class="bandeau" id="bandeau" role="status" hidden>Connexion perdue. Reconnexion en cours…</div>
+<main id="scene" class="lv-eleve" aria-live="polite">
+  <div class="centre"><div class="lv-points" aria-hidden="true"><i></i><i></i><i></i></div><p>Connexion…</p></div>
+</main>
+<script src="/js/etabli-client.js"></script>
+<script src="/js/etabli-ui.js"></script>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/live-commun.js"></script>
+<script src="/js/live-jeu.js"></script>
+<script src="/js/live-resultats.js"></script>
+<script>
+(() => {
+  'use strict';
+  const { h, $ } = Live;
+  $('#logo').innerHTML = EtabliUI.icone('logo') + '<span>L’Établi</span>';
+  const scene = $('#scene');
+  const code = Live.codeDansAdresse();
+
+  const kPid = 'etabli.live.p.' + code;
+  const kPseudo = 'etabli.live.pseudo';
+  let pid = code ? Live.stock(kPid) : null;
+  if (code && !/^p[A-Za-z0-9]{8,30}$/.test(pid || '')) { pid = 'p' + Live.genId(15); Live.stock(kPid, pid); }
+  let pseudo = Live.stock(kPseudo) || '';
+  let infos = null;
+  let etat = null;
+  let cx = null;
+  let brouillon = '';
+  let derniereCle = '';
+  let pseudoEnvoye = false;
+  let exclu = false;
+  // tableau participatif : notes visibles (id -> note), brouillon et colonne choisie
+  let notes = new Map();
+  let notesQ = null;
+  let brouillonNote = '';
+  let colNote = null;
+  let ordres = {}; // classement en cours de préparation, par question
+  let chrono = null;
+
+  const vider = (...enfants) => { arreterChrono(); scene.replaceChildren(...enfants.flat().filter((x) => x !== null && x !== undefined && x !== false)); };
+  const vibrer = (ms) => { try { if (navigator.userActivation && navigator.userActivation.hasBeenActive && navigator.vibrate) navigator.vibrate(ms); } catch (e) {} };
+  const enJeu = () => !!(etat && etat.jeu) || !!(infos && infos.jeu);
+
+  /* ---------- un autre code ---------- */
+  function formulaireCode(message) {
+    const champ = h('input', { class: 'input', id: 'code', inputmode: 'numeric', autocomplete: 'off', maxlength: '7', placeholder: '123 456', 'aria-label': 'Code à 6 chiffres' });
+    const msg = h('p', { class: 'message-erreur', role: 'alert' });
+    champ.addEventListener('input', () => {
+      const c = champ.value.replace(/\D/g, '').slice(0, 6);
+      champ.value = c.length > 3 ? c.slice(0, 3) + ' ' + c.slice(3) : c;
+      msg.textContent = '';
+    });
+    const form = h('form', { class: 'code-form', onsubmit: async (e) => {
+      e.preventDefault();
+      const c = champ.value.replace(/\D/g, '');
+      if (c.length !== 6) { msg.textContent = Live.typo('Le code compte 6 chiffres.'); return; }
+      try { await Live.infosPubliques(c); location.href = '/' + c; }
+      catch (err) { msg.textContent = Live.typo(err.code === 'reseau' ? err.message : 'Aucune session avec ce code. Vérifie les chiffres.'); }
+    } }, champ, h('button', { class: 'btn btn-primary', type: 'submit' }, 'Entrer'));
+    vider(h('div', { class: 'centre' },
+      h('h1', {}, message ? 'Code introuvable' : 'Rejoindre un quiz'),
+      message ? h('p', {}, message) : h('p', {}, 'Entre le code affiché au tableau.'),
+      form, msg));
+    setTimeout(() => { const a = document.activeElement; if (a && a !== champ && a.matches && a.matches('input, textarea, select, [contenteditable="true"]')) return; champ.focus(); }, 50);
+  }
+
+  async function demarrer() {
+    if (!code) return formulaireCode('');
+    try { infos = await Live.infosPubliques(code); }
+    catch (e) {
+      if (e.code === 'reseau') {
+        vider(h('div', { class: 'centre' }, h('h1', {}, 'Pas de connexion'), h('p', {}, 'Vérifie le wifi ou les données mobiles, puis réessaie.'),
+          h('button', { class: 'btn btn-primary', type: 'button', onclick: demarrer }, 'Réessayer')));
+        return;
+      }
+      return formulaireCode('Aucune session ne correspond au code ' + Live.formatCode(code) + '.');
+    }
+    $('#titre').textContent = Live.typo(infos.titre || '');
+    document.title = (infos.titre ? infos.titre + ' · ' : '') + 'L’Établi';
+    if (infos.mode === 'cartes') {
+      vider(h('div', { class: 'centre' },
+        h('span', { class: 'cartes-icone', html: Live.icone('cartes') }),
+        h('h1', {}, 'Ce quiz se fait avec des cartes'),
+        h('p', {}, 'Pas besoin de téléphone : quand ton enseignant·e le demande, lève ta carte avec la lettre choisie en haut.')));
+      return;
+    }
+    if (infos.pseudo && !pseudo) return demanderPseudo(connecter);
+    connecter();
+  }
+
+  function demanderPseudo(suite) {
+    const jeu = enJeu();
+    const champ = h('input', { class: 'input', type: 'text', maxlength: '30', autocomplete: jeu ? 'nickname' : 'given-name', autocapitalize: 'words', enterkeyhint: 'go', value: pseudo, id: 'pseudo' });
+    vider(h('form', { class: 'pseudo', onsubmit: (e) => {
+      e.preventDefault();
+      const p = champ.value.trim();
+      if (!p) { champ.focus(); return; }
+      pseudo = p;
+      Live.stock(kPseudo, p);
+      if (cx) cx.envoyer({ t: 'pseudo', pseudo: p });
+      suite();
+    } },
+    h('h1', {}, jeu ? 'Ton pseudo' : 'Ton prénom'),
+    h('p', {}, jeu ? 'Choisis le nom qui s’affichera au classement.' : 'Ton enseignant·e a demandé que les réponses portent un prénom.'),
+    jeu ? h('p', { class: 'regle' }, 'Pas de nom de famille ni de mot blessant : ton enseignant·e peut retirer un pseudo.') : null,
+    h('label', { class: 'lv-sr', for: 'pseudo' }, jeu ? 'Pseudo' : 'Prénom'), champ,
+    h('button', { class: 'btn btn-primary grand', type: 'submit' }, jeu ? 'Jouer' : 'Continuer')));
+    setTimeout(() => { const a = document.activeElement; if (a && a !== champ && a.matches && a.matches('input, textarea, select, [contenteditable="true"]')) return; champ.focus(); champ.select(); }, 50);
+  }
+
+  function ecranExclu() {
+    exclu = true;
+    if (cx) cx.fermer();
+    vider(h('div', { class: 'centre' }, h('h1', {}, 'Tu as quitté la session'),
+      h('p', {}, 'Ton enseignant·e t’a retiré·e de cette session. Si c’est une erreur, parle-lui en directement.')));
+  }
+
+  function connecter() {
+    if (cx) { rendre(); return; }
+    vider(h('div', { class: 'centre' }, h('div', { class: 'lv-points', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')), h('p', {}, 'Connexion…')));
+    cx = Live.connecter(code, () => ({ t: 'hello', role: 'participant', pid, pseudo: pseudo || undefined }), {
+      onMessage: (m) => {
+        if (exclu) return;
+        if (m.t === 'etat') { Live.synchroniser(m); const avant = etat; etat = m; rendre(avant); }
+        else if (m.t === 'notes') recevoirNotes(m);
+        else if (m.t === 'info') Live.toast(m.message);
+        else if (m.t === 'refus') {
+          if (m.exclu) ecranExclu();
+          else vider(h('div', { class: 'centre' }, h('h1', {}, 'Impossible de rejoindre'), h('p', {}, m.message || '')));
+        }
+      },
+      onStatut: (s, codeFermeture) => {
+        $('#bandeau').hidden = s !== 'coupe' || exclu;
+        if (s === 'refuse') {
+          if (codeFermeture === 4010) { if (!exclu) ecranExclu(); }
+          else if (codeFermeture === 4004) vider(h('div', { class: 'centre' }, h('h1', {}, 'Session fermée'), h('p', {}, 'Cette session a été supprimée par ton enseignant·e.')));
+          else if (codeFermeture === 4029) vider(h('div', { class: 'centre' }, h('h1', {}, 'Session complète'), h('p', {}, 'Le nombre maximum de participant·es est atteint.')));
+          else if (!etat) vider(h('div', { class: 'centre' }, h('h1', {}, 'Impossible de rejoindre'), h('p', {}, 'Recharge la page pour réessayer.')));
+        }
+      },
+    });
+  }
+
+  function envoyer(valeur) {
+    if (!etat || !cx) return;
+    if (!cx.envoyer({ t: 'repondre', q: etat.index, valeur })) { Live.toast('Pas de connexion, réessaie dans un instant.', 'erreur'); return; }
+    vibrer(20);
+  }
+
+  /* ---------- tableau participatif ---------- */
+  function recevoirNotes(m) {
+    if (!etat || m.q !== etat.index) return;
+    if (m.complet && !m.suite) notes = new Map();
+    notesQ = m.q;
+    for (const n of m.notes || []) notes.set(n.id, n);
+    for (const n of m.maj || []) notes.set(n.id, n);
+    for (const id of m.suppr || []) notes.delete(id);
+    majZonesIdees();
+  }
+  let rafZones = null;
+  function majZonesIdees() {
+    if (rafZones) return;
+    rafZones = requestAnimationFrame(() => {
+      rafZones = null;
+      if (!etat || !etat.question || etat.question.type !== 'idees') return;
+      const o = optionsIdees();
+      for (const [nom, fn] of Object.entries(LiveVue.tableauEleve.zones)) {
+        const zone = scene.querySelector('[data-zone="' + nom + '"]');
+        if (!zone) continue;
+        // on garde le focus sur le bouton de vote touché
+        const actif = document.activeElement && zone.contains(document.activeElement) ? document.activeElement.getAttribute('aria-label') : null;
+        zone.replaceChildren(...[fn(etat.question, o)].filter(Boolean));
+        if (actif) { const b = Array.from(zone.querySelectorAll('button')).find((x) => x.getAttribute('aria-label') === actif); if (b) b.focus(); }
+      }
+      const c = scene.querySelector('[data-zone="compteur"]');
+      if (c) c.textContent = LiveVue.tableauEleve.compteur((etat.mesNotes || []).length, etat.question.maxParPersonne || 3, etat.question.variante === 'questions');
+    });
+  }
+  function optionsIdees() {
+    // votes reçus par ses propres notes : la liste des notes (quand elle est visible) est plus fraîche
+    const mes = (etat.mesNotes || []).map((n) => (notesQ === etat.index && notes.has(n.id) ? Object.assign({}, n, { votes: notes.get(n.id).votes }) : n));
+    return {
+      idees: {
+        mesNotes: mes, mesVotes: etat.mesVotes || [], tableau: etat.tableau || {},
+        notes: notesQ === etat.index ? Array.from(notes.values()) : [],
+        brouillon: brouillonNote, onBrouillon: (t) => (brouillonNote = t),
+        col: colNote, onCol: (c) => (colNote = c),
+        onNote: (texte, col) => {
+          if (!cx.envoyer({ t: 'note', q: etat.index, id: 'n' + Live.genId(12), texte, col: col || undefined })) Live.toast('Pas de connexion, réessaie dans un instant.', 'erreur');
+          else vibrer(20);
+        },
+        onRetirer: (id) => cx.envoyer({ t: 'retirerNote', q: etat.index, id }),
+        onVoter: (id, valeur) => { cx.envoyer({ t: 'voter', q: etat.index, note: id, valeur }); vibrer(15); },
+      },
+    };
+  }
+
+  /* ---------- minuterie du jeu ---------- */
+  function arreterChrono() { clearInterval(chrono); chrono = null; }
+  function lancerChrono(barre, sec) {
+    arreterChrono();
+    const j = etat.jeu;
+    const maj = () => {
+      const reste = Math.max(0, j.fin - Live.maintenantServeur());
+      const f = j.duree ? reste / (j.duree * 1000) : 0;
+      barre.querySelector('i').style.transform = 'scaleX(' + f.toFixed(4) + ')';
+      const s = Math.ceil(reste / 1000);
+      sec.textContent = String(s);
+      sec.classList.toggle('urgent', s <= 5);
+      barre.classList.toggle('urgent', s <= 5);
+      if (!reste) arreterChrono();
+    };
+    maj();
+    chrono = setInterval(maj, 200);
+  }
+
+  /* ---------- écrans ---------- */
+  const enteteJeu = (droite) => h('div', { class: 'jeu-tete' },
+    h('span', {}, etat.pseudo ? etat.pseudo : ''), droite || null);
+
+  function retourJeu(e) {
+    const j = e.jeu || {};
+    const d = j.dernier && j.dernier.q === e.index ? j.dernier : null;
+    if (!d) return null;
+    let bloc;
+    if (d.juste) {
+      bloc = h('div', { class: 'lj-retour juste', role: 'status' },
+        h('span', { html: Live.icone('check') }),
+        h('h1', {}, 'Juste !'),
+        h('p', { class: 'pts' }, '+' + LiveJeu.points(d.points)),
+        d.serie > 1 ? h('p', { class: 'serie' }, 'Série de ' + d.serie + ' · bonus +' + d.bonus) : null);
+    } else {
+      bloc = h('div', { class: 'lj-retour rate', role: 'status' },
+        h('span', { html: Live.icone('croix') }),
+        h('h1', {}, d.repondu ? 'Raté' : 'Temps écoulé'),
+        h('p', {}, d.repondu ? 'Ce sera pour la prochaine !' : 'Pas de réponse cette fois.'));
+    }
+    return bloc;
+  }
+  const blocRang = (j) => (j && j.rang ? h('div', { class: 'lj-rang' }, h('span', {}, 'Ta place'), h('b', {}, LiveJeu.rang(j.rang) + ' sur ' + j.nb), h('span', {}, LiveJeu.points(j.points) + ' points')) : null);
+  function listeTop(liste) {
+    return h('ol', { class: 'lj-top', 'aria-label': 'Les premières places' }, (liste || []).map((x) => h('li', { class: x.pseudo === etat.pseudo ? 'soi' : '', 'aria-current': x.pseudo === etat.pseudo ? 'true' : null },
+      h('span', { class: 'lv-rang' }, String(x.rang)), h('span', {}, x.pseudo), h('b', {}, LiveJeu.points(x.points)))));
+  }
+
+  function rendre(avant) {
+    const e = etat;
+    if (!e || exclu) return;
+    if (e.pseudoRequis && !e.pseudo && !pseudo) return demanderPseudo(() => rendre());
+    if (e.pseudoRequis && !e.pseudo && pseudo && cx && !pseudoEnvoye) { pseudoEnvoye = true; cx.envoyer({ t: 'pseudo', pseudo }); }
+    if (e.titre) { $('#titre').textContent = Live.typo(e.titre); }
+    const jeu = !!e.jeu;
+    const q = e.question;
+    const cle = e.statut + '|' + e.index + '|' + e.revele + '|' + !!e.ferme;
+    const nouvelleQuestion = e.statut === 'question' && (!avant || avant.index !== e.index || avant.statut !== 'question');
+    if (cle !== derniereCle) {
+      if (nouvelleQuestion) { brouillon = ''; brouillonNote = ''; vibrer(60); }
+      if (jeu && e.ferme && avant && !avant.ferme && e.jeu.dernier && e.jeu.dernier.q === e.index) vibrer(e.jeu.dernier.juste ? [40, 60, 40] : 120);
+    }
+
+    // tableau participatif : on ne reconstruit pas pendant la saisie, seules les listes changent
+    if (e.statut === 'question' && q && q.type === 'idees') {
+      if (nouvelleQuestion || notesQ !== e.index) { notes = new Map(); notesQ = null; }
+      const t = e.tableau || {};
+      const cleI = [cle, t.depots, t.liste, t.votesOuverts, (e.mesNotes || []).length >= (q.maxParPersonne || 3), e.pseudo].join('|');
+      if (cleI === derniereCle && scene.querySelector('.lv-note-form, [data-zone="notes"]')) { majZonesIdees(); return; }
+      derniereCle = cleI;
+      const avantFocus = document.activeElement && document.activeElement.id;
+      vider(...LiveVue.questionEleve(q, Object.assign({ index: e.index, nb: e.nb }, optionsIdees())));
+      if (avantFocus === 'lv-note') { const s = $('#lv-note'); if (s) { s.focus(); const n = s.value.length; try { s.setSelectionRange(n, n); } catch (x) {} } }
+      return;
+    }
+    derniereCle = cle;
+
+    if (e.statut === 'attente') {
+      if (jeu) {
+        vider(h('div', { class: 'centre' },
+          h('h1', {}, 'Tu es dans la partie !'),
+          e.pseudo ? h('p', { class: 'lj-pseudo' }, e.pseudo) : null,
+          h('p', {}, 'Regarde l’écran : la première question arrive bientôt.'),
+          h('div', { class: 'lv-points', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
+          e.pseudo && e.jeu.pseudos !== 'generes' ? h('button', { type: 'button', class: 'btn btn-sm btn-ghost', onclick: () => demanderPseudo(() => rendre()) }, 'Changer de pseudo') : null,
+          h('p', { class: 'vie-privee' }, 'Aucun compte, aucune adresse e-mail : ton appareil reçoit seulement un identifiant au hasard pour ce jeu.')));
+        return;
+      }
+      vider(h('div', { class: 'centre' },
+        h('h1', {}, 'C’est parti !'),
+        h('p', {}, 'Tu es connecté·e. La première question va apparaître ici.'),
+        h('div', { class: 'lv-points', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
+        e.pseudo ? h('p', { class: 'moi' }, 'Tu apparais sous le nom ', h('b', {}, e.pseudo), '. ',
+          h('button', { type: 'button', class: 'btn btn-sm btn-ghost', onclick: () => demanderPseudo(() => rendre()) }, 'Ce n’est pas toi ? Changer')) : null,
+        h('p', { class: 'vie-privee' }, 'Aucun compte, aucune adresse e-mail : ton appareil reçoit seulement un identifiant au hasard pour ce quiz.')));
+      return;
+    }
+
+    if (e.statut === 'classement' && jeu) {
+      vider(h('div', { class: 'centre' },
+        h('h1', {}, 'Classement'),
+        blocRang(e.jeu),
+        listeTop(e.jeu.top),
+        h('p', { class: 'discret' }, 'La suite arrive, regarde l’écran.')));
+      return;
+    }
+
+    if (e.statut === 'terminee') {
+      if (jeu) {
+        const j = e.jeu || {};
+        vider(h('div', { class: 'centre' },
+          h('h1', {}, j.rang && j.rang <= 3 ? 'Bravo !' : 'Partie terminée'),
+          j.rang && j.rang <= 3 ? h('p', { class: 'podium-moi' }, LiveJeu.rang(j.rang) + ' place') : null,
+          blocRang(j),
+          j.podium && j.podium.length ? [h('p', { class: 'discret' }, 'Le podium'), listeTop(j.podium)] : null,
+          h('p', { class: 'discret' }, 'Merci d’avoir joué ! Tu peux fermer cette page.')));
+        return;
+      }
+      vider(h('div', { class: 'centre' },
+        h('h1', {}, 'Merci pour ta participation !'),
+        e.score ? [h('p', { class: 'discret' }, 'Bonnes réponses'), h('p', { class: 'score' }, String(e.score.justes), h('small', {}, ' / ' + e.score.total))] : null,
+        h('p', { class: 'discret' }, 'Tu as répondu à ' + Live.pluriel(e.nbRepondu || 0, 'question', 'questions') + '.'),
+        h('p', { class: 'discret' }, 'Tu peux fermer cette page.')));
+      return;
+    }
+
+    if (e.statut !== 'question' || !q) return;
+    const avantFocus = document.activeElement && document.activeElement.id;
+    const opts = {
+      index: e.index, nb: e.nb, maReponse: e.maReponse, ferme: !!e.ferme, revele: !!e.revele,
+      correction: e.correction, resultats: e.resultats, brouillon,
+      onBrouillon: (t) => (brouillon = t), onRepondre: envoyer,
+      ordre: ordres[e.index], onOrdre: (o) => (ordres[e.index] = o),
+    };
+    if (jeu && e.jeu.fin) {
+      // question chronométrée
+      if (e.ferme) {
+        const retour = retourJeu(e);
+        if (retour) {
+          vider(enteteJeu(h('span', { class: 'pts' }, LiveJeu.points(e.jeu.points) + ' pts')), retour, blocRang(e.jeu),
+            h('p', { class: 'discret', style: { textAlign: 'center', marginTop: '16px' } }, 'Regarde l’écran pour la suite.'));
+          return;
+        }
+        vider(...LiveVue.questionEleve(q, Object.assign(opts, { jeu: false, ferme: true })));
+        return;
+      }
+      const sec = h('span', { class: 'sec', 'aria-hidden': 'true' });
+      const barre = h('div', { class: 'lj-chrono', role: 'presentation' }, h('i'));
+      vider(enteteJeu(sec), barre, ...LiveVue.questionEleve(q, Object.assign(opts, { jeu: true })));
+      lancerChrono(barre, sec);
+      return;
+    }
+    vider(...LiveVue.questionEleve(q, opts));
+    if (avantFocus === 'lv-saisie') { const s = $('#lv-saisie'); if (s) s.focus(); }
+  }
+
+  demarrer();
+})();
+</script>
+</body>
+</html>

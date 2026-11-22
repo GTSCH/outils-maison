@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Devoirs de la classe</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#FBFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#172021" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B4235A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5z'/%3E%3Cpath d='M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/polices.css">
+<style>
+  /* Page publique des devoirs : autonome (pas de compte, pas de client de l'Établi), lisible sur téléphone. */
+  :root {
+    --bg: #F3F5F2; --surface: #FFFFFF; --surface-2: #EEF2EF; --fg: #172126; --muted: #56646A; --line: #D5DDD9;
+    --accent: #2350B8; --mark: #FDF0C8; --mark-fg: #7A4E00; --bad: #BF3328; --bad-soft: #F8DEDA; --rose: #B4235A;
+    --radius: 14px; --font: "Andika", "Atkinson Hyperlegible", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1513; --surface: #172021; --surface-2: #1E292A; --fg: #E6EEEA; --muted: #9AAAA5; --line: #2D3B3A;
+      --accent: #7FA6FF; --mark: #3A3115; --mark-fg: #F5C343; --bad: #F07A6E; --bad-soft: #3A1C1A; --rose: #F07AA6;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1513; --surface: #172021; --surface-2: #1E292A; --fg: #E6EEEA; --muted: #9AAAA5; --line: #2D3B3A;
+    --accent: #7FA6FF; --mark: #3A3115; --mark-fg: #F5C343; --bad: #F07A6E; --bad-soft: #3A1C1A; --rose: #F07AA6;
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { min-height: 100vh; background: var(--bg); color: var(--fg); font: 18px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 70%, transparent); outline-offset: 2px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  .page { width: min(680px, 100%); margin: 0 auto; padding: calc(20px + env(safe-area-inset-top, 0px)) 16px calc(32px + env(safe-area-inset-bottom, 0px)); }
+  header { padding: 8px 2px 18px; }
+  .surtitre { display: inline-flex; align-items: center; gap: 8px; margin: 0; color: var(--rose); font-weight: 700; font-size: 16px; letter-spacing: .02em; }
+  .surtitre svg { width: 22px; height: 22px; }
+  h1 { margin: 4px 0 6px; font-size: clamp(30px, 8vw, 40px); line-height: 1.1; font-weight: 700; overflow-wrap: anywhere; }
+  .periode { margin: 0; color: var(--muted); font-size: 16px; }
+  .jour { margin: 0 0 18px; }
+  .jour h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 8px; padding: 0 2px; font-size: 20px; line-height: 1.3; }
+  .jour h2 .quand { color: var(--muted); font-weight: 400; font-size: 17px; }
+  .jour.proche h2 .etiquette { display: inline-block; padding: 1px 10px; border-radius: 999px; background: var(--mark); color: var(--mark-fg); font-size: 15px; }
+  .cartes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .carte { position: relative; padding: 14px 16px 14px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: inset 5px 0 0 var(--bc, var(--accent)); }
+  .branche { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 4px; font-weight: 700; font-size: 16px; color: var(--muted); }
+  .branche i { width: 11px; height: 11px; border-radius: 50%; background: var(--bc, var(--accent)); }
+  .texte { margin: 0; font-size: 19px; white-space: pre-line; overflow-wrap: anywhere; }
+  .texte a { color: var(--accent); }
+  .donne { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+  details.passes { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 12px; }
+  details.passes summary { min-height: 44px; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--muted); font-weight: 700; font-size: 17px; }
+  details.passes .jour { opacity: .8; margin-top: 12px; }
+  .message { margin: 24px 0; padding: 22px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .message h2 { margin: 0 0 6px; font-size: 22px; line-height: 1.25; }
+  .message p { margin: 0; color: var(--muted); }
+  .message.erreur { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
+  .message .ico { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 12px; border-radius: 12px; background: var(--surface-2); color: var(--muted); }
+  .message.erreur .ico { background: var(--bad-soft); color: var(--bad); }
+  .message .ico svg { width: 26px; height: 26px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; margin-top: 16px; padding: 0 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--fg); font: 700 17px/1 var(--font); cursor: pointer; }
+  .chargement { margin: 40px 0; color: var(--muted); text-align: center; }
+  footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  footer p { margin: 0 0 4px; }
+  footer a { color: inherit; }
+  @media print {
+    body { background: #fff; color: #000; }
+    .carte { break-inside: avoid; box-shadow: inset 5px 0 0 #000; }
+    details.passes, footer .actualiser, .btn { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <p class="surtitre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z"/></svg>Devoirs</p>
+    <h1 id="classe">Devoirs de la classe</h1>
+    <p class="periode" id="periode"></p>
+  </header>
+  <main id="contenu" aria-live="polite"><p class="chargement">Chargement des devoirs…</p></main>
+  <footer>
+    <p>Cette page ne montre que les devoirs de la classe. Elle se met à jour toute seule.</p>
+    <p>Publié avec L’Établi</p>
+    <p><a href="/confidentialite">Protection des données</a></p>
+  </footer>
+</div>
+<script>
+(function () {
+  'use strict';
+  var NB = ' ';
+  var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  var MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  // mêmes couleurs que EtabliCalendrier.couleurBranche (page autonome : copie)
+  var COULEURS = ['#2350B8', '#C2410C', '#1D7F4A', '#7A4BB0', '#0E7490', '#B45309', '#BE185D', '#4D7C0F', '#1E3A8A', '#9F1239', '#0F766E', '#6D28D9'];
+  function couleur(nom) {
+    var s = String(nom || '').toLowerCase(), h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return COULEURS[h % COULEURS.length];
+  }
+  function date(s) { var p = String(s).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2], 12); }
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function format(s) { var d = date(s); return JOURS[d.getDay()] + ' ' + d.getDate() + (d.getDate() === 1 ? 'er' : '') + ' ' + MOIS[d.getMonth()]; }
+  function ecartJours(s) { var a = date(iso(new Date())), b = date(s); return Math.round((b - a) / 864e5); }
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  /** Texte des devoirs : les adresses https deviennent des liens (rien d'autre n'est interprété). */
+  function texteAvecLiens(p, t) {
+    var re = /https?:\/\/[^\s<>"']+[^\s<>"'.,;:!?)]/g, i = 0, m;
+    while ((m = re.exec(t))) {
+      if (m.index > i) p.appendChild(document.createTextNode(t.slice(i, m.index)));
+      var a = el('a', null, m[0]);
+      a.href = m[0]; a.rel = 'noopener noreferrer nofollow'; a.target = '_blank';
+      p.appendChild(a);
+      i = m.index + m[0].length;
+    }
+    if (i < t.length) p.appendChild(document.createTextNode(t.slice(i)));
+  }
+  var ICO_ATTENTION = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4.5M12 17.5v.2"/></svg>';
+  var ICO_LIVRE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z"/></svg>';
+
+  var contenu = document.getElementById('contenu');
+  function jeton() {
+    var m = /^\/devoirs\/([A-Za-z0-9_-]{8,80})\/?$/.exec(location.pathname);
+    if (m) return m[1];
+    try { var q = new URLSearchParams(location.search).get('jeton'); if (q && /^[A-Za-z0-9_-]{8,80}$/.test(q)) return q; } catch (e) {}
+    return null;
+  }
+  function message(titre, texte, erreur, bouton) {
+    var b = el('div', 'message' + (erreur ? ' erreur' : ''));
+    var i = el('span', 'ico'); i.innerHTML = erreur ? ICO_ATTENTION : ICO_LIVRE; b.appendChild(i);
+    b.appendChild(el('h2', null, titre));
+    b.appendChild(el('p', null, texte));
+    if (bouton) { var x = el('button', 'btn', bouton.label); x.type = 'button'; x.onclick = bouton.fn; b.appendChild(x); }
+    contenu.replaceChildren(b);
+  }
+
+  function rendre(r) {
+    var nom = (r.classe && r.classe.nom) || 'la classe';
+    document.getElementById('classe').textContent = nom;
+    document.title = 'Devoirs, ' + nom;
+    var auj = iso(new Date());
+    if (r.periode && r.periode.debut && r.periode.fin) document.getElementById('periode').textContent = 'Du ' + format(r.periode.debut) + ' au ' + format(r.periode.fin) + '.';
+    // regroupement par jour où le travail est attendu (« pour le »), sinon par jour où il a été noté
+    var groupes = {};
+    (r.jours || []).forEach(function (j) {
+      (j.entrees || []).forEach(function (e) {
+        if (!e || !e.devoirs) return;
+        var cle = e.pourLe || j.date;
+        var g = groupes[cle] = groupes[cle] || { date: cle, pour: !!e.pourLe, entrees: [] };
+        if (e.pourLe) g.pour = true;
+        g.entrees.push({ branche: e.branche || '', devoirs: e.devoirs, donne: j.date, pourLe: e.pourLe || null });
+      });
+    });
+    var liste = Object.keys(groupes).sort().map(function (k) { return groupes[k]; });
+    var avenir = liste.filter(function (g) { return g.date >= auj; });
+    var passes = liste.filter(function (g) { return g.date < auj; }).reverse();
+    contenu.replaceChildren();
+    if (!avenir.length) {
+      var b = el('div', 'message');
+      var i = el('span', 'ico'); i.innerHTML = ICO_LIVRE; b.appendChild(i);
+      b.appendChild(el('h2', null, 'Pas de devoirs à venir'));
+      b.appendChild(el('p', null, 'Rien n’est noté pour les trois prochaines semaines. Reviens plus tard : la page se met à jour toute seule.'));
+      contenu.appendChild(b);
+    }
+    avenir.forEach(function (g) { contenu.appendChild(blocJour(g)); });
+    if (passes.length) {
+      var d = el('details', 'passes');
+      var s = el('summary', null, 'Devoirs des jours passés');
+      d.appendChild(s);
+      passes.forEach(function (g) { d.appendChild(blocJour(g)); });
+      contenu.appendChild(d);
+    }
+  }
+  function blocJour(g) {
+    var ecart = ecartJours(g.date);
+    var sec = el('section', 'jour' + (ecart >= 0 && ecart <= 1 ? ' proche' : ''));
+    var h2 = el('h2');
+    if (g.pour) {
+      if (ecart === 0) { h2.appendChild(el('span', 'etiquette', 'Pour aujourd’hui')); h2.appendChild(el('span', 'quand', format(g.date))); }
+      else if (ecart === 1) { h2.appendChild(el('span', 'etiquette', 'Pour demain')); h2.appendChild(el('span', 'quand', format(g.date))); }
+      else h2.appendChild(el('span', null, 'Pour le ' + format(g.date)));
+    } else h2.appendChild(el('span', null, 'Noté le ' + format(g.date)));
+    sec.appendChild(h2);
+    var ul = el('ul', 'cartes');
+    g.entrees.forEach(function (e) {
+      var li = el('li', 'carte');
+      li.style.setProperty('--bc', couleur(e.branche));
+      if (e.branche) { var b = el('p', 'branche'); b.appendChild(el('i')); b.appendChild(document.createTextNode(e.branche)); li.appendChild(b); }
+      var t = el('p', 'texte'); texteAvecLiens(t, String(e.devoirs)); li.appendChild(t);
+      if (e.pourLe && e.donne && e.donne !== e.pourLe) li.appendChild(el('p', 'donne', 'Donné le ' + format(e.donne) + '.'));
+      ul.appendChild(li);
+    });
+    sec.appendChild(ul);
+    return sec;
+  }
+
+  var dernier = 0;
+  function charger() {
+    var j = jeton();
+    if (!j) { message('Ce lien n’est pas complet', 'L’adresse de la page des devoirs semble coupée. Vérifie le lien reçu, ou demande-le à nouveau à l’enseignant·e.', true); return; }
+    dernier = Date.now();
+    fetch('/api/public/devoirs/' + encodeURIComponent(j), { credentials: 'omit', headers: { Accept: 'application/json' }, cache: 'no-store' })
+      .then(function (rep) {
+        if (rep.status === 404 || rep.status === 410) { var e = new Error('inactif'); e.inactif = true; throw e; }
+        if (!rep.ok) throw new Error('serveur');
+        return rep.json();
+      })
+      .then(rendre)
+      .catch(function (e) {
+        if (e && e.inactif) {
+          document.title = 'Lien inactif';
+          message('Ce lien n’est plus actif', 'L’enseignant·e a retiré cette page de devoirs, ou en a créé une nouvelle. Demande-lui le nouveau lien.', true);
+          return;
+        }
+        message('Impossible de charger les devoirs', 'Vérifie ta connexion à internet, puis réessaie.', true, { label: 'Réessayer', fn: charger });
+      });
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && Date.now() - dernier > 10 * 60000) charger(); });
+  charger();
+  void NB;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+ "worker": "visios-srl-ia",
+ "module_principal": "worker.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "9385e392ba3daaf9657500399ca532602fcd5cf7ce00deb3e012655265da2d3a",
+ "modules": [
+  {
+   "nom": "worker.js",
+   "fichier": "worker.js",
+   "type": "application/javascript+module",
+   "sha256": "9385e392ba3daaf9657500399ca532602fcd5cf7ce00deb3e012655265da2d3a",
+   "octets": 23384
+  }
+ ]
+}

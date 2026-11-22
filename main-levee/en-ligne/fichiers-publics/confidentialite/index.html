@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Protection des données · Main levée</title>
+<meta name="description" content="Ce que Main levée garde, pourquoi, où, combien de temps, avec qui, et comment l’effacer. Prototype en test, outil personnel de Guillaume Tschupp.">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  /* Page « Protection des données » de Main levée : s'appuie sur /css/style.css, avec un thème sombre propre à la page. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --blanc: #161314; --encre: #ECE8E9; --encre-50: #A39C9E;
+      --rd-10: #242022; --rd-25: #3B3638; --rd-50: #5E585A; --fc: #6FB6F0;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --blanc: #161314; --encre: #ECE8E9; --encre-50: #A39C9E;
+    --rd-10: #242022; --rd-25: #3B3638; --rd-50: #5E585A; --fc: #6FB6F0;
+    color-scheme: dark;
+  }
+  body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow-wrap: anywhere; }
+  .entete { padding-top: 10px; padding-bottom: 10px; }
+  .conf { flex: 1; width: 100%; max-width: 780px; padding-bottom: 40px; }
+  .conf .maj { opacity: .75; margin: -4px 0 22px; }
+  .conf .encart { margin: 0 0 24px; }
+  .conf .encart h2 { font-size: 21px; margin-bottom: .4em; }
+  .conf .encart p:last-child { margin-bottom: 0; }
+  .bref { border: 1px solid var(--rd-25); padding: 16px 20px; margin: 0 0 24px; }
+  .bref h2 { font-size: 21px; margin-bottom: .4em; }
+  .bref ul { margin: 0; padding-left: 1.2em; }
+  .bref li { margin: 4px 0; }
+  .sommaire { background: var(--rd-10); padding: 14px 20px; margin: 0 0 34px; }
+  .sommaire h2 { font-size: 18px; margin-bottom: .3em; }
+  .sommaire ol { margin: 0; padding-left: 1.4em; columns: 2 220px; column-gap: 28px; }
+  .sommaire li { margin: 3px 0; break-inside: avoid; }
+  .conf section { margin: 0 0 36px; scroll-margin-top: 80px; }
+  .conf section > h2 { font-size: clamp(24px, 4.6vw, 30px); margin-bottom: .5em; }
+  .conf h3 { font-size: 20px; margin: 1.2em 0 .35em; }
+  .conf ul { padding-left: 1.3em; margin: 0 0 .9em; }
+  .conf li { margin: 4px 0; }
+  .note { opacity: .8; font-size: 16px; }
+  code { font: 15px/1.4 ui-monospace, Menlo, Consolas, monospace; background: var(--rd-10); padding: 1px 5px; }
+  .conf-table { width: 100%; border-collapse: collapse; font-size: 16px; margin: 6px 0 14px; border: 1px solid var(--rd-25); }
+  .conf-table th, .conf-table td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rd-25); }
+  .conf-table thead th { font-family: var(--font-din); background: var(--rd-10); }
+  .conf-table tbody th { width: 30%; font-family: var(--font-din); }
+  .pied { padding: 18px var(--gouttiere); border-top: 1px solid var(--rd-25); display: flex; justify-content: space-between; align-items: center; gap: 8px 16px; flex-wrap: wrap; font-size: 15px; }
+  @media (max-width: 640px) {
+    .conf-table, .conf-table thead, .conf-table tbody, .conf-table tr, .conf-table th, .conf-table td { display: block; width: 100%; }
+    .conf-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .conf-table tr { border-bottom: 1px solid var(--rd-25); padding: 8px 0; }
+    .conf-table tbody tr:last-child { border-bottom: 0; }
+    .conf-table th, .conf-table td { border-bottom: 0; padding: 3px 14px; }
+    .conf-table tbody th { width: 100%; font-size: 18px; }
+    .conf-table td[data-titre]::before { content: attr(data-titre); display: block; font-size: 14px; font-weight: 700; opacity: .75; }
+  }
+  @media print {
+    .entete, .sommaire, .pied { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="entete">
+  <a class="marque" href="/"><b>Main levée</b><span>Protection des données</span></a>
+  <div class="droite"><svg class="logo" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Main levée" viewBox="0 0 118 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13.5V5.2a1.6 1.6 0 0 1 3.2 0V12M10.2 11.2V3.6a1.6 1.6 0 0 1 3.2 0v7.6M13.4 11V4.8a1.6 1.6 0 0 1 3.2 0v8"/><path d="M16.6 9.6a1.6 1.6 0 0 1 3.2 0v4.6c0 4.8-3.2 8.3-7.6 8.3-3.2 0-5.1-1.6-6.8-4.2L2.9 14.6a1.6 1.6 0 0 1 2.6-1.8L7 14.6"/></g><text x="27" y="17.6" fill="currentColor" font-family="Barlow, system-ui, sans-serif" font-weight="700" font-size="16.5">Main levée</text></svg></div>
+</header>
+
+<main class="page conf" id="contenu">
+  <h1 class="titre-barre">Protection des données</h1>
+  <p class="maj">Mise à jour le 23 octobre 2026</p>
+
+  <div class="encart" role="note">
+    <h2>Un prototype, un outil personnel</h2>
+    <p>Main levée est un outil personnel de Guillaume Tschupp, à l’état de prototype : un essai, pas un produit fini. Ce n’est <b>pas un service de la HEP-VS</b>, ni d’aucune autre institution.</p>
+    <p>Il est offert sans garantie de disponibilité : il peut changer ou s’interrompre sans préavis. Téléchargez de temps en temps votre sauvegarde (Mon espace, onglet « Mon lien et sauvegarde »), et <b>ne saisissez pas de données sensibles</b> dans vos questions ni dans vos listes de classe.</p>
+  </div>
+
+  <div class="bref">
+    <h2>En bref</h2>
+    <ul>
+      <li>Pas de compte, ni pour vous ni pour les participant·es : aucune adresse e-mail, aucun mot de passe.</li>
+      <li>Le prénom des participant·es est facultatif : par défaut, les réponses sont anonymes.</li>
+      <li>Aucun cookie, aucune publicité, aucun traceur publicitaire. Une statistique de visites anonyme (Cloudflare Web Analytics) compte les pages vues, sans cookie et sans garder l’adresse IP. À part son script, les polices et les programmes des pages sont servis par Main levée elle-même.</li>
+      <li>Main levée ne garde pas les adresses IP, et le journal détaillé des requêtes de Cloudflare est désactivé.</li>
+      <li>Hébergement chez Cloudflare, une entreprise américaine.</li>
+      <li>Tout reste jusqu’à ce que vous l’effaciez.</li>
+    </ul>
+  </div>
+
+  <nav class="sommaire" aria-labelledby="sommaire-titre">
+    <h2 id="sommaire-titre">Sommaire</h2>
+    <ol>
+      <li><a href="#responsable">Qui est responsable</a></li>
+      <li><a href="#donnees">Quelles données</a></li>
+      <li><a href="#pourquoi">Pourquoi</a></li>
+      <li><a href="#ou">Où</a></li>
+      <li><a href="#duree">Combien de temps</a></li>
+      <li><a href="#avec-qui">Avec qui</a></li>
+      <li><a href="#droits">Vos droits</a></li>
+      <li><a href="#cookies">Cookies et stockage local</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ol>
+  </nav>
+
+  <section id="responsable" aria-labelledby="t-responsable">
+    <h2 class="titre-barre" id="t-responsable">Qui est responsable</h2>
+    <p>Guillaume Tschupp, à Fully (Valais, Suisse), développe et exploite Main levée à titre personnel. Il est responsable du service au sens de la loi fédérale sur la protection des données (nLPD). Pour les personnes qui se trouvent dans l’Union européenne, le règlement général sur la protection des données (RGPD) peut aussi s’appliquer : cette page en suit les principes, sans prétendre à une conformité certifiée.</p>
+    <p>Vos questions et vos listes de classe vous appartiennent, et c’est vous qui décidez de les utiliser avec un groupe. Avant d’utiliser Main levée avec des élèves ou des étudiant·es, vérifiez avec votre établissement que c’est permis : dans une école publique, le droit cantonal sur la protection des données s’applique aussi à cet usage.</p>
+  </section>
+
+  <section id="donnees" aria-labelledby="t-donnees">
+    <h2 class="titre-barre" id="t-donnees">Quelles données</h2>
+
+    <h3>Votre espace d’enseignant·e</h3>
+    <p>Main levée n’a pas de compte. La première fois, votre navigateur crée une clé secrète aléatoire, qui forme votre lien personnel. Le navigateur envoie cette clé avec chaque demande ; le serveur ne la garde pas : il range votre espace sous une empreinte de la clé (SHA-256). Votre espace contient :</p>
+    <ul>
+      <li>vos activités : titre, questions, propositions de réponse et bonnes réponses ;</li>
+      <li>vos classes : un nom et jusqu’à 63 prénoms, pour les cartes ;</li>
+      <li>l’historique de vos sessions : code, activité, mode, dates, nombre de participant·es, taux de réussite.</li>
+    </ul>
+    <p>Qui a votre lien personnel peut voir et modifier votre espace : ne le partagez pas. Le bouton « Me l’envoyer par e-mail » ouvre simplement votre propre messagerie ; Main levée n’envoie rien. La démonstration crée, elle aussi, un espace avec une activité d’exemple et une classe fictive.</p>
+
+    <h3>Les sessions en direct</h3>
+    <p>Chaque session garde :</p>
+    <ul>
+      <li>une copie des questions ;</li>
+      <li>les participant·es : un identifiant aléatoire créé par leur téléphone et, seulement si l’activité le demande, un prénom ou un pseudo (30 caractères au plus) ; en mode cartes, le numéro de la carte et le prénom lié à ce numéro dans votre classe ;</li>
+      <li>les réponses, avec leur heure.</li>
+    </ul>
+    <p>Les réponses s’affichent sans nom à l’écran projeté ; l’écran d’attente montre les prénoms ou pseudos des personnes connectées, quand ils sont demandés. Dans les statistiques, vous voyez les réponses de chaque participant·e, avec son prénom ou son pseudo. La télécommande s’ouvre avec un lien secret : qui l’a voit les résultats de la session.</p>
+
+    <h3>Statistique de visites</h3>
+    <p>Cloudflare Web Analytics compte les visites des pages : adresse de la page, site d’où l’on arrive, pays, type de navigateur et d’appareil, vitesse de chargement. Ce service ne dépose pas de cookie, n’utilise pas le stockage du navigateur et ne garde pas l’adresse IP ; Guillaume Tschupp n’en voit que des totaux, sans pouvoir identifier personne. Le petit programme qui envoie ces mesures vient de <code>static.cloudflareinsights.com</code>.</p>
+
+    <h3>Rien d’autre</h3>
+    <p>Le programme de Main levée ne garde ni adresse IP, ni fichier, ni image. Aucune question n’est envoyée à un service d’intelligence artificielle. La caméra de la télécommande, qui lit les cartes levées, est traitée dans le navigateur : aucune image n’est envoyée.</p>
+  </section>
+
+  <section id="pourquoi" aria-labelledby="t-pourquoi">
+    <h2 class="titre-barre" id="t-pourquoi">Pourquoi</h2>
+    <p>Pour faire fonctionner les questions en direct, garder vos activités et vos classes, et vous rendre vos statistiques. Rien d’autre : ni profilage, ni publicité, ni revente, ni statistiques d’usage.</p>
+    <p class="note">Pour les personnes soumises au RGPD, ces traitements reposent sur la fourniture du service que vous demandez.</p>
+  </section>
+
+  <section id="ou" aria-labelledby="t-ou">
+    <h2 class="titre-barre" id="t-ou">Où</h2>
+    <p>Tout est hébergé par <b>Cloudflare, Inc.</b>, une entreprise des États-Unis, seul sous-traitant de Main levée.</p>
+    <ul>
+      <li>Le programme du site tourne dans les centres de données de Cloudflare, en général le plus proche de la personne qui consulte.</li>
+      <li>Les espaces, les sessions et le registre des codes sont des Durable Objects de Cloudflare, créés en principe près de la première connexion, sans limitation à une juridiction.</li>
+    </ul>
+    <p>Comme tout hébergeur, Cloudflare voit les adresses IP pour acheminer les requêtes. Pour Main levée, son journal technique ne garde que les messages d’erreur du programme, avec quelques renseignements sur la requête concernée (heure, résultat) ; le journal détaillé de chaque requête (adresse IP, en-têtes) est désactivé. Ce journal sert à repérer et à corriger les pannes ; seul Guillaume Tschupp le consulte, et Cloudflare l’efface après quelques jours (7 au plus).</p>
+    <p>Entreprise américaine, Cloudflare peut être soumise au droit des États-Unis, même pour des données stockées en Europe. Voir la <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">politique de confidentialité de Cloudflare</a>.</p>
+  </section>
+
+  <section id="duree" aria-labelledby="t-duree">
+    <h2 class="titre-barre" id="t-duree">Combien de temps</h2>
+    <table class="conf-table">
+      <thead><tr><th scope="col">Donnée</th><th scope="col">Durée</th><th scope="col">Pour l’effacer</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Activités et classes</th><td data-titre="Durée">Jusqu’à ce que vous les effaciez. Aucune expiration.</td><td data-titre="Pour l’effacer">Mon espace, onglets « Activités » et « Classes et cartes » : bouton Supprimer.</td></tr>
+        <tr><th scope="row">Sessions et statistiques</th><td data-titre="Durée">Jusqu’à la suppression de la session. Supprimer une activité garde les statistiques de ses sessions passées.</td><td data-titre="Pour l’effacer">Mon espace, onglet « Historique » : bouton Supprimer de la session.</td></tr>
+        <tr><th scope="row">Registre des codes</th><td data-titre="Durée">Les numéros déjà attribués et leur date, pour ne jamais les réutiliser, sans lien avec une personne.</td><td data-titre="Pour l’effacer">Rien à effacer.</td></tr>
+        <tr><th scope="row">Journal technique (messages d’erreur)</th><td data-titre="Durée">Quelques jours, 7 au plus.</td><td data-titre="Pour l’effacer">Automatique, par Cloudflare.</td></tr>
+        <tr><th scope="row">Données du navigateur</th><td data-titre="Durée">Jusqu’à ce que vous les effaciez.</td><td data-titre="Pour l’effacer">Réglages du navigateur, données du site.</td></tr>
+      </tbody>
+    </table>
+    <p>Il n’existe pas encore de bouton pour effacer tout un espace d’un coup : effacez ses activités, ses classes et ses sessions, puis les données du site dans votre navigateur.</p>
+    <p>Si vous perdez votre lien personnel, personne ne peut plus ouvrir votre espace, pas même Guillaume Tschupp, qui ne peut pas le retrouver pour vous. Son contenu reste alors stocké sans pouvoir être effacé. Gardez donc votre lien en lieu sûr, avec une sauvegarde.</p>
+  </section>
+
+  <section id="avec-qui" aria-labelledby="t-avec-qui">
+    <h2 class="titre-barre" id="t-avec-qui">Avec qui</h2>
+    <ul>
+      <li><b>Cloudflare</b>, seul sous-traitant : hébergement des pages, des espaces et des sessions, et statistique de visites anonyme.</li>
+      <li><b>Les personnes que vous choisissez</b> : celles à qui vous donnez votre lien personnel ou le lien d’une télécommande, et la classe, qui voit à l’écran les résultats que vous affichez.</li>
+      <li><b>Personne d’autre.</b> Ni vente, ni publicité, ni réseau social. À part le script de la statistique de visites de Cloudflare, aucun script, aucune police et aucune image n’est chargé depuis un autre site. Guillaume Tschupp ne transmet vos données à personne, sauf si la loi l’y oblige.</li>
+    </ul>
+  </section>
+
+  <section id="droits" aria-labelledby="t-droits">
+    <h2 class="titre-barre" id="t-droits">Vos droits</h2>
+    <p>Vous pouvez savoir ce qui est gardé, en obtenir une copie, le faire corriger ou effacer, et vous opposer à un traitement. L’essentiel se fait directement dans Main levée :</p>
+    <ul>
+      <li><b>Voir et corriger</b> : dans Mon espace.</li>
+      <li><b>Obtenir une copie</b> : Mon espace, onglet « Mon lien et sauvegarde », « Télécharger toute ma sauvegarde » (fichier JSON avec vos activités, vos classes et vos sessions, réponses comprises) ; les statistiques de chaque session s’exportent aussi pour Excel.</li>
+      <li><b>Effacer</b> : une activité, une classe ou une session.</li>
+    </ul>
+    <p><b>Participant·es</b> : Main levée ne sait pas qui vous êtes. Pour une réponse donnée pendant une session, adressez-vous d’abord à l’enseignant·e qui l’a lancée ; vous pouvez aussi écrire à Guillaume Tschupp.</p>
+    <p>Vous pouvez enfin vous adresser à une autorité de protection des données : en Suisse, le Préposé fédéral à la protection des données et à la transparence (<a href="https://www.edoeb.admin.ch/" rel="noopener noreferrer">PFPDT</a>) ; dans l’Union européenne, l’autorité de votre pays.</p>
+  </section>
+
+  <section id="cookies" aria-labelledby="t-cookies">
+    <h2 class="titre-barre" id="t-cookies">Cookies et stockage local</h2>
+    <p><b>Aucun cookie.</b> Quelques informations restent dans votre navigateur (stockage local), sur votre appareil :</p>
+    <ul>
+      <li><code>mainlevee.cle</code> : la clé de votre espace. Toute personne qui utilise ce navigateur peut l’ouvrir : sur un ordinateur partagé, effacez les données du site après usage.</li>
+      <li><code>mainlevee.ancienne</code> : la clé de l’espace précédent, si vous en avez changé sur ce navigateur.</li>
+      <li><code>mainlevee.p.</code> suivi du code : l’identifiant aléatoire d’un·e participant·e à une session, pour retrouver ses réponses après une coupure.</li>
+      <li><code>mainlevee.pseudo</code> : le dernier prénom ou pseudo saisi, proposé à la session suivante.</li>
+    </ul>
+    <p class="note">Pour tout effacer : réglages du navigateur, données du site de Main levée.</p>
+  </section>
+
+  <section id="contact" aria-labelledby="t-contact">
+    <h2 class="titre-barre" id="t-contact">Contact</h2>
+    <p>Pour toute question ou demande sur vos données, écrivez à Guillaume Tschupp par message sur <a href="https://www.linkedin.com/in/guillaume-tschupp-9b24a7157/" rel="noopener noreferrer">LinkedIn</a>. Indiquez le code de la session concernée, mais jamais votre lien personnel : il donne accès à tout votre espace.</p>
+    <p class="note">Cette page change avec l’outil. La date en haut indique sa dernière mise à jour.</p>
+  </section>
+</main>
+
+<footer class="pied">
+  <span>Prototype en test, outil personnel de Guillaume Tschupp</span>
+  <a href="/">Retour à l’accueil</a>
+</footer>
+</body>
+</html>

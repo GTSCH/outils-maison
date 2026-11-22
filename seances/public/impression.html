@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>PDF</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/seances.css">
+<style>
+  body { background: #E9EEEB; }
+  .outils { position: sticky; top: 0; z-index: 2; display: flex; gap: 8px; align-items: center; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .outils p { flex: 1; min-width: 200px; color: var(--muted); font-size: 14px; }
+  #pages { display: grid; gap: 24px; justify-content: center; padding: 24px; }
+  /* à l'écran : diapositives réduites */
+  body[data-mode="diapos"] .page { width: 960px; height: 540px; overflow: hidden; box-shadow: var(--shadow); }
+  body[data-mode="diapos"] .scene-imp { transform: scale(.5); transform-origin: 0 0; width: 1920px; height: 1080px; }
+  body[data-mode="notes"] .page { width: 794px; min-height: 1123px; background: #fff; padding: 48px; box-shadow: var(--shadow); color: #141A1E; }
+  body[data-mode="notes"] .scene-imp { transform: scale(.363); transform-origin: 0 0; width: 1920px; height: 1080px; margin-bottom: -688px; border: 1px solid #ccc; }
+  .notes-imp { margin-top: 28px; font-size: 15px; line-height: 1.5; }
+  .notes-imp .puces { padding-left: 1.2em; }
+  .n-num { font: 700 13px var(--font-display); color: #56646A; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  @media print {
+    .outils { display: none; }
+    body { background: #fff; }
+    #pages { display: block; padding: 0; }
+    body[data-mode="diapos"] .page { width: 1920px; height: 1080px; box-shadow: none; page-break-after: always; break-after: page; }
+    body[data-mode="diapos"] .scene-imp { transform: none; }
+    body[data-mode="notes"] .page { box-shadow: none; page-break-after: always; break-after: page; padding: 0; width: auto; min-height: 0; }
+  }
+</style>
+<style id="format-page">
+  @page { size: 1920px 1080px; margin: 0; }
+</style>
+</head>
+<body data-mode="diapos">
+<div class="outils">
+  <p>Pour un PDF : bouton ci-contre, puis « Enregistrer au format PDF » comme destination.</p>
+  <button class="btn" id="b-notes">Avec mes notes</button>
+  <button class="btn primaire" id="b-imprimer">Imprimer ou enregistrer en PDF</button>
+</div>
+<div id="pages"></div>
+<script>
+  // format de page selon le mode
+  new MutationObserver(() => {
+    document.getElementById("format-page").textContent = document.body.dataset.mode === "notes"
+      ? "@page { size: A4 portrait; margin: 14mm; }" : "@page { size: 1920px 1080px; margin: 0; }";
+  }).observe(document.body, { attributes: true, attributeFilter: ["data-mode"] });
+</script>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/commun.js"></script>
+<script src="/js/impression.js"></script>
+</body>
+</html>

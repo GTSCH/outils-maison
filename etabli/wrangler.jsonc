@@ -1,0 +1,40 @@
+// Configuration de TRAVAIL LOCAL pour L'Établi (reconstituée le 26.10.2026), pas celle de la mise en ligne.
+// - essayer en local : npx --yes wrangler@4 dev --persist-to ~/.cache/outils-maison-ia/etabli   (http://127.0.0.1:8787)
+// - mettre en ligne (depuis le dossier parent, avec accord) : node outils/mettre-en-ligne.mjs etabli --construire --essai
+// Le nom « etabli-local » et les identifiants fictifs empêchent qu'un « wrangler deploy » par erreur touche le vrai service.
+// Réglages d'interface identiques à ceux en ligne (relevés le 26.10.2026).
+{
+  "name": "etabli-local",
+  "main": "source-reconstituee/worker/src/index.js",
+  "compatibility_date": "2026-10-01",
+  "rules": [{ "type": "Text", "globs": ["**/*.sql"], "fallthrough": true }],
+  "assets": {
+    "directory": "en-ligne/fichiers-publics",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/*", "!/*.js", "!/*.mjs", "!/*.css", "!/*.map", "!/*.svg", "!/*.png", "!/*.jpg", "!/*.jpeg", "!/*.webp", "!/*.gif", "!/*.avif", "!/*.ico", "!/*.woff", "!/*.woff2", "!/*.ttf", "!/*.otf", "!/*.json", "!/*.webmanifest", "!/*.txt", "!/*.wasm", "!/*.mp3", "!/*.ogg", "!/*.wav", "!/*.pdf"]
+  },
+  "d1_databases": [{ "binding": "DB", "database_name": "etabli-local", "database_id": "local-uniquement" }],
+  "r2_buckets": [{ "binding": "FICHIERS", "bucket_name": "etabli-fichiers-local" }],
+  "durable_objects": { "bindings": [
+    { "name": "REGISTRE", "class_name": "Registre" },
+    { "name": "SESSION", "class_name": "Session" }
+  ] },
+  "migrations": [{ "tag": "local-v1", "new_sqlite_classes": ["Registre", "Session"] }],
+  // En ligne : liaison AI (Workers AI). En local, IA_FACTICE = "1" renvoie des questions d'exemple ;
+  // SCHEMA_AUTO = "1" crée les tables de la base locale au premier appel.
+  "vars": {
+    "SCHEMA_AUTO": "1",
+    "IA_FACTICE": "1",
+    "IA_MODELE": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "IA_LIMITE_JOUR": "20", "IA_LIMITE_GLOBALE_JOUR": "200",
+    "FICHIERS_PLAFOND_GLOBAL": "9000000000",
+    "QUOTA_FICHIERS_COMPTE": "1000000000", "QUOTA_FICHIERS_ESPACE": "1000000000",
+    "QUOTA_OCTETS_COMPTE": "200000000", "QUOTA_OCTETS_ESPACE": "200000000",
+    "LIMITE_CODES_IP": "20", "LIMITE_ECHECS_CLASSE_IP": "30", "LIMITE_ECHECS_EMAIL": "10", "LIMITE_ECHECS_IP": "40"
+  },
+  // Secret en ligne : POIVRE. En local, sa valeur de test est dans .dev.vars (sans rapport avec la vraie).
+  "triggers": { "crons": ["17 3 * * *"] },
+  "observability": { "enabled": true }
+}

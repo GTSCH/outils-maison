@@ -1,0 +1,105 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": [
+   "nodejs_compat"
+  ],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "limits": {
+   "cpu_ms": 300000
+  },
+  "observability": {
+   "enabled": true,
+   "head_sampling_rate": 1,
+   "redact_query_string": false,
+   "logs": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "persist": true,
+    "invocation_logs": true
+   },
+   "traces": {
+    "enabled": false,
+    "persist": true,
+    "head_sampling_rate": 1
+   }
+  },
+  "annotations": {
+   "workers/triggered_by": "upload"
+  },
+  "bindings": [
+   {
+    "name": "ACCESS_PASSWORD",
+    "type": "secret_text"
+   },
+   {
+    "name": "AI",
+    "project": "<catalog>",
+    "type": "ai"
+   },
+   {
+    "name": "API_TOKEN",
+    "type": "secret_text"
+   },
+   {
+    "name": "ASSETS",
+    "type": "assets"
+   },
+   {
+    "name": "BROWSER",
+    "type": "browser",
+    "version": 2
+   },
+   {
+    "name": "CONTACT_EMAIL",
+    "text": "contact@exemple.ch",
+    "type": "plain_text"
+   },
+   {
+    "database_id": "64cb3eaf-ac45-485b-80a0-2da3e8119a22",
+    "id": "64cb3eaf-ac45-485b-80a0-2da3e8119a22",
+    "name": "DB",
+    "type": "d1"
+   },
+   {
+    "name": "DEMO_PUBLIC",
+    "text": "1",
+    "type": "plain_text"
+   },
+   {
+    "name": "EDITION",
+    "text": "bibliotheque",
+    "type": "plain_text"
+   },
+   {
+    "name": "PAQUET_VERSION",
+    "text": "202610051336",
+    "type": "plain_text"
+   },
+   {
+    "bucket_name": "passages-demo-pdfs",
+    "jurisdiction": "eu",
+    "name": "PDFS",
+    "type": "r2_bucket"
+   },
+   {
+    "name": "SERVER_EXTRACT",
+    "text": "1",
+    "type": "plain_text"
+   },
+   {
+    "index_name": "passages-demo-passages",
+    "name": "VEC",
+    "type": "vectorize"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": false
+ }
+}

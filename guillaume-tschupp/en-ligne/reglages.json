@@ -1,0 +1,38 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": [],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "annotations": {
+   "workers/triggered_by": "upload"
+  },
+  "bindings": [
+   {
+    "name": "AI",
+    "project": "<catalog>",
+    "type": "ai"
+   },
+   {
+    "database_id": "b49ebc31-9bb6-49cc-9607-c192060d4c0e",
+    "id": "b49ebc31-9bb6-49cc-9607-c192060d4c0e",
+    "name": "DB",
+    "type": "d1"
+   },
+   {
+    "allowed_sender_addresses": [
+     "newsletter@guillaumetschupp.com"
+    ],
+    "name": "EMAIL",
+    "type": "send_email"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": true
+ }
+}

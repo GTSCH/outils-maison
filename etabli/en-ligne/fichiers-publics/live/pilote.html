@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FBFCFB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#172021" media="(prefers-color-scheme: dark)">
+<title>Télécommande · L’Établi</title>
+<link rel="stylesheet" href="/css/polices.css">
+<link rel="stylesheet" href="/css/etabli.css">
+<link rel="stylesheet" href="/live/live.css">
+<style>
+  body { min-height: 100vh; min-height: 100dvh; }
+  .tete { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 12px; padding-top: calc(6px + env(safe-area-inset-top, 0px)); background: var(--surface); border-bottom: 1px solid var(--line); }
+  .tete::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--t-quiz); }
+  .tete .lv-logo span { font-size: 15px; }
+  .tete .code { margin-left: auto; font: 700 15px/1.2 var(--font-display); color: var(--muted); white-space: nowrap; }
+  .tete .code b { color: var(--fg); font-variant-numeric: tabular-nums; }
+  .bandeau { position: sticky; top: 52px; z-index: 19; padding: 8px 16px; background: var(--fg); color: var(--bg); font-size: 15px; text-align: center; }
+  main { padding: 16px 16px calc(40px + env(safe-area-inset-bottom, 0px)); max-width: 640px; margin: 0 auto; }
+  .etat { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font: 700 13px/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .etat .rep { color: var(--fg); text-transform: none; letter-spacing: 0; font-size: 15px; }
+  .q { font: 700 21px/1.3 var(--font-eleve); margin: 8px 0 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .titre-quiz { font: 700 22px/1.25 var(--font-display); margin: 6px 0 10px; overflow-wrap: anywhere; }
+  .pad { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 8px; margin: 14px 0; }
+  .pad .btn { min-height: 76px; font-size: 17px; padding: 8px; white-space: normal; line-height: 1.15; text-align: center; }
+  .pad .btn svg { width: 28px; height: 28px; }
+  .large { width: 100%; min-height: 64px; font-size: 19px; }
+  .scan-btn { width: 100%; min-height: 72px; font-size: 20px; margin-bottom: 8px; }
+  .scan-btn svg { width: 26px !important; height: 26px !important; }
+  .ligne { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ligne .btn { flex: 1 1 auto; }
+  .cartes-liste { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .cartes-liste button { appearance: none; border: 1px solid var(--line-strong); background: var(--surface); color: var(--fg); font: 15px/1.2 var(--font-ui); padding: 8px 10px; min-height: 44px; border-radius: var(--radius); cursor: pointer; }
+  .cartes-liste button b { font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+  .cartes-liste button small { color: var(--muted); }
+  .mini { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 16px; }
+  .mini .lv-res-echelle { height: 120px; }
+  .mini .lv-res-nuage { font-size: 14px; }
+  .mini .lv-res-libre { columns: 1; }
+  .petit { font-size: 14px; color: var(--muted); }
+  .bas { margin-top: 28px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .centre { text-align: center; padding-top: 8vh; display: grid; gap: 14px; justify-items: center; }
+  .centre h1 { font-size: 24px; }
+  .chiffres { display: flex; gap: 24px; justify-content: center; margin: 8px 0; }
+  .chiffres b { display: block; font: 800 34px/1 var(--font-display); }
+  .chiffres span { color: var(--muted); font-size: 14px; }
+  .presents { display: flex; align-items: center; gap: 8px; margin: 10px 0 16px; font-size: 17px; }
+  .presents b { font: 800 26px/1 var(--font-display); }
+  .chrono-pilote { font: 800 40px/1 var(--font-display); font-variant-numeric: tabular-nums; text-align: center; margin: 6px 0; }
+  .chrono-pilote.urgent { color: var(--bad); }
+  .top-pilote { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 6px; }
+  .top-pilote li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .top-pilote b { font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+  .att-pilote { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+  .att-pilote li { display: grid; gap: 8px; padding: 10px; border: 1px solid var(--line); border-left: 5px solid var(--warn); border-radius: var(--radius); background: var(--surface); font: 16px/1.35 var(--font-eleve); }
+  .att-pilote .ligne .btn { min-height: 44px; }
+</style>
+</head>
+<body>
+<header class="tete">
+  <a class="lv-logo" id="logo" href="/" title="Retour au pupitre"></a>
+  <span class="code" id="code"></span>
+</header>
+<div class="bandeau" id="bandeau" role="status" hidden>Connexion perdue. Reconnexion en cours…</div>
+<main id="app"><div class="centre"><div class="lv-points" aria-hidden="true"><i></i><i></i><i></i></div><p>Connexion…</p></div></main>
+<script src="/js/etabli-client.js"></script>
+<script src="/js/etabli-ui.js"></script>
+<script src="/js/vendor/qrcode.js"></script>
+<script src="/js/live-commun.js"></script>
+<script src="/js/live-jeu.js"></script>
+<script src="/js/live-resultats.js"></script>
+<script src="/js/live-scanner.js"></script>
+<script>
+(async () => {
+  'use strict';
+  const { h, $ } = Live;
+  $('#logo').innerHTML = EtabliUI.icone('logo') + '<span>L’Établi</span>';
+  const app = $('#app');
+  const code = Live.codeDansAdresse();
+  const jeton = code ? Live.jetonSession(code) : null;
+  if (code) $('#code').replaceChildren('Télécommande · ', h('b', {}, Live.formatCode(code)));
+  let S = null;
+  const notes = new Map(); // tableau participatif : notes de la question courante (avec statut)
+  let notesQ = null;
+
+  if (!code) {
+    app.replaceChildren(h('div', { class: 'centre' }, h('h1', {}, 'Lien incomplet'), h('p', {}, 'Scanne le QR code « Télécommande » affiché sur la projection.')));
+    return;
+  }
+
+  // la session existe-t-elle ? (évite de tenter le WebSocket en boucle sur un code inconnu)
+  try { await Live.infosPubliques(code); }
+  catch (e) {
+    app.replaceChildren(h('div', { class: 'centre' },
+      h('h1', {}, e.code === 'reseau' ? 'Pas de connexion' : 'Session introuvable'),
+      h('p', {}, e.code === 'reseau' ? 'Vérifie le réseau de ton téléphone, puis recharge la page.' : 'Cette session n’existe pas ou a été supprimée.'),
+      e.code === 'reseau' ? h('button', { type: 'button', class: 'btn btn-primary', onclick: () => location.reload() }, 'Recharger') : null));
+    return;
+  }
+
+  const cx = Live.connecter(code, () => (jeton ? { t: 'hello', role: 'staff', jeton } : { t: 'hello', role: 'staff' }), {
+    onMessage(m) {
+      if (m.t === 'etat') {
+        Live.synchroniser(m);
+        // appuis rapides : un état en retard sur la dernière commande « aller » ne ramène pas en arrière
+        if (attenduNav && Date.now() < attenduNav.t && S && (m.etat.statut !== 'question' || m.etat.index !== attenduNav.index)) return;
+        attenduNav = null;
+        S = m;
+        if (S.config && S.config.jeton) Live.memoriserJeton(code, S.config.jeton);
+        rendre();
+        scanner.maj();
+      } else if (m.t === 'notes') {
+        if (!S || m.q !== S.etat.index) return;
+        if (notesQ !== m.q || (m.complet && !m.suite)) { notes.clear(); notesQ = m.q; }
+        for (const n of (m.notes || []).concat(m.maj || [])) notes.set(n.id, n);
+        for (const id of m.suppr || []) notes.delete(id);
+        if (S) majZones();
+      } else if (m.t === 'refus') Live.toast(m.message || 'Accès refusé.', 'erreur');
+      else if (m.t === 'info') Live.toast(m.message);
+    },
+    onStatut(s, c) {
+      $('#bandeau').hidden = s !== 'coupe';
+      if (s === 'refuse') {
+        scanner.fermer();
+        app.replaceChildren(h('div', { class: 'centre' },
+          h('h1', {}, c === 4004 ? 'Session supprimée' : 'Accès refusé'),
+          h('p', {}, c === 4004 ? 'Cette session n’existe plus.' : 'Ce lien de télécommande n’est plus valable. Scanne à nouveau le QR code « Télécommande » de la projection.')));
+      }
+    },
+  });
+  const cmd = (m) => {
+    const r = cx.envoyer(m);
+    if (r === 'file') Live.toast('Reconnexion en cours : la commande partira dès le retour de la connexion.');
+    else if (!r) Live.toast('Pas de connexion pour l’instant.', 'erreur');
+    return r !== false;
+  };
+  const questionCourante = () => (S ? S.config.questions[S.etat.index] : null);
+  const nomCarte = (n) => Live.nomsClasse(S && S.config.classe)[n - 1] || '';
+  const scanner = LiveScanner.creer({ etat: () => S, envoyer: (m) => cx.envoyer(m), nomCarte });
+  const manuel = () => LiveScanner.saisieManuelle({ etat: () => S, envoyer: (m) => cx.envoyer(m), nomCarte });
+  const ic = Live.ic;
+  const enJeu = () => !!(S && S.config.jeu);
+  const bonnesDe = (q) => (q && q.type === 'qcm' ? q.options.map((o, i) => (o.bonne ? i : -1)).filter((i) => i >= 0) : []);
+  const infoJeu = () => (S && S.etat.jeu && S.etat.jeu.q ? S.etat.jeu.q[S.etat.index] : null);
+
+  // affichage immédiat : le serveur confirme dans la foulée
+  function optimiste(etat, extra) {
+    S = Object.assign({}, S, extra || {}, { etat: Object.assign({}, S.etat, etat) });
+    rendre();
+    scanner.maj();
+  }
+  let attenduNav = null;
+  function aller(i) {
+    if (!S || i < 0 || i >= S.config.questions.length) return;
+    if (enJeu()) { cmd({ t: 'aller', index: i }); return; }
+    if (cmd({ t: 'aller', index: i }) !== false) {
+      attenduNav = { index: i, t: Date.now() + 1500 };
+      optimiste({ statut: 'question', index: i, revele: false }, { resultats: null, cartes: [] });
+    }
+  }
+  function reveler(v) {
+    if (S && S.etat.statut === 'question' && cmd({ t: 'reveler', valeur: !!v }) !== false) optimiste({ revele: !!v });
+  }
+
+  async function terminer() {
+    if (await EtabliUI.confirmer({ titre: 'Terminer la session ?', message: enJeu() ? 'Le podium s’affiche sur la projection.' : 'Les élèves verront leur score.', ok: 'Terminer' })) cmd({ t: 'terminer' });
+  }
+  async function exclure(j) {
+    if (await EtabliUI.confirmer({ titre: 'Retirer « ' + j.pseudo + ' » ?', message: 'Cette personne quitte la session.', ok: 'Retirer', danger: true })) cmd({ t: 'exclure', pid: j.pid });
+  }
+
+  // Reconstruction complète seulement quand l'état utile change ; sinon, mise à jour des zones dynamiques.
+  // (un appui qui tombe pendant une mise à jour n'est ainsi jamais perdu)
+  let cleRendu = '';
+  const zone = (nom) => h('div', { 'data-zone': nom });
+
+  function suivanteBouton(e, n, primaire) {
+    return e.index < n - 1
+      ? h('button', { type: 'button', class: 'btn ' + (primaire ? 'btn-primary' : ''), 'aria-label': 'Question suivante', onclick: () => aller(e.index + 1) }, ic('suivant'))
+      : h('button', { type: 'button', class: 'btn ' + (primaire ? 'btn-primary' : ''), onclick: () => cmd({ t: 'terminer' }) }, ic(enJeu() ? 'podium' : 'stop'), enJeu() ? 'Podium' : 'Fin');
+  }
+
+  function rendre() {
+    const e = S.etat, c = S.config, n = c.questions.length, q = questionCourante();
+    const info = infoJeu();
+    const cle = [e.statut, e.index, e.revele, !!e.simulation, c.mode, n, info ? !!info.close : '', JSON.stringify(S.tableau || null)].join('|');
+    if (cle === cleRendu) { majZones(); return; }
+    cleRendu = cle;
+    document.title = (c.titre ? c.titre + ' · ' : '') + 'Télécommande · L’Établi';
+    const blocs = [];
+    const jeu = enJeu();
+    if (e.statut === 'attente') {
+      blocs.push(h('p', { class: 'etat' }, h('span', {}, jeu ? 'Mode jeu' : c.mode === 'cartes' ? 'Mode cartes' : 'Mode appareils'), h('span', {}, n + ' questions')),
+        h('h1', { class: 'titre-quiz' }, c.titre || 'Quiz'),
+        zone('presents'),
+        h('button', { type: 'button', class: 'btn btn-primary large', onclick: () => cmd({ t: 'demarrer' }) }, ic('jouer'), jeu ? 'Lancer la partie' : 'Commencer'));
+      if (jeu) blocs.push(zone('joueurs'));
+      if (c.demo) blocs.push(boutonDemo(e));
+    } else if (e.statut === 'terminee') {
+      blocs.push(h('div', { class: 'centre' },
+        h('h1', {}, jeu ? 'Partie terminée' : 'Session terminée'),
+        jeu ? zone('top') : zone('fin'),
+        h('div', { class: 'ligne' },
+          h('button', { type: 'button', class: 'btn', onclick: () => cmd({ t: 'reprendre' }) }, ic('jouer'), 'Reprendre'),
+          h('a', { class: 'btn btn-primary', href: '/stats/' + code }, ic('stats'), 'Résultats'))));
+    } else if (e.statut === 'classement') {
+      blocs.push(
+        h('p', { class: 'etat' }, h('span', {}, 'Classement après la question ' + (e.index + 1)), h('span', {}, (e.index + 1) + ' / ' + n)),
+        zone('top'),
+        h('div', { class: 'pad' },
+          h('button', { type: 'button', class: 'btn', 'aria-label': 'Question précédente', disabled: e.index === 0, onclick: () => aller(e.index - 1) }, ic('precedent')),
+          e.index < n - 1 ? h('button', { type: 'button', class: 'btn btn-primary', onclick: () => aller(e.index + 1) }, ic('suivant'), 'Question suivante')
+            : h('button', { type: 'button', class: 'btn btn-primary', onclick: () => cmd({ t: 'terminer' }) }, ic('podium'), 'Podium'),
+          h('span')));
+    } else {
+      blocs.push(
+        h('p', { class: 'etat' }, h('span', {}, (q.type === 'diapo' ? 'Étape ' : 'Question ') + (e.index + 1) + ' / ' + n), h('span', { class: 'rep', 'data-zone': 'rep' })),
+        h('h1', { class: 'q' }, q.texte || (q.type === 'diapo' ? '(diapositive)' : '(question sans texte)')));
+      const prec = h('button', { type: 'button', class: 'btn', 'aria-label': 'Question précédente', disabled: e.index === 0, onclick: () => aller(e.index - 1) }, ic('precedent'));
+      if (q.type === 'idees') {
+        const t = S.tableau || {};
+        blocs.push(h('div', { class: 'pad' }, prec,
+          (q.votes || 0) > 0
+            ? h('button', { type: 'button', class: 'btn ' + (t.votes ? '' : 'btn-primary'), onclick: () => cmd({ t: 'tableau', q: e.index, votes: !t.votes }) }, ic('pouce'), t.votes ? 'Fermer les votes' : 'Ouvrir les votes')
+            : h('button', { type: 'button', class: 'btn', onclick: () => cmd({ t: 'tableau', q: e.index, depots: t.depots === false }) }, ic(t.depots === false ? 'plus' : 'pause'), t.depots === false ? 'Rouvrir les dépôts' : 'Fermer les dépôts'),
+          suivanteBouton(e, n, false)));
+        if ((q.votes || 0) > 0) blocs.push(h('button', { type: 'button', class: 'btn large', onclick: () => cmd({ t: 'tableau', q: e.index, depots: t.depots === false }) }, ic(t.depots === false ? 'plus' : 'pause'), t.depots === false ? 'Rouvrir les dépôts' : 'Fermer les dépôts'));
+        blocs.push(zone('attente'));
+      } else if (q.type === 'diapo') {
+        blocs.push(h('div', { class: 'pad' }, prec, h('span'), suivanteBouton(e, n, true)));
+      } else if (jeu && info && !info.close) {
+        blocs.push(zone('chrono'), h('div', { class: 'pad' }, prec,
+          h('button', { type: 'button', class: 'btn btn-primary', onclick: () => cmd({ t: 'fermer' }) }, ic('stop'), 'Arrêter le temps'),
+          suivanteBouton(e, n, false)));
+      } else if (jeu) {
+        blocs.push(h('div', { class: 'pad' }, prec,
+          bonnesDe(q).length ? h('button', { type: 'button', class: 'btn btn-primary', onclick: () => cmd({ t: 'classement' }) }, ic('podium'), 'Classement')
+            : h('button', { type: 'button', class: 'btn ' + (e.revele ? '' : 'btn-primary'), onclick: () => reveler(!e.revele) }, ic(e.revele ? 'oeilBarre' : 'oeil'), e.revele ? 'Masquer les résultats' : 'Afficher les résultats'),
+          suivanteBouton(e, n, !bonnesDe(q).length)));
+        blocs.push(zone('mini'));
+      } else {
+        blocs.push(h('div', { class: 'pad' }, prec,
+          h('button', { type: 'button', class: 'btn ' + (e.revele ? '' : 'btn-primary'), onclick: () => reveler(!e.revele) }, ic(e.revele ? 'oeilBarre' : 'oeil'), e.revele ? 'Masquer les résultats' : 'Afficher les résultats'),
+          e.index < n - 1
+            ? h('button', { type: 'button', class: 'btn ' + (e.revele ? 'btn-primary' : ''), 'aria-label': 'Question suivante', onclick: () => aller(e.index + 1) }, ic('suivant'))
+            : h('button', { type: 'button', class: 'btn ' + (e.revele ? 'btn-primary' : ''), onclick: () => cmd({ t: 'terminer' }) }, ic('stop'), 'Fin')));
+      }
+      if (c.mode === 'cartes') {
+        if (Live.compatibleCartes(q)) {
+          blocs.push(h('button', { type: 'button', class: 'btn btn-primary scan-btn', onclick: () => scanner.ouvrir() }, ic('camera'), 'Scanner les cartes'));
+          blocs.push(h('button', { type: 'button', class: 'btn large', onclick: manuel }, ic('clavier'), 'Saisir une carte à la main'));
+          blocs.push(zone('cartes'));
+        } else {
+          blocs.push(h('div', { class: 'lv-encart info' }, ic('info'), h('span', {}, 'Pas de cartes pour cette question : choix multiple de 4 réponses au plus seulement.')));
+        }
+      }
+      if (c.demo) blocs.push(boutonDemo(e));
+      if (e.revele && !jeu) blocs.push(zone('mini'));
+      blocs.push(h('div', { class: 'bas' },
+        h('button', { type: 'button', class: 'btn btn-ghost', onclick: terminer }, ic('stop'), 'Terminer la session'),
+        h('a', { class: 'btn btn-ghost', href: '/stats/' + code }, ic('stats'), 'Résultats')));
+    }
+    app.replaceChildren(...blocs.filter(Boolean));
+    majZones(true);
+    if (jeu && info && !info.close) animerChrono();
+  }
+
+  let iv = null;
+  function animerChrono() {
+    clearInterval(iv);
+    const pas = () => {
+      const info = infoJeu();
+      const el = app.querySelector('[data-zone="chrono"]');
+      if (!el || !info || info.close) { clearInterval(iv); return; }
+      const sec = Math.ceil(Math.max(0, info.fin - Live.maintenantServeur()) / 1000);
+      el.replaceChildren(h('p', { class: 'chrono-pilote' + (sec <= 5 ? ' urgent' : ''), role: 'timer' }, sec + ' s'));
+    };
+    pas();
+    iv = setInterval(pas, 250);
+  }
+
+  function boutonDemo(e) {
+    return h('button', { type: 'button', class: 'btn large', style: { marginTop: '10px' }, onclick: () => cmd({ t: 'simuler', valeur: !e.simulation }) }, ic(e.simulation ? 'check' : 'personnes'), e.simulation ? 'Classe fictive active : la retirer' : 'Ajouter une classe fictive (24)');
+  }
+
+  // contenu des zones dynamiques, remplacé seulement s'il a changé
+  const derniers = {};
+  function remplir(nom, cle, fabriquer, force) {
+    const el = app.querySelector('[data-zone="' + nom + '"]');
+    if (!el) return;
+    if (!force && derniers[nom] === cle) return;
+    derniers[nom] = cle;
+    el.replaceChildren(...[fabriquer()].flat().filter(Boolean));
+  }
+
+  function majZones(force) {
+    const e = S.etat, c = S.config, q = questionCourante();
+    const total = (S.resultats && S.resultats.total) || 0;
+    remplir('presents', String(S.connectes), () => c.mode !== 'cartes'
+      ? h('p', { class: 'presents', html: Live.icone('personnes') }, h('b', {}, String(S.connectes || 0)), enJeu() ? ((S.connectes || 0) > 1 ? 'joueur·euses' : 'joueur·euse') : (S.connectes || 0) > 1 ? 'connecté·es' : 'connecté·e')
+      : h('p', { class: 'petit' }, 'La session n’a pas commencé.'), force);
+    remplir('joueurs', JSON.stringify(S.joueurs || []), () => {
+      const l = (S.joueurs || []).filter((j) => j.connecte);
+      if (!l.length) return null;
+      return [h('p', { class: 'petit' }, 'Touche un pseudo pour le retirer :'),
+        h('div', { class: 'cartes-liste' }, l.map((j) => h('button', { type: 'button', onclick: () => exclure(j) }, j.pseudo)))];
+    }, force);
+    const idees = q && q.type === 'idees' && e.statut === 'question';
+    remplir('rep', total + '|' + S.connectes + '|' + JSON.stringify(idees ? S.resultats : null), () => Live.typo(idees
+      ? Live.pluriel((S.resultats || {}).visibles || 0, 'note', 'notes') + ((S.resultats || {}).votes ? ' · ' + Live.pluriel(S.resultats.votes, 'vote', 'votes') : '')
+      : Live.pluriel(total, 'réponse', 'réponses') + (c.mode !== 'cartes' ? ' · ' + (S.connectes || 0) + ' connecté·es' : '')), force);
+    remplir('fin', JSON.stringify(S.resume), () => {
+      const r = S.resume || {};
+      return h('div', { class: 'chiffres' },
+        h('div', {}, h('b', {}, String(r.participants == null ? 0 : r.participants)), h('span', {}, 'participant·es')),
+        r.reussite != null ? h('div', {}, h('b', {}, Math.round(r.reussite) + ' %'), h('span', {}, 'de réussite')) : null);
+    }, force);
+    remplir('top', JSON.stringify(S.classement || null), () => {
+      const l = (S.classement || []).slice(0, e.statut === 'terminee' ? 10 : 5);
+      if (!l.length) return h('p', { class: 'petit' }, 'Pas encore de points.');
+      return h('ol', { class: 'top-pilote' }, l.map((x) => h('li', {}, h('b', {}, LiveJeu.rang(x.rang)), h('span', {}, x.pseudo), h('b', {}, LiveJeu.points(x.points)))));
+    }, force);
+    remplir('attente', JSON.stringify(Array.from(notes.values()).filter((n) => n.statut === 'attente').map((n) => n.id)), () => {
+      const att = Array.from(notes.values()).filter((n) => n.statut === 'attente').sort((a, b) => a.t - b.t);
+      if (!att.length) return q && q.moderation ? h('p', { class: 'petit', style: { marginTop: '12px' } }, 'Aucune note à valider.') : null;
+      const qi = S.etat.index;
+      return [h('div', { class: 'ligne', style: { marginTop: '14px', alignItems: 'center' } }, h('b', {}, Live.pluriel(att.length, 'note à valider', 'notes à valider')),
+        h('button', { type: 'button', class: 'btn btn-sm btn-primary', onclick: () => cmd({ t: 'moderer', q: qi, tout: 'ok' }) }, ic('check'), 'Tout valider')),
+        h('ul', { class: 'att-pilote' }, att.slice(0, 50).map((n) => h('li', {}, h('span', {}, n.texte),
+          h('div', { class: 'ligne' },
+            h('button', { type: 'button', class: 'btn btn-primary', onclick: () => cmd({ t: 'moderer', q: qi, note: n.id, statut: 'ok' }) }, ic('check'), 'Valider'),
+            h('button', { type: 'button', class: 'btn', onclick: () => cmd({ t: 'moderer', q: qi, note: n.id, statut: 'masque' }) }, 'Masquer')))))];
+    }, force);
+    remplir('cartes', JSON.stringify(S.cartes), () => {
+      const lues = (S.cartes || []).slice().sort((a, b) => a.carte - b.carte);
+      if (!lues.length) return null;
+      return [h('p', { class: 'petit', style: { margin: '14px 0 0' } }, 'Cartes lues (touche pour retirer une erreur de lecture) :'),
+        h('div', { class: 'cartes-liste' }, lues.map((x) => h('button', { type: 'button', onclick: async () => {
+          if (await EtabliUI.confirmer({ titre: 'Retirer la carte ' + x.carte + ' ?', message: 'Sa réponse à cette question sera effacée.', ok: 'Retirer', danger: true })) cmd({ t: 'retirerCarte', q: S.etat.index, carte: x.carte });
+        } }, h('b', {}, x.carte + ' · ' + x.lettre), nomCarte(x.carte) ? h('small', {}, ' ' + nomCarte(x.carte)) : null)))];
+    }, force);
+    remplir('mini', JSON.stringify([S.resultats, (e.masques || {})[e.index], e.revele]), () => (S.resultats && q && (e.revele || enJeu()) && q.type !== 'idees' && q.type !== 'diapo' ? h('div', { class: 'mini' }, LiveVue.rendre(q, S.resultats, {
+      revele: true, tailleMax: 2.4, montrerMasques: true,
+      onMasquer: q.type === 'libre' ? (t) => cmd({ t: 'masquer', q: S.etat.index, pid: t.pid, valeur: !t.masque }) : null,
+    })) : null), force);
+  }
+})();
+</script>
+</body>
+</html>

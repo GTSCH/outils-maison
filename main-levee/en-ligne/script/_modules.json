@@ -1,0 +1,22 @@
+{
+ "worker": "main-levee",
+ "module_principal": "main-levee-worker.js",
+ "releve_le": "2026-10-26",
+ "sha256_principal_en_ligne": "c28c9c685ea9b7192df402608af99a60ffab54ef299965edb3b57077f5261d9a",
+ "modules": [
+  {
+   "nom": "main-levee-worker.js",
+   "fichier": "main-levee-worker.js",
+   "type": "application/javascript+module",
+   "sha256": "c28c9c685ea9b7192df402608af99a60ffab54ef299965edb3b57077f5261d9a",
+   "octets": 34817
+  },
+  {
+   "nom": "main-levee-worker.js.map",
+   "fichier": "main-levee-worker.js.map",
+   "type": "application/source-map",
+   "sha256": "72bcb73c2dcf097c23188bab28b143070a2a7674df2a81d84871e5c8e6f2c9e6",
+   "octets": 64114
+  }
+ ]
+}

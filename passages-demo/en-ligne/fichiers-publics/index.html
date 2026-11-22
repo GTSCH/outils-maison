@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bibliothèque de recherche</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#23466e">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <button class="btn ghost side-toggle" id="sideToggle" aria-label="Menu">☰</button>
+  <button class="brand" data-nav="home" aria-label="Accueil">
+    <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M5 5h6v22H5zM13 5h6v22h-6zM21 6.6l5.2-1.4 5.6 21.2-5.2 1.4z"/></svg>
+    <span id="brandName">Bibliothèque</span>
+  </button>
+  <form class="search" id="searchForm" role="search">
+    <input type="search" id="q" placeholder="Chercher dans le texte des PDF…" aria-label="Recherche dans le texte des articles">
+    <select id="mode" aria-label="Type de recherche">
+      <option value="hybrid">Hybride</option>
+      <option value="keyword">Mots-clés</option>
+      <option value="semantic">Par le sens</option>
+    </select>
+    <button class="btn" type="submit">Chercher</button>
+  </form>
+  <button class="btn primary" id="addBtn">+ Ajouter</button>
+  <div class="menu-wrap">
+    <button class="btn ghost" id="menuBtn" aria-label="Plus d’options">⋯</button>
+    <div class="menu hidden" id="menu">
+      <button data-act="export">Exporter (RIS, BibTeX, CSV, APA)</button>
+      <button data-act="manage">Gérer collections et étiquettes</button>
+      <button data-act="reindex">Indexer les PDF en attente</button>
+      <button data-act="embed">Compléter l’index sémantique</button>
+      <button data-act="connector">Connecter à Claude</button>
+      <button data-act="share">Partage : liens publics et accès invité</button>
+      <button data-act="setup">Assistant de démarrage (import Zotero)</button>
+      <button data-act="exportall">Tout exporter</button>
+      <button data-act="logout">Se déconnecter</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="side" id="side" aria-label="Navigation">
+    <div id="sideExt"></div>
+
+    <h4>Bibliothèque</h4>
+    <button class="nav-item" data-nav="dashboard"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="2.5" width="6.5" height="8" rx="1.5"/><rect x="11" y="2.5" width="6.5" height="5" rx="1.5"/><rect x="2.5" y="12.5" width="6.5" height="5" rx="1.5"/><rect x="11" y="9.5" width="6.5" height="8" rx="1.5"/></svg>Tableau de bord</span></button>
+    <button class="nav-item" data-nav="all"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 3h3.5v14H3.5zM8.5 3H12v14H8.5zM13.2 4.1l3.2-.8 3 12.2-3.2.8z"/></svg>Toute la bibliothèque</span><span class="n" id="nAll"></span></button>
+    <button class="nav-item hidden" data-nav="pending" id="navPending"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 6v4.3l2.8 1.7"/></svg>PDF à indexer</span><span class="n" id="nPending"></span></button>
+
+    <h4>Lecture</h4>
+    <button class="nav-item" data-nav="read" data-name="to_read"><span class="nav-label"><i class="dot dot-to_read"></i>À lire</span><span class="n" id="n_to_read"></span></button>
+    <button class="nav-item" data-nav="read" data-name="reading"><span class="nav-label"><i class="dot dot-reading"></i>En cours</span><span class="n" id="n_reading"></span></button>
+    <button class="nav-item" data-nav="read" data-name="read"><span class="nav-label"><i class="dot dot-read"></i>Lu</span><span class="n" id="n_read"></span></button>
+    <button class="nav-item" data-nav="opened"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 5.5c2.5-1.3 5-1.3 7.5 0v11c-2.5-1.3-5-1.3-7.5 0zM10 5.5c2.5-1.3 5-1.3 7.5 0v11c-2.5-1.3-5-1.3-7.5 0z"/></svg>Ouverts récemment</span><span class="n" id="nOpened"></span></button>
+    <button class="nav-item" data-nav="annotated"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 14.5 12.8 4.7l2.5 2.5L5.5 17H3zM11 17h6"/></svg>Articles annotés</span><span class="n" id="nAnnotated"></span></button>
+    <button class="nav-item" data-nav="notes"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h12a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 16 14H9l-4 3v-3H4a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 4 4z"/></svg>Toutes les annotations</span><span class="n" id="nNotes"></span></button>
+
+    <div class="side-head"><h4>Collections</h4><button class="linkish" data-task="manage">Gérer</button></div>
+    <div id="collections"></div>
+    <div class="side-head"><h4>Étiquettes</h4><button class="linkish" data-task="manage">Gérer</button></div>
+    <div id="tags"></div>
+
+    <h4>Outils</h4>
+    <button class="nav-item" data-nav="duplicates"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="5.5" width="10" height="12" rx="1.5"/><path d="M7.5 5.5V3.8c0-.7.6-1.3 1.3-1.3h7.4c.7 0 1.3.6 1.3 1.3v9.4c0 .7-.6 1.3-1.3 1.3h-3.7"/></svg>Doublons possibles</span></button>
+    <button class="nav-item" data-nav="activity"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 10h3l2-5 3.5 10 2-5h4.5"/></svg>Journal d’activité</span></button>
+    <button class="nav-item" data-nav="trash"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 5.5h13M8 5.5V3.5h4v2M5.2 5.5l.8 11h8l.8-11"/></svg>Corbeille</span><span class="n" id="nTrash"></span></button>
+    <button class="nav-item" data-act-side="exportall"><span class="nav-label"><svg class="ni" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9.5M6 9l4 4 4-4M4 16.5h12"/></svg>Tout exporter</span></button>
+  </nav>
+
+  <main id="main">
+    <div class="view-head">
+      <div>
+        <h1 id="viewTitle">Tableau de bord</h1>
+        <div id="viewNote" class="note"></div>
+      </div>
+    </div>
+    <div class="tools hidden" id="listTools">
+      <input type="search" id="filter" placeholder="Filtrer : titre, auteur·e, revue, DOI…" aria-label="Filtrer les fiches">
+      <select id="fPdf" aria-label="PDF">
+        <option value="">Avec ou sans PDF</option>
+        <option value="yes">Avec PDF</option>
+        <option value="no">Sans PDF</option>
+      </select>
+      <select id="fRead" aria-label="Lecture">
+        <option value="">Tout statut de lecture</option>
+        <option value="to_read">À lire</option>
+        <option value="reading">En cours</option>
+        <option value="read">Lu</option>
+        <option value="none">Sans statut</option>
+      </select>
+      <select id="fType" aria-label="Type de document"></select>
+      <select id="sort" aria-label="Tri">
+        <option value="recent">Ajout récent</option>
+        <option value="oldest">Ajout ancien</option>
+        <option value="title">Titre (A-Z)</option>
+        <option value="author">Auteur·e (A-Z)</option>
+        <option value="year">Année (récente)</option>
+        <option value="year_asc">Année (ancienne)</option>
+        <option value="container">Revue ou source</option>
+        <option value="type">Type</option>
+        <option value="opened">Ouverture récente</option>
+        <option value="annotated">Annotation récente</option>
+      </select>
+      <div class="seg" role="group" aria-label="Affichage">
+        <button class="seg-btn" id="displayCards" title="Fiches">Fiches</button>
+        <button class="seg-btn" id="displayTable" title="Tableau, avec sélection multiple">Tableau</button>
+      </div>
+      <button class="btn" id="exportBtn">Exporter</button>
+    </div>
+    <div class="chips hidden" id="chips"></div>
+    <div class="bulk hidden" id="bulkBar" role="toolbar" aria-label="Actions sur la sélection">
+      <b id="bulkCount">0 sélectionnée</b>
+      <div class="bulk-acts">
+        <span class="bulk-group">
+          <button class="btn small" data-bulk="collection_add" data-bulk-trash>+ Collection</button>
+          <button class="btn small" data-bulk="collection_remove" data-bulk-trash>− Collection</button>
+          <button class="btn small" data-bulk="tag_add" data-bulk-trash>+ Étiquette</button>
+          <button class="btn small" data-bulk="tag_remove" data-bulk-trash>− Étiquette</button>
+          <select id="bulkRead" class="small" aria-label="Statut de lecture" data-bulk-trash>
+            <option value="">Lecture…</option>
+            <option value="to_read">À lire</option>
+            <option value="reading">En cours</option>
+            <option value="read">Lu</option>
+            <option value="none">Retirer le statut</option>
+          </select>
+        </span>
+        <span class="bulk-group">
+          <button class="btn small" data-bulk="oa" data-bulk-trash>Chercher les PDF libres</button>
+          <button class="btn small" data-bulk="check" data-bulk-trash>Vérifier les métadonnées</button>
+          <button class="btn small" data-bulk="export">Exporter</button>
+        </span>
+        <span class="bulk-group">
+          <button class="btn small danger" data-bulk="trash" data-bulk-trash>Corbeille</button>
+          <button class="btn small" data-bulk="restore" data-bulk-restore>Restaurer</button>
+          <button class="btn small danger" data-bulk="delete" data-bulk-restore>Supprimer définitivement</button>
+          <button class="btn small ghost" data-bulk="clear">Désélectionner</button>
+        </span>
+      </div>
+    </div>
+    <div id="content"></div>
+  </main>
+</div>
+
+
+<aside class="drawer hidden" id="drawer" aria-label="Fiche"></aside>
+
+<dialog id="addDialog">
+  <div class="dlg-head"><h2>Ajouter à la bibliothèque</h2><button class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+  <div class="tabs">
+    <button class="tab active" data-tab="pdf">Déposer des PDF</button>
+    <button class="tab" data-tab="doi">Par DOI</button>
+    <button class="tab" data-tab="ris">Importer un fichier RIS</button>
+    <button class="tab" data-tab="web">Archiver une page web</button>
+  </div>
+  <div class="dlg-body">
+    <div class="row">
+      <label>Collection<br><input type="text" id="addCollection" list="collectionList" placeholder="ex. Thèse"></label>
+      <label>Étiquettes (séparées par des virgules)<br><input type="text" id="addTags" placeholder="ex. à lire, IA"></label>
+    </div>
+    <datalist id="collectionList"></datalist>
+    <div data-pane="pdf">
+      <div class="drop" id="drop">Glisse des PDF ici, ou clique pour les choisir.<br><small>Le DOI est repéré dans le PDF pour récupérer les métadonnées officielles.</small></div>
+      <input type="file" id="fileInput" accept="application/pdf" multiple hidden>
+    </div>
+    <div data-pane="doi" class="hidden">
+      <textarea id="doiInput" rows="5" placeholder="Un DOI par ligne, par exemple 10.1080/00933104.2016.1210549"></textarea>
+      <label><input type="checkbox" id="doiFetch" checked> Chercher et joindre le PDF en libre accès quand il existe</label>
+      <div><button class="btn primary" id="doiGo">Ajouter</button></div>
+    </div>
+    <div data-pane="ris" class="hidden">
+      <p class="note">Fichier RIS exporté de Zotero (Fichier &gt; Exporter la bibliothèque, format RIS). Les doublons sont repérés par DOI ou par titre et année.</p>
+      <input type="file" id="risInput" accept=".ris,.txt">
+    </div>
+    <div data-pane="web" class="hidden">
+      <p class="note">La page est enregistrée en PDF telle qu’elle est aujourd’hui (titre, site, date de consultation), puis son texte est indexé : elle se lit, se surligne et se cite comme un article, même si elle change ou disparaît.</p>
+      <textarea id="webInput" rows="3" placeholder="Une adresse par ligne, par exemple https://www.edulog.ch/fr/..."></textarea>
+      <div><button class="btn primary" id="webGo">Archiver</button></div>
+    </div>
+    <div class="log" id="addLog"></div>
+  </div>
+</dialog>
+
+<dialog id="viewer">
+  <div class="dlg-head"><h2 id="viewerTitle">PDF</h2>
+    <div><a class="btn small" id="viewerOpen" target="_blank" rel="noopener">Ouvrir dans un onglet</a> <button class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+  </div>
+  <iframe id="viewerFrame" title="PDF"></iframe>
+</dialog>
+
+<dialog id="connectorDialog">
+  <div class="dlg-head"><h2>Connecter à Claude</h2><button class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+  <div class="dlg-body" id="connectorBody"></div>
+</dialog>
+
+<dialog id="exportDialog" class="narrow">
+  <div class="dlg-head"><h2>Exporter</h2><button class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+  <div class="dlg-body">
+    <p class="note" id="exportScope"></p>
+    <div class="choices">
+      <button class="choice" data-export="ris"><b>RIS</b><span>Pour Zotero, Mendeley, EndNote</span></button>
+      <button class="choice" data-export="bibtex"><b>BibTeX</b><span>Pour LaTeX et Overleaf</span></button>
+      <button class="choice" data-export="csv"><b>Tableur (CSV)</b><span>Pour Excel ou Numbers, avec la référence APA</span></button>
+      <button class="choice" data-export="apa"><b>Bibliographie APA 7</b><span>À copier dans un document Word</span></button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="apaDialog">
+  <div class="dlg-head"><h2>Bibliographie APA 7</h2><button class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+  <div class="dlg-body">
+    <p class="note" id="apaCount"></p>
+    <div class="apa-list" id="apaList"></div>
+    <div class="actions"><button class="btn primary" id="apaCopy">Copier (avec l’italique)</button><button class="btn" id="apaDownload">Télécharger en texte</button></div>
+  </div>
+</dialog>
+
+<dialog id="manageDialog">
+  <div class="dlg-head"><h2>Collections et étiquettes</h2><button class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+  <div class="dlg-body" id="manageBody"></div>
+</dialog>
+
+<dialog id="askDialog" class="narrow">
+  <form method="dialog">
+    <div class="dlg-head"><h2 id="askTitle">Saisir</h2><button type="button" class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+    <div class="dlg-body">
+      <label><span id="askLabel"></span><br><input type="text" id="askInput" list="askList" autocomplete="off" class="full"></label>
+      <datalist id="askList"></datalist>
+      <div class="dlg-foot"><button class="btn primary" id="askOk" value="ok">Valider</button><button type="button" class="btn" data-close>Annuler</button></div>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="confirmDialog" class="narrow">
+  <form method="dialog">
+    <div class="dlg-head"><h2 id="confirmTitle">Confirmer</h2><button type="button" class="btn ghost" data-close aria-label="Fermer">✕</button></div>
+    <div class="dlg-body">
+      <p id="confirmText"></p>
+      <div class="dlg-foot"><button class="btn primary" id="confirmOk" value="ok">Confirmer</button><button type="button" class="btn" data-close>Annuler</button></div>
+    </div>
+  </form>
+</dialog>
+
+<div id="toasts" aria-live="polite"></div>
+<div id="progress" class="hidden"><div id="progressText"></div><div class="bar"><i id="progressBar"></i></div></div>
+
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>

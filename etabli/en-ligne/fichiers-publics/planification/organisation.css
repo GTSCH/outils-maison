@@ -1,0 +1,99 @@
+/*
+ * L'Établi : organisation de la classe (planification annuelle et semaine). Complète etabli.css.
+ * Principe : des objets d'information calmes (une frise, une grille), où la couleur des branches est le seul
+ * code couleur fort. Chiffres et dates en Lexend tabulaire.
+ */
+:root {
+  --t-planification: #9A5B0C;
+  --t-semaine: #B03A5B;
+  --hach: color-mix(in srgb, var(--fg) 13%, transparent);
+  --voile-conge: color-mix(in srgb, var(--surface-3) 82%, transparent);
+  --org-max: 1440px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --t-planification: #E3A55A; --t-semaine: #EE8CA6; --hach: color-mix(in srgb, var(--fg) 12%, transparent); }
+}
+:root[data-theme="dark"] { --t-planification: #E3A55A; --t-semaine: #EE8CA6; --hach: color-mix(in srgb, var(--fg) 12%, transparent); }
+
+.type-dot[data-type="planification"] { background: var(--t-planification); }
+.type-dot[data-type="semaine"] { background: var(--t-semaine); }
+.type-dot.org-td-xl { width: 56px; height: 56px; border-radius: 14px; }
+.type-dot.org-td-xl svg { width: 30px; height: 30px; }
+
+body { min-height: 100vh; }
+.org-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.org-chargement { padding: 48px 24px; color: var(--muted); text-align: center; font-family: var(--font-display); }
+kbd { display: inline-block; font: 700 12px/1 var(--font-ui); padding: 4px 6px 3px; min-width: 22px; text-align: center; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); color: var(--muted); white-space: nowrap; }
+.org-page .btn > span:empty { display: none; }
+
+/* ---------- cadre de page ---------- */
+.org-page { width: 100%; max-width: var(--org-max); margin: 0 auto; padding: 20px clamp(16px, 2.6vw, 40px) 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.org-tete { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.org-tete-txt { min-width: 0; display: grid; gap: 4px; }
+.org-fil { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; color: var(--muted); font-size: 14px; font-weight: 700; }
+.org-fil a { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; color: var(--muted); text-decoration: none; }
+.org-fil a:hover { color: var(--accent); text-decoration: underline; }
+.org-fil svg { width: 16px; height: 16px; }
+.org-h1 { display: flex; align-items: center; gap: 12px; font: 600 clamp(24px, 2.6vw, 32px)/1.15 var(--font-display); letter-spacing: -0.015em; overflow-wrap: anywhere; }
+.org-h1 .num { font-weight: 600; }
+.org-sous { color: var(--muted); font-size: 15px; }
+.org-tete-act { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.org-h2 { font: 600 18px/1.25 var(--font-display); }
+.org-petit-titre { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
+.org-boutons { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.org-select { width: auto; min-height: 40px; padding: 6px 30px 6px 10px; font-size: 15px; }
+
+/* ---------- onglets ---------- */
+.org-onglets { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.org-onglet { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 0; background: none; color: var(--muted); font: 700 15px/1 var(--font-ui); text-decoration: none; white-space: nowrap; cursor: pointer; }
+.org-onglet svg { width: 18px; height: 18px; }
+.org-onglet:hover { color: var(--fg); }
+.org-onglet[aria-selected="true"], .org-onglet[aria-current="page"] { color: var(--fg); }
+.org-onglet[aria-selected="true"]::after, .org-onglet[aria-current="page"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent); }
+
+/* ---------- pastilles ---------- */
+.org-point { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--b, var(--faint)); flex: none; }
+.org-h1 .org-point { width: 14px; height: 14px; }
+.org-auteur { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--a); color: #fff; font: 700 11px/1 var(--font-display); flex: none; box-shadow: 0 0 0 2px var(--surface); }
+.org-puces { display: flex; flex-wrap: wrap; gap: 6px; }
+.org-puce { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--fg); font: 700 14px/1.1 var(--font-ui); cursor: pointer; text-decoration: none; }
+.org-puce:hover { background: var(--surface-2); border-color: var(--fg); }
+.org-choix-branche { display: grid; gap: 10px; }
+
+/* ---------- bandeaux, messages ---------- */
+.org-bandeau { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--mark) 45%, var(--line)); border-radius: var(--radius-lg); background: var(--mark-soft); font-size: 15px; }
+.org-bandeau p { flex: 1; min-width: 0; }
+.org-bandeau-ico { color: var(--warn); display: grid; flex: none; }
+.org-bandeau-ico svg { width: 22px; height: 22px; }
+.org-bandeau .btn { flex: none; background: var(--surface); }
+.org-mention { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius); background: var(--accent-soft); color: var(--fg); font-size: 15px; }
+.org-mention svg { width: 20px; height: 20px; color: var(--accent); flex: none; }
+.org-message { width: min(560px, calc(100% - 32px)); margin: clamp(32px, 9vh, 88px) auto; display: grid; justify-items: start; gap: 14px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius-xl); background: var(--surface); }
+.org-message-large { width: min(720px, calc(100% - 32px)); }
+.org-message-ico { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: var(--mark-soft); color: var(--warn); }
+.org-message-ico svg { width: 28px; height: 28px; }
+.org-vide { display: grid; justify-items: start; gap: 10px; padding: 18px; width: 100%; border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); color: var(--muted); }
+.org-classes { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; width: 100%; }
+.org-classe { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--fg); font: inherit; text-align: left; cursor: pointer; }
+.org-classe:hover { border-color: var(--accent); }
+.org-classe span { display: grid; min-width: 0; }
+.org-classe b { font: 600 16px/1.2 var(--font-display); }
+.org-classe small { color: var(--muted); font-size: 13px; }
+
+/* ---------- impression (base) ---------- */
+.org-impression { display: none; }
+@media print {
+  @page { size: A4 landscape; margin: 9mm 10mm; }
+  :root { --fg: #111; --muted: #444; --faint: #666; --line: #BBB; --line-strong: #888; --surface: #FFF; --surface-2: #F3F3F3; --surface-3: #E6E6E6; --bg: #FFF; --hach: rgb(0 0 0 / .16); color-scheme: light; }
+  html, body { background: #FFF !important; color: #111 !important; }
+  body { min-height: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .eb-barre, .eb-toasts, .eb-voile, .eb-menu, .org-ecran, .org-sr { display: none !important; }
+  .org-impression { display: block !important; }
+  a { color: inherit; text-decoration: none; }
+}
+@media (prefers-reduced-motion: reduce) { .org-page * { transition: none !important; } }
+@media (max-width: 640px) {
+  .org-page { padding: 14px 16px 56px; gap: 14px; }
+  .org-message { padding: 20px 18px; }
+  .org-bandeau { flex-wrap: wrap; }
+}

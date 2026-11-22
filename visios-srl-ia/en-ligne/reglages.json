@@ -1,0 +1,26 @@
+{
+ "reglages": {
+  "placement": {},
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": [],
+  "usage_model": "standard",
+  "tags": [],
+  "tail_consumers": [],
+  "logpush": false,
+  "annotations": {
+   "workers/triggered_by": "version_upload"
+  },
+  "bindings": [
+   {
+    "database_id": "0046218e-18e8-443a-9342-8cc18d625af4",
+    "id": "0046218e-18e8-443a-9342-8cc18d625af4",
+    "name": "DB",
+    "type": "d1"
+   }
+  ]
+ },
+ "sous_domaine_workers_dev": {
+  "enabled": true,
+  "previews_enabled": true
+ }
+}

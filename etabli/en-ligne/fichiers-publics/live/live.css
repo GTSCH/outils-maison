@@ -1,0 +1,271 @@
+/*
+ * L'Établi : styles des quiz en direct (pages participant·e, projection, télécommande, statistiques, aperçu de l'éditeur).
+ * S'appuie sur les jetons de /css/etabli.css. Andika (--font-eleve) pour tout ce que lisent les élèves.
+ */
+.lv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ic { display: inline-flex; flex: none; }
+.ic svg { width: 1.15em; height: 1.15em; }
+.btn .ic svg { width: 20px; height: 20px; }
+.btn-sm .ic svg { width: 18px; height: 18px; }
+
+/* ---------- pastilles de lettres ---------- */
+.lv-lettre { display: inline-grid; place-items: center; flex: none; width: 1.9em; height: 1.9em; border-radius: 6px; background: var(--fg); color: var(--bg); font: 700 1em/1 var(--font-display); }
+
+/* ---------- résultats : choix multiple ---------- */
+.lv-res-qcm { display: grid; gap: .6em; }
+.lv-res-ligne { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .3em .7em; align-items: center; }
+.lv-res-ligne .lv-txt { font-family: var(--font-eleve); font-weight: 700; overflow-wrap: anywhere; line-height: 1.25; }
+.lv-res-ligne .lv-val { font-family: var(--font-display); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lv-res-ligne .lv-val b { font-weight: 700; }
+.lv-res-ligne .lv-val small { color: var(--muted); font-size: .78em; font-weight: 400; }
+.lv-res-ligne .lv-barre { grid-column: 2 / 4; height: .55em; background: var(--surface-3); border-radius: 999px; overflow: hidden; position: relative; }
+.lv-res-ligne .lv-barre i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 999px; transition: width .6s cubic-bezier(.2, .7, .2, 1); }
+.lv-res-ligne.bonne .lv-lettre { background: var(--ok); color: var(--surface); }
+.lv-res-ligne.bonne .lv-barre i { background: var(--ok); }
+.lv-res-ligne.autre .lv-lettre { background: var(--surface-3); color: var(--muted); }
+.lv-res-ligne.autre .lv-barre i { background: var(--line-strong); }
+.lv-res-ligne.autre .lv-txt { color: var(--muted); }
+.lv-res-ligne.mienne .lv-lettre { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 5px var(--accent); }
+.lv-bonne-marque { display: inline-flex; vertical-align: -.12em; margin-left: .35em; color: var(--ok); }
+.lv-bonne-marque svg { width: 1em; height: 1em; stroke-width: 2.6; }
+
+/* ---------- résultats : échelle ---------- */
+.lv-res-echelle { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: .5em; align-items: end; height: 10em; }
+.lv-col { display: grid; grid-template-rows: auto 1fr auto; height: 100%; text-align: center; min-width: 0; }
+.lv-col .lv-b { align-self: end; background: var(--accent); border-radius: 6px 6px 0 0; min-height: 3px; transition: height .6s cubic-bezier(.2, .7, .2, 1); }
+.lv-col .lv-n { font: 700 1em/1.3 var(--font-display); font-variant-numeric: tabular-nums; }
+.lv-col .lv-v { font: 700 1em/1.3 var(--font-display); border-top: 2px solid var(--fg); padding-top: .2em; }
+.lv-res-echelle-legende { display: flex; justify-content: space-between; gap: 1em; margin-top: .4em; color: var(--muted); font-family: var(--font-eleve); }
+.lv-res-moyenne { margin-top: .5em; }
+.lv-res-moyenne b { font-family: var(--font-display); font-size: 1.3em; }
+
+/* ---------- résultats : nuage ---------- */
+.lv-res-nuage { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .1em .55em; line-height: 1.05; text-align: center; font-family: var(--font-eleve); font-weight: 700; overflow-wrap: anywhere; }
+.lv-res-nuage span { display: inline-block; max-width: 100%; }
+.lv-res-nuage .c0 { color: var(--accent); }
+.lv-res-nuage .c1 { color: var(--t-quiz); }
+.lv-res-nuage .c2 { color: var(--ok); }
+.lv-res-nuage .c3 { color: var(--t-seance); }
+.lv-res-nuage .c4 { color: var(--fg); }
+
+/* ---------- résultats : réponses libres ---------- */
+.lv-res-libre { columns: 3 280px; column-gap: 16px; }
+.lv-bulle { break-inside: avoid; display: flex; flex-direction: column; gap: .4em; background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--t-quiz); border-radius: var(--radius-lg); padding: .6em .8em; margin: 0 0 16px; font-family: var(--font-eleve); line-height: 1.35; }
+.lv-bulle-txt { white-space: pre-wrap; overflow-wrap: anywhere; }
+.lv-bulle.masque { border-left-color: var(--line-strong); color: var(--muted); background: var(--surface-2); }
+.lv-masque-txt { font-style: italic; font-family: var(--font-ui); }
+.lv-masquer { align-self: flex-start; font-family: var(--font-ui); }
+.lv-res-vide { color: var(--muted); padding: 1em 0; }
+
+/* ---------- vue élève (page participant·e et aperçu de l'éditeur) ---------- */
+.lv-eleve { font-family: var(--font-eleve); }
+.lv-num { font: 700 13px/1.2 var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.lv-question { font-family: var(--font-eleve); font-weight: 700; font-size: clamp(22px, 6vw, 30px); line-height: 1.25; margin: 0 0 18px; white-space: pre-wrap; overflow-wrap: anywhere; text-wrap: pretty; }
+.lv-choix { display: grid; gap: 10px; }
+.lv-choix-btn { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 10px 14px; text-align: left; font: 700 19px/1.25 var(--font-eleve); color: var(--fg); background: var(--surface); border: 2px solid var(--line-strong); border-radius: var(--radius-lg); cursor: pointer; transition: border-color .12s, background .12s; }
+.lv-choix-btn:hover:not(:disabled) { border-color: var(--accent); }
+.lv-choix-btn .lv-lettre { font-size: 17px; }
+.lv-choix-btn .lv-txt { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.lv-choix-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+.lv-choix-btn[aria-pressed="true"] .lv-lettre { background: var(--accent); color: var(--accent-fg); }
+.lv-choix-btn.bonne { border-color: var(--ok); background: var(--ok-soft); box-shadow: inset 0 0 0 2px var(--ok); }
+.lv-choix-btn.bonne .lv-lettre { background: var(--ok); color: var(--surface); }
+.lv-choix-btn.faux { border-color: var(--bad); background: var(--bad-soft); box-shadow: none; }
+.lv-choix-btn.faux .lv-lettre { background: var(--bad); color: var(--surface); }
+.lv-choix-btn.eteint { opacity: .6; }
+.lv-choix-btn:disabled { cursor: default; }
+.lv-tag { font: 700 12px/1 var(--font-ui); text-transform: uppercase; letter-spacing: .05em; color: var(--accent); white-space: nowrap; }
+.lv-choix-btn.bonne .lv-tag { color: var(--ok); }
+.lv-choix-btn.faux .lv-tag { color: var(--bad); }
+.lv-echelle { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 6px; }
+.lv-echelle button { min-height: 64px; font: 700 24px/1 var(--font-display); border: 2px solid var(--line-strong); background: var(--surface); color: var(--fg); border-radius: var(--radius); cursor: pointer; padding: 0; }
+.lv-echelle.serree button { font-size: 20px; min-height: 56px; }
+.lv-echelle button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.lv-echelle button:disabled { cursor: default; opacity: .7; }
+.lv-echelle-legende { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; font-size: 16px; color: var(--muted); }
+.lv-echelle-legende span:last-child { text-align: right; }
+.lv-saisie { display: grid; gap: 10px; }
+.lv-saisie .input, .lv-saisie .textarea { font: 20px/1.4 var(--font-eleve); }
+.lv-saisie-bas { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.lv-compteur { color: var(--faint); font: 14px/1 var(--font-ui); }
+.lv-envoyer { min-height: 52px; font-size: 18px; padding: 0 22px; }
+.lv-envoi { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0 0; padding: 12px 14px; border-radius: var(--radius-lg); background: var(--surface-2); font: 16px/1.4 var(--font-ui); overflow-wrap: anywhere; }
+.lv-envoi.ok { background: var(--ok-soft); }
+.lv-envoi svg { width: 22px; height: 22px; color: var(--ok); flex: none; stroke-width: 2.4; }
+.lv-envoi-plus { color: var(--muted); }
+.lv-retour { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; padding: 14px 16px; border-radius: var(--radius-lg); font: 700 21px/1.2 var(--font-display); }
+.lv-retour svg { width: 26px; height: 26px; stroke-width: 2.4; display: block; }
+.lv-retour.juste { background: var(--ok); color: var(--surface); }
+.lv-retour.faux { background: var(--surface-3); color: var(--fg); }
+.lv-eleve-res { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 17px; }
+.lv-eleve-res h2 { font-size: 18px; margin-bottom: 12px; }
+.lv-eleve-res h2 small { font: 400 15px var(--font-ui); color: var(--muted); }
+.lv-eleve-res .lv-res-echelle { height: 140px; }
+.lv-eleve-res .lv-res-nuage { font-size: 16px; }
+
+/* ---------- attente animée ---------- */
+.lv-points { display: inline-flex; gap: 10px; margin: 22px 0; }
+.lv-points i { width: 14px; height: 14px; border-radius: 50%; background: var(--t-quiz); animation: lv-saut 1.2s infinite ease-in-out; }
+.lv-points i:nth-child(2) { animation-delay: .15s; }
+.lv-points i:nth-child(3) { animation-delay: .3s; }
+@keyframes lv-saut { 0%, 80%, 100% { opacity: .2; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .lv-points i { animation: none; opacity: .7; } }
+
+/* ---------- logo compact (pages sans barre commune) ---------- */
+.lv-logo { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); text-decoration: none; font: 700 16px/1 var(--font-display); white-space: nowrap; }
+.lv-logo svg { width: 26px; height: 26px; flex: none; }
+a.lv-logo { padding: 6px 8px; margin-left: -8px; border-radius: var(--radius); }
+a.lv-logo:hover { background: var(--surface-2); }
+
+/* ---------- encarts ---------- */
+.lv-encart { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: var(--radius-lg); background: var(--surface-2); border: 1px solid var(--line); line-height: 1.45; }
+.lv-encart > .ic svg { width: 22px; height: 22px; margin-top: 1px; }
+.lv-encart.attention { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+.lv-encart.attention > .ic { color: var(--warn); }
+.lv-encart.info > .ic { color: var(--accent); }
+
+/* ---------- scanner de cartes (projection et télécommande) ---------- */
+.lv-scanner { position: fixed; inset: 0; z-index: 800; background: #000; color: #fff; display: grid; grid-template-rows: auto 1fr auto; font-family: var(--font-ui); }
+.lv-scanner .lv-sc-zone { position: relative; overflow: hidden; min-height: 0; }
+.lv-scanner video, .lv-scanner canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.lv-scanner .lv-sc-barre { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; background: #141A1E; font: 700 17px/1.2 var(--font-display); flex-wrap: wrap; }
+.lv-scanner .lv-sc-barre .gros { font-size: 26px; font-variant-numeric: tabular-nums; }
+.lv-scanner .lv-sc-bas { flex-direction: column; align-items: stretch; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+.lv-scanner .lv-sc-repartition { display: flex; gap: 14px; flex-wrap: wrap; font-size: 18px; }
+.lv-scanner .lv-sc-repartition span { display: inline-flex; gap: 6px; align-items: center; }
+.lv-scanner .lv-sc-repartition b { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: #fff; color: #141A1E; }
+.lv-scanner .lv-sc-zoom { display: flex; gap: 10px; align-items: center; font: 500 16px var(--font-ui); }
+.lv-scanner .lv-sc-zoom input { flex: 1; accent-color: #F5C343; }
+.lv-scanner .lv-sc-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lv-scanner .btn { min-height: 56px; background: #263334; color: #fff; border-color: #40524F; white-space: normal; text-align: center; line-height: 1.15; }
+.lv-scanner .btn:hover { background: #2C413C; }
+.lv-scanner .btn-primary { background: #F5C343; color: #141A1E; border-color: #F5C343; }
+.lv-scanner .btn-primary:hover { background: #F7CF62; }
+.lv-scanner .lv-sc-conseil { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; padding: 8px 16px; background: rgb(20 26 30 / .78); font-size: 15px; text-align: center; }
+.lv-scanner .lv-sc-message { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; font-size: 18px; line-height: 1.45; }
+.lv-scanner .lv-sc-message > div { max-width: 520px; display: grid; gap: 14px; justify-items: center; }
+.lv-scanner .lv-sc-message h2 { font-size: 24px; color: #fff; }
+
+/* saisie manuelle d'une carte */
+.lv-manuel { display: grid; gap: 14px; }
+.lv-manuel-lettres { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.lv-manuel-lettres .btn { min-height: 64px; font: 700 26px/1 var(--font-display); }
+.lv-manuel-lettres .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+
+/* ======================================================================== étape 3 */
+
+/* ---------- image d'une question ---------- */
+.lv-image { margin: 0 0 18px; display: flex; justify-content: center; }
+.lv-image img { display: block; max-width: 100%; height: auto; object-fit: contain; border-radius: var(--radius-lg); background: var(--surface-2); border: 1px solid var(--line); }
+.lv-image-eleve img { max-height: 28vh; }
+.lv-image.casse { display: none; }
+
+/* ---------- diapositive (téléphone) ---------- */
+.lv-diapo-corps { font: 19px/1.5 var(--font-eleve); white-space: pre-wrap; overflow-wrap: anywhere; margin: 0 0 18px; }
+.lv-regarde { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: var(--radius-lg); background: var(--surface-2); border: 1px solid var(--line); font: 600 18px/1.35 var(--font-ui); }
+.lv-regarde .ic svg { width: 30px; height: 30px; color: var(--t-quiz); }
+
+/* ---------- classement d'items (téléphone) ---------- */
+.lv-consigne { color: var(--muted); font-size: 16px; margin: -6px 0 12px; }
+.lv-ordre { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
+.lv-ordre-item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 60px; padding: 6px 6px 6px 10px; background: var(--surface); border: 2px solid var(--line-strong); border-radius: var(--radius-lg); font: 700 18px/1.25 var(--font-eleve); }
+.lv-ordre-item .lv-txt { overflow-wrap: anywhere; min-width: 0; }
+.lv-rang { display: inline-grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 50%; background: var(--fg); color: var(--bg); font: 700 15px/1 var(--font-display); }
+.lv-ordre-btns { display: flex; gap: 4px; }
+.lv-ordre-btns .btn { width: 46px; min-height: 46px; }
+.lv-envoyer-ordre { width: 100%; }
+
+/* ---------- résultats : classement ---------- */
+.lv-res-classement { list-style: none; margin: 0; padding: 0; display: grid; gap: .65em; }
+.lv-res-cl { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .3em .7em; align-items: center; }
+.lv-res-cl .lv-rang { font-size: .85em; }
+.lv-res-cl.premier .lv-rang { background: var(--mark); color: #141A1E; }
+.lv-res-cl .lv-txt { font-family: var(--font-eleve); font-weight: 700; overflow-wrap: anywhere; }
+.lv-res-cl .lv-val { font-family: var(--font-display); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lv-res-cl .lv-val small { color: var(--muted); font-size: .72em; font-weight: 400; }
+.lv-res-cl .lv-barre { grid-column: 2 / 4; height: .55em; background: var(--surface-3); border-radius: 999px; overflow: hidden; position: relative; }
+.lv-res-cl .lv-barre i { position: absolute; inset: 0 auto 0 0; background: var(--t-quiz); border-radius: 999px; transition: width .6s cubic-bezier(.2, .7, .2, 1); }
+
+/* ---------- tableau participatif (téléphone) ---------- */
+.lv-note-form .textarea { font: 19px/1.4 var(--font-eleve); }
+.lv-compteur-notes { font: 600 14px/1 var(--font-display); color: var(--muted); margin-right: auto; }
+.lv-cols { display: flex; flex-wrap: wrap; gap: 6px; }
+.lv-col-choix { position: relative; }
+.lv-col-choix input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.lv-col-choix span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--line-strong); background: var(--surface); font: 600 16px/1.2 var(--font-ui); }
+.lv-col-choix input:checked + span { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.lv-col-choix input:focus-visible + span { outline: 3px solid color-mix(in srgb, var(--accent) 70%, transparent); outline-offset: 2px; }
+.lv-aide-note { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 15px; margin-top: 10px; }
+.lv-mes-notes, .lv-notes-eleve { margin-top: 22px; }
+.lv-mes-notes h2, .lv-notes-eleve h2 { font-size: 18px; margin-bottom: 10px; }
+.lv-mes-notes ul, .lv-notes-eleve ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lv-ma-note, .lv-note-v { display: grid; gap: 6px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--t-quiz); border-radius: var(--radius-lg); font: 17px/1.35 var(--font-eleve); }
+.lv-ma-note.attente { border-left-color: var(--warn); }
+.lv-ma-note.masque { border-left-color: var(--line-strong); color: var(--muted); }
+.lv-note-txt { overflow-wrap: anywhere; white-space: pre-wrap; }
+.lv-note-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font: 14px/1.3 var(--font-ui); color: var(--muted); }
+.lv-note-meta .lv-retirer { margin-left: auto; }
+.lv-note-col { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--fg); }
+.lv-note-statut { font-weight: 700; color: var(--warn); }
+.lv-note-statut.ok { color: var(--ok); display: inline-flex; align-items: center; gap: 4px; }
+.lv-note-v { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.lv-note-v .lv-note-statut { grid-column: 1; }
+.lv-note-v.repondue { border-left-color: var(--ok); }
+.lv-vote { grid-column: 2; grid-row: 1 / span 2; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 56px; min-height: 56px; border-radius: var(--radius-lg); border: 2px solid var(--line-strong); background: var(--surface); color: var(--fg); cursor: pointer; font: 700 16px/1 var(--font-display); }
+.lv-vote svg { width: 22px; height: 22px; }
+.lv-vote[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.lv-vote:disabled { cursor: default; opacity: .55; }
+.lv-vote[aria-pressed="true"]:disabled { opacity: 1; }
+.lv-votes-reste { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 16px; }
+
+/* notes (statistiques, télécommande) */
+.lv-notes-liste { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.lv-note-l { display: grid; gap: 6px; align-content: space-between; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--t-quiz); border-radius: var(--radius-lg); font: 16px/1.35 var(--font-eleve); }
+.lv-note-l.attente { border-left-color: var(--warn); }
+.lv-note-l.masque { border-left-color: var(--line-strong); color: var(--muted); }
+.lv-note-l.repondue { border-left-color: var(--ok); }
+.lv-note-l.plus { border-style: dashed; color: var(--muted); place-items: center; }
+.lv-note-votes { margin-left: auto; color: var(--fg); font-family: var(--font-display); }
+
+/* ---------- mode jeu : tuiles de réponse (téléphone) ---------- */
+.lj-tuiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lj-tuiles.deux { grid-template-columns: 1fr; }
+.lj-tuile { --c: #2350B8; position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 4px 10px; align-items: start; min-height: 112px; padding: 12px; text-align: left; border: 0; border-radius: var(--radius-xl); background: var(--c); color: #fff; cursor: pointer; font: 700 18px/1.2 var(--font-eleve); box-shadow: inset 0 -5px 0 rgb(0 0 0 / .22); transition: transform .08s, opacity .2s, filter .2s; }
+.lj-tuile:active:not(:disabled) { transform: translateY(2px); box-shadow: inset 0 -2px 0 rgb(0 0 0 / .22); }
+.lj-tuile-forme { grid-row: 1 / span 2; display: block; }
+.lj-tuile-forme svg { width: 40px; height: 40px; display: block; }
+.lj-tuile-l { font: 800 15px/1 var(--font-display); opacity: .8; }
+.lj-tuile-txt { overflow-wrap: anywhere; min-width: 0; }
+.lj-tuile:disabled { cursor: default; }
+.lj-tuile.eteinte { opacity: .28; filter: saturate(.5); }
+.lj-tuile.choisie { outline: 4px solid var(--fg); outline-offset: 3px; }
+.lj-tuile.bonne { outline: 4px solid var(--ok); outline-offset: 3px; }
+.lj-tuile.bonne::after { content: ""; position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 50%; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B7546' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 20px no-repeat; }
+@media (max-width: 360px) { .lj-tuiles { grid-template-columns: 1fr; } .lj-tuile { min-height: 76px; } }
+
+/* minuterie (téléphone) */
+.lj-chrono { position: relative; height: 10px; border-radius: 999px; background: var(--surface-3); overflow: hidden; margin: 0 0 16px; }
+.lj-chrono i { position: absolute; inset: 0 auto 0 0; width: 100%; background: var(--t-quiz); border-radius: 999px; transform-origin: left; }
+.lj-chrono.urgent i { background: var(--bad); }
+
+/* retours du jeu (téléphone) */
+.lj-retour { display: grid; justify-items: center; gap: 10px; text-align: center; padding: 26px 18px; border-radius: var(--radius-xl); color: #fff; margin: 0 0 18px; }
+.lj-retour.juste { background: #1B7546; }
+.lj-retour.rate { background: #8E2F25; }
+.lj-retour.neutre { background: var(--slate); }
+.lj-retour h1 { font: 800 clamp(30px, 9vw, 44px)/1.05 var(--font-display); color: #fff; }
+.lj-retour .pts { font: 800 clamp(28px, 8vw, 40px)/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.lj-retour .serie { font: 600 16px/1.3 var(--font-ui); background: rgb(255 255 255 / .16); border-radius: 999px; padding: 4px 12px; }
+.lj-retour svg { width: 54px; height: 54px; }
+.lj-rang { display: grid; justify-items: center; gap: 2px; padding: 14px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); text-align: center; width: 100%; max-width: 420px; }
+.lj-rang b { font: 800 34px/1.05 var(--font-display); font-variant-numeric: tabular-nums; }
+.lj-rang span { color: var(--muted); font-size: 15px; }
+.lj-top { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 6px; width: 100%; max-width: 420px; text-align: left; }
+.lj-top li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 12px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); font: 600 16px/1.2 var(--font-ui); }
+.lj-top li.soi { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.lj-top li b { font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+.lj-top .lv-rang { width: 1.9em; height: 1.9em; }
+.lj-pseudo { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; background: var(--surface); border: 2px solid var(--t-quiz); font: 700 22px/1.2 var(--font-display); overflow-wrap: anywhere; }
+@keyframes lj-pop { 0% { transform: scale(.7); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); } }
+.lj-retour, .lj-pseudo { animation: lj-pop .35s cubic-bezier(.2, .8, .3, 1.2); }
+@media (prefers-reduced-motion: reduce) { .lj-retour, .lj-pseudo { animation: none; } }
